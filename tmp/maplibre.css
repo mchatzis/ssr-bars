@@ -1,0 +1,39 @@
+body {
+    background: black;
+    top: 0;
+    left: 0;
+    margin: 0;
+    padding: 0;
+    
+    --header-height: 80px;
+  }
+  
+  .side-menu {
+    width: 300px;
+    height: calc(100vh - var(--header-height));
+    overflow: auto;
+    
+    a {
+      cursor: pointer;
+      width: 100%;
+      display: block;
+      padding: 8px;
+      
+      &.active {
+        color: #00ab6e;
+      }
+      
+      &:hover {
+        color: #78ffcf;
+      }
+      
+    }
+  }
+  
+  #map {
+    height: calc(100vh - var(--header-height));
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    background: black;
+  }

@@ -1,0 +1,31 @@
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@latest/dist/maplibre-gl.css" />
+<script src="https://unpkg.com/maplibre-gl@latest/dist/maplibre-gl.js"></script>
+
+
+<div class="flex flex-col h-screen relative">
+  
+  <!-- HEADER -->
+  <div class="pb-4 text-white px-6 bg-gray-900 text-gray-100" style="z-index:300">
+    <div class="flex justify-start items-center text-2xl md:text-4xl ">
+      <h3>
+        <b>Free Raster Tile Basemaps in MapLibre</b>
+        <span class="font-light text-green-500"> No keys required</span>
+      </h3>
+    </div>
+    <div>
+    <div class="my-2 text-gray-300"><small>These are resources I have found and wanted to share. Learn more at <a href="https://medium.com/@go2garret/free-basemap-tiles-for-maplibre-18374fab60cb" target="_blank">https://medium.com/@go2garret/free-basemap-tiles-for-maplibre-18374fab60cb</a></small></div>
+  </div>
+
+  <!-- MAIN CONTAINER -->
+  <div class="flex flex-grow">    
+    
+    
+    <!-- SIDEBAR -->
+    <div class="side-menu text-white py-8 px-1 sm:px-4">
+      <h2 class="mb-3 text-xl">Select Basemap</h2>
+    </div>
+    
+    <div id="map"></div>
+    
+  </div>
+</div>
