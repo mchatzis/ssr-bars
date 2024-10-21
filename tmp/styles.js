@@ -29,6 +29,8 @@
         // });
 
         /*
+        Medium Guy:
+        https://medium.com/@go2garret/free-basemap-tiles-for-maplibre-18374fab60cb
+
         const darkMatter = "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json";
-        
         */
