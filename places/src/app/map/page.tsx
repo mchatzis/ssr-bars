@@ -1,12 +1,13 @@
 import dynamic from "next/dynamic"
-import MapComponent from "./MapComponent"
+import MapComponent from "./MapComponent"   
 
 const FullScreenButton = dynamic(
     () => import('@/components/buttons/FullScreen'),
     {ssr: false}
 )
 
-export default function Main(){
+export default function App(){
+    
     return(
         <div className="relative h-full w-full">
             <FullScreenButton></FullScreenButton>

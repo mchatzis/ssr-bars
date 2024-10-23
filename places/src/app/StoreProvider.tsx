@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef } from "react";
-import { AppStore, makeStore } from "@/lib/store";
+import { AppStore, makeStore } from "@/lib/redux/store";
 import { Provider } from "react-redux";
 import type { ReactNode } from "react";
 

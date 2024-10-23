@@ -3,8 +3,8 @@
 import Map from 'react-map-gl/maplibre'
 import 'maplibre-gl/dist/maplibre-gl.css';
 
-import { useAppSelector, useAppDispatch } from '../../lib/hooks';
-import { toggleTheme, selectViewState, selectLightTheme } from '../../lib/slices/mapStateSlice';
+import { useAppSelector, useAppDispatch } from '../../lib/redux/hooks';
+import { toggleTheme, selectViewState, selectLightTheme } from '../../lib/redux/slices/mapStateSlice';
 
 const darkMapStyle = "/dark-matter-style.json";
 const lightMapStyle = "/positron-style.json"
