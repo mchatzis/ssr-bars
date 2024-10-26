@@ -1,0 +1,165 @@
+# Table Name: PlacesMain
+
+# Primary Keys
+Table:
+  PartitionKey: PK  # String
+  SortKey: SK       # String
+
+# Global Secondary Indexes (GSIs)
+GSIs:
+  # For querying places by category
+  GSI1:
+    PartitionKey: GSI1_PK  # String
+    SortKey: GSI1_SK       # String
+
+
+# Data Patterns:
+# 1. User Profile
+- PK: USER#<userId>
+  SK: METADATA
+  Attributes:
+    entityType: USER
+    userId: string
+    username: string
+    email: string
+    password: string
+    createdAt: number
+    age?: number
+    #savedPlaces: list<number>
+
+
+#TODO
+
+# 2. Place
+- PK: PLACE#<placeId>
+  SK: METADATA
+  GSI1PK: CAT#<categoryId>    # For category queries
+  GSI1SK: PLACE#<placeId>
+  GSI2PK: GEO#<geohash>       # For location queries
+  GSI2SK: PLACE#<placeId>
+  Attributes:
+    entityType: PLACE
+    placeId: string
+    name: string
+    description: string
+    categoryId: string
+    latitude: number
+    longitude: number
+    geohash: string
+    createdAt: timestamp
+
+# 3. Category
+- PK: CAT#<categoryId>
+  SK: METADATA
+  Attributes:
+    entityType: CATEGORY
+    categoryId: string
+    name: string
+    description: string
+
+# 4. Saved Place (User-Place relationship)
+- PK: USER#<userId>
+  SK: PLACE#<placeId>
+  GSI1PK: PLACE#<placeId>     # For reverse lookup
+  GSI1SK: USER#<userId>
+  Attributes:
+    entityType: SAVED_PLACE
+    userId: string
+    placeId: string
+    savedAt: timestamp
+
+# Example Queries:
+
+# Get user profile
+query:
+  KeyConditionExpression: "PK = :pk AND SK = :sk"
+  ExpressionAttributeValues:
+    ":pk": "USER#123"
+    ":sk": "METADATA"
+
+# Get place details
+query:
+  KeyConditionExpression: "PK = :pk AND SK = :sk"
+  ExpressionAttributeValues:
+    ":pk": "PLACE#456"
+    ":sk": "METADATA"
+
+# Get all places in a category (using GSI1)
+query:
+  IndexName: "GSI1"
+  KeyConditionExpression: "GSI1PK = :pk AND begins_with(GSI1SK, :sk)"
+  ExpressionAttributeValues:
+    ":pk": "CAT#food"
+    ":sk": "PLACE#"
+
+# Get all places in a geographic area (using GSI2)
+query:
+  IndexName: "GSI2"
+  KeyConditionExpression: "GSI2PK = :pk AND begins_with(GSI2SK, :sk)"
+  ExpressionAttributeValues:
+    ":pk": "GEO#u8j"
+    ":sk": "PLACE#"
+
+# Get all saved places for a user
+query:
+  KeyConditionExpression: "PK = :pk AND begins_with(SK, :sk)"
+  ExpressionAttributeValues:
+    ":pk": "USER#123"
+    ":sk": "PLACE#"
+
+# Check if user saved a specific place
+get:
+  Key:
+    PK: "USER#123"
+    SK: "PLACE#456"
+
+# Get all users who saved a place (using GSI1)
+query:
+  IndexName: "GSI1"
+  KeyConditionExpression: "GSI1PK = :pk AND begins_with(GSI1SK, :sk)"
+  ExpressionAttributeValues:
+    ":pk": "PLACE#456"
+    ":sk": "USER#"
+
+# Sample Item Examples:
+
+# User Item
+{
+  "PK": "USER#123",
+  "SK": "METADATA",
+  "entityType": "USER",
+  "userId": "123",
+  "email": "john@example.com",
+  "name": "John Doe",
+  "createdAt": "2024-03-15T10:30:00Z"
+}
+
+# Place Item
+{
+  "PK": "PLACE#456",
+  "SK": "METADATA",
+  "GSI1PK": "CAT#restaurant",
+  "GSI1SK": "PLACE#456",
+  "GSI2PK": "GEO#u8j",
+  "GSI2SK": "PLACE#456",
+  "entityType": "PLACE",
+  "placeId": "456",
+  "name": "Nice Restaurant",
+  "categoryId": "restaurant",
+  "latitude": 40.7128,
+  "longitude": -74.0060,
+  "geohash": "u8j",
+  "createdAt": "2024-03-15T10:30:00Z"
+}
+
+# Saved Place Item
+{
+  "PK": "USER#123",
+  "SK": "PLACE#456",
+  "GSI1PK": "PLACE#456",
+  "GSI1SK": "USER#123",
+  "entityType": "SAVED_PLACE",
+  "userId": "123",
+  "placeId": "456",
+  "savedAt": "2024-03-15T10:30:00Z"
+}

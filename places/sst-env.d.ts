@@ -10,5 +10,9 @@ declare module "sst" {
       "type": "sst.aws.Nextjs"
       "url": string
     }
+    "PlacesMain": {
+      "name": string
+      "type": "sst.aws.Dynamo"
+    }
   }
 }
