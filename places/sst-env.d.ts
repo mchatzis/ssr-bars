@@ -6,13 +6,13 @@ import "sst"
 export {}
 declare module "sst" {
   export interface Resource {
+    "DynamoTable": {
+      "name": string
+      "type": "sst.aws.Dynamo"
+    }
     "MyWeb": {
       "type": "sst.aws.Nextjs"
       "url": string
-    }
-    "PlacesMain": {
-      "name": string
-      "type": "sst.aws.Dynamo"
     }
   }
 }
