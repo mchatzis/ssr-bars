@@ -6,7 +6,7 @@ const FullScreenButton = dynamic(
     {ssr: false}
 )
 
-export default function App(){
+export default function Page(){
     
     return(
         <div className="relative h-full w-full">
