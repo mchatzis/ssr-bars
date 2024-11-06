@@ -15,7 +15,7 @@ const initialViewState: ViewState = {
 
 const initialMapState: MapState = {
     viewState: initialViewState,
-    lightTheme: true
+    lightTheme: false
 }
 
 export const mapStateSlice = createSlice({

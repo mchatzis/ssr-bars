@@ -1,13 +1,16 @@
-import Image from "next/image";
+import dynamic from "next/dynamic"
+import MapComponent from "@/components/map/MapComponent"
 
-export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <p>Placeholder</p>
+const FullScreenButton = dynamic(
+    () => import('@/components/buttons/FullScreen'),
+    {ssr: false}
+)
+
+export default function Page(){
+    return(
+        <div className="fixed inset-0">
+            <MapComponent className="absolute inset-0 z-[var(--z-map)]"></MapComponent>
+            <FullScreenButton className="absolute top-4 left-4 z-[var(--z-controls)]"></FullScreenButton>
         </div>
-      </main>
-    </div>
-  );
+    )
 }

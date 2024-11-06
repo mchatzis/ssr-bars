@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 
-export default function FullscreenToggle() {
+export default function FullscreenToggle({ className='' }) {
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   const handleFullscreenChange = () => {
@@ -18,7 +18,7 @@ export default function FullscreenToggle() {
   }, []);
 
   return (
-    <button onClick={toggleFullScreen} className='z-10 absolute text-white'>
+    <button id="fullscreen-button" onClick={toggleFullScreen} className={className}>
       {isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}
     </button>
   );

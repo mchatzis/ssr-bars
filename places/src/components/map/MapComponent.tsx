@@ -9,15 +9,19 @@ import { toggleTheme, selectViewState, selectLightTheme } from '../../lib/redux/
 const darkMapStyle = "/dark-matter-style.json";
 const lightMapStyle = "/positron-style.json"
 
-export default function MapComponent() {
+export default function MapComponent({ className='' }) {
     const viewState = useAppSelector(selectViewState)
     const lightTheme = useAppSelector(selectLightTheme)
     const dispatch = useAppDispatch()
 
-    return <Map
-        mapLib={import('maplibre-gl')}
-        initialViewState={viewState}
-        mapStyle={lightTheme ? lightMapStyle : darkMapStyle}
-        onClick={() => dispatch(toggleTheme())}
-    />
+    return (
+        <div id="map-container" className={className}>
+            <Map
+                mapLib={import('maplibre-gl')}
+                initialViewState={viewState}
+                mapStyle={lightTheme ? lightMapStyle : darkMapStyle}
+                onClick={() => dispatch(toggleTheme())}
+            />
+        </div>
+    )
 }

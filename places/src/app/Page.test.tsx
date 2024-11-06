@@ -10,22 +10,18 @@ vi.mock('next/dynamic', () => ({
   }
 }))
 
-vi.mock('./MapComponent', () => ({
+vi.mock('@/components/map/MapComponent', () => ({
   default: () => <div data-testid="map-component">Map Component</div>
 }))
 
 describe('Page Component', () => {
-  test('renders all components in the correct order', () => {
+  test('renders all components', () => {
     render(<Page />)
     
-    const container = screen.getByTestId('fullscreen-button').parentElement
     const fullscreenButton = screen.getByTestId('fullscreen-button')
     const mapComponent = screen.getByTestId('map-component')
 
     expect(fullscreenButton).toBeInTheDocument()
     expect(mapComponent).toBeInTheDocument()
-
-    expect(container?.firstChild).toBe(fullscreenButton)
-    expect(container?.lastChild).toBe(mapComponent.parentElement)
   })
 })

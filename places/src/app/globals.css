@@ -5,6 +5,9 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --z-map: 0;
+  --z-controls: 10;
+  --z-app: 20;
 }
 
 @media (prefers-color-scheme: dark) {
