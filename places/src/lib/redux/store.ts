@@ -1,8 +1,8 @@
-import type { Action, ThunkAction } from "@reduxjs/toolkit";
-import { configureStore, combineSlices } from '@reduxjs/toolkit'
-import mapStateSlice from './slices/mapStateSlice'
+import { combineSlices, configureStore } from '@reduxjs/toolkit';
+import mapStateSlice from './slices/mapStateSlice';
+import styleStateSlice from "./slices/styleStateSlice";
 
-const rootReducer = combineSlices(mapStateSlice);
+const rootReducer = combineSlices(mapStateSlice, styleStateSlice);
 export type RootState = ReturnType<typeof rootReducer>;
 
 // `makeStore` encapsulates the store configuration to allow

@@ -3,8 +3,7 @@ import type { RootState } from '../store'
 import { ViewState } from 'react-map-gl'
 
 interface MapState {
-    viewState: ViewState,
-    lightTheme: boolean
+    viewState: ViewState
 }
 
 const initialViewState: ViewState = {
@@ -14,23 +13,16 @@ const initialViewState: ViewState = {
 } as ViewState
 
 const initialMapState: MapState = {
-    viewState: initialViewState,
-    lightTheme: false
+    viewState: initialViewState
 }
 
 export const mapStateSlice = createSlice({
     name: 'map',
     initialState: initialMapState,
     reducers: {
-        toggleTheme: (state) => {
-            state.lightTheme = !state.lightTheme
-        }
     }
 })
 
-export const { toggleTheme } = mapStateSlice.actions
-
 export const selectViewState = (state: RootState) => state.map.viewState
-export const selectLightTheme = (state: RootState) => state.map.lightTheme
 
 export default mapStateSlice
