@@ -5,14 +5,14 @@ import Map from 'react-map-gl/maplibre';
 
 import { useAppSelector } from '@/lib/redux/hooks';
 import { selectViewState } from '@/lib/redux/slices/mapStateSlice';
-import { selectLightTheme } from '@/lib/redux/slices/styleStateSlice';
+import { selectTheme } from '@/lib/redux/slices/styleStateSlice';
 
 const darkMapStyle = "/dark-matter-style.json";
 const lightMapStyle = "/positron-style.json"
 
 export default function MapComponent({ className = '' }) {
     const viewState = useAppSelector(selectViewState)
-    const theme = useAppSelector(selectLightTheme)
+    const theme = useAppSelector(selectTheme)
 
     return (
         <div id="map-container" className={className}>

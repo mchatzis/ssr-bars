@@ -18,7 +18,11 @@
   --accent-dark: #ffab91;
 }
 
-.light-theme {
+body {
+  text-align: center;
+}
+
+[data-theme="light"] body {
   background: var(--background-light);
   color: var(--text-light);
   --primary-color: var(--primary-light);
@@ -26,17 +30,13 @@
   --accent-color: var(--accent-light);
 }
 
-.dark-theme {
+[data-theme="dark"] body {
   background: var(--background-dark);
   color: var(--text-dark);
   --primary-color: var(--primary-dark);
   --secondary-color: var(--secondary-dark);
   --accent-color: var(--accent-dark);
 }
-
-/* body {
-  background: #000000;
-} */
 
 .maplibregl-ctrl-attrib.maplibregl-compact {
   background-color: #acacac !important;

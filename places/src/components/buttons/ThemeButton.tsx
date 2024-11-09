@@ -1,16 +1,26 @@
 'use client'
 
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
-import { selectLightTheme, toggleTheme } from "@/lib/redux/slices/styleStateSlice";
+import { selectTheme, setTheme, toggleTheme } from "@/lib/redux/slices/styleStateSlice";
 import { useEffect } from "react";
 
 export default function ThemeButton({ className = '' }) {
-    const lightTheme = useAppSelector(selectLightTheme)
+    const theme = useAppSelector(selectTheme)
     const dispatch = useAppDispatch()
 
     useEffect(() => {
-        document.body.className = lightTheme + '-theme';
-    }, [lightTheme]);
+        const mediaQueryList = window.matchMedia('(prefers-color-scheme: dark)');
+        const listener = (e: MediaQueryListEvent) => {
+            const newTheme = e.matches ? 'dark' : 'light';
+            dispatch(setTheme(newTheme));
+        };
+
+        mediaQueryList.addEventListener('change', listener);
+
+        return () => {
+            mediaQueryList.removeEventListener('change', listener);
+        };
+    }, [dispatch]);
 
     return (
         <button className={className} onClick={() => dispatch(toggleTheme())}>Toggle theme</button>

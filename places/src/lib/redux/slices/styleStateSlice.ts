@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import type { RootState } from '../store';
 
 type Theme = 'light' | 'dark';
@@ -8,32 +8,29 @@ function isValidTheme(theme: string): theme is Theme {
     return theme === 'light' || theme === 'dark';
 }
 
+interface StyleState {
+    theme: Theme
+}
+
 function getInitialTheme(): Theme {
-    const savedTheme = localStorage.getItem('theme');
+    const savedTheme = sessionStorage.getItem('theme');
     if (savedTheme && isValidTheme(savedTheme)) {
         return savedTheme;
     }
-
-    return window.matchMedia('(prefers-color-scheme: light)').matches
-        ? 'light'
-        : 'dark';
-}
-
-interface StyleState {
-    lightTheme: Theme
+    else {
+        console.warn("None or invalid theme found in sessionStorage, defaulting to: ", defaultTheme)
+        return defaultTheme;
+    }
 }
 
 const getInitialState = (): StyleState => {
     if (typeof window === 'undefined') {
         return {
-            lightTheme: 'light'
+            theme: defaultTheme
         };
     }
-
-    const theme = getInitialTheme();
-    document.body.className = theme + '-theme';
     return {
-        lightTheme: theme
+        theme: getInitialTheme()
     }
 }
 
@@ -42,14 +39,24 @@ export const styleStateSlice = createSlice({
     initialState: getInitialState,
     reducers: {
         toggleTheme: (state) => {
-            state.lightTheme = state.lightTheme === 'light' ? 'dark' : 'light';
-            localStorage.setItem('theme', state.lightTheme);
+            state.theme = state.theme === 'light' ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', state.theme);
+            sessionStorage.setItem('theme', state.theme);
+        },
+        setTheme: (state, action: PayloadAction<Theme>) => {
+            if (isValidTheme(action.payload)) {
+                state.theme = action.payload;
+                document.documentElement.setAttribute('data-theme', state.theme);
+                sessionStorage.setItem('theme', state.theme);
+            } else {
+                console.warn("Invalid theme passed to setTheme action:", action.payload);
+            }
         }
     }
 })
 
-export const { toggleTheme } = styleStateSlice.actions
+export const { toggleTheme, setTheme } = styleStateSlice.actions
 
-export const selectLightTheme = (state: RootState) => state.style.lightTheme
+export const selectTheme = (state: RootState) => state.style.theme
 
 export default styleStateSlice
