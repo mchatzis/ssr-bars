@@ -18,14 +18,29 @@ GSIs:
 - PK: USER#<userId>
   SK: METADATA
   Attributes:
-    entityType: USER
     userId: string
     username: string
     email: string
     password: string
     createdAt: number
+    updatedAt: number
     age?: number
-    #savedPlaces: list<number>
+
+# 2. Email lookup (ensures uniqueness)
+- PK: EMAIL#<email>
+  SK: METADATA
+  Attributes:
+    userId: string
+    createdAt: number
+    updatedAt: number
+
+# 3. Username lookup (ensures uniqueness)
+- PK: USERNAME#<username>
+  SK: METADATA
+  Attributes:
+    userId: string
+    createdAt: number
+    updatedAt: number
 
 
 #TODO
