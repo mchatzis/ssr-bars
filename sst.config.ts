@@ -1,8 +1,6 @@
 /// <reference path="./.sst/platform/config.d.ts" />
 
-import { DynamoArgs } from "./.sst/platform/src/components/aws";
-
-const dynamoTableArgs: DynamoArgs = {
+const dynamoTableArgs: sst.aws.DynamoArgs = {
   fields: {
     PK: "string",
     SK: "string",
@@ -28,21 +26,24 @@ export default $config({
           region: 'eu-central-1',
         },
       },
+      version: "3.2.50"
     };
   },
   async run() {
-    const dynamoTable = new sst.aws.Dynamo("DynamoTable", dynamoTableArgs);
-    const dynamoTestTable = new sst.aws.Dynamo("DynamoTestTable", dynamoTableArgs);
+    const dynamoTables = [
+      new sst.aws.Dynamo("DynamoTable", dynamoTableArgs),
+      ...($app.stage === "dev"
+        ? [new sst.aws.Dynamo("DynamoTestTable", dynamoTableArgs)]
+        : []),
+    ];
+
     const app = new sst.aws.Nextjs("MyWeb", {
       path: "places",
-      link: [dynamoTable, dynamoTestTable],
+      link: dynamoTables,
     });
-
 
     return {
       app: app.url,
-      dynamoTable: dynamoTable.name,
-      dynamoTestTable: dynamoTestTable.name
     };
   },
 });
