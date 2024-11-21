@@ -1,76 +1,147 @@
+import { ConditionCheck, Delete, DynamoDBClient, Get, Put, TransactGetItem, TransactWriteItem, Update } from "@aws-sdk/client-dynamodb";
 import {
-    ConditionCheck,
-    Delete,
-    DeleteItemCommand,
-    DynamoDBClient,
-    GetItemCommand,
-    Put,
-    PutItemCommand,
+    BatchWriteCommand,
+    DeleteCommand,
+    DeleteCommandInput,
+    DynamoDBDocumentClient,
+    GetCommand,
+    GetCommandInput,
+    NativeAttributeValue,
+    PutCommand,
+    PutCommandInput,
     QueryCommand,
+    QueryCommandInput,
     ScanCommand,
-    TransactGetItem,
-    TransactGetItemsCommand,
-    TransactWriteItemsCommand,
-    Update
-} from "@aws-sdk/client-dynamodb";
-import { marshall, unmarshall } from "@aws-sdk/util-dynamodb";
+    ScanCommandInput,
+    TransactGetCommand,
+    TransactGetCommandInput,
+    TransactGetCommandOutput,
+    TransactWriteCommand,
+    TransactWriteCommandInput
+} from "@aws-sdk/lib-dynamodb";
+import { Resource } from "sst";
 
 interface DynamoDBConfig {
     region?: string;
     tableName: string;
 }
 
-type UnmarshalledAttributeValue = Record<string, any>;
+type GetOperation = (Omit<Get, "Key"> & {
+    Key: Record<string, NativeAttributeValue> | undefined;
+});
 
-type UnmarshalledPut = Omit<Put, 'TableName' | 'Item'> & {
-    Item: UnmarshalledAttributeValue;
+type ConditionCheckOperation = Omit<ConditionCheck, "Key" | "ExpressionAttributeValues"> & {
+    Key: Record<string, NativeAttributeValue> | undefined;
+    ExpressionAttributeValues?: Record<string, NativeAttributeValue>;
 };
 
-type UnmarshalledDelete = Omit<Delete, 'TableName' | 'Key'> & {
-    Key: UnmarshalledAttributeValue;
+type PutOperation = Omit<Put, "Item" | "ExpressionAttributeValues"> & {
+    Item: Record<string, NativeAttributeValue> | undefined;
+    ExpressionAttributeValues?: Record<string, NativeAttributeValue>;
 };
 
-type UnmarshalledUpdate = Omit<Update, 'TableName' | 'Key' | 'ExpressionAttributeValues'> & {
-    Key: UnmarshalledAttributeValue;
-    ExpressionAttributeValues?: Record<string, any>;
+type DeleteOperation = Omit<Delete, "Key" | "ExpressionAttributeValues"> & {
+    Key: Record<string, NativeAttributeValue> | undefined;
+    ExpressionAttributeValues?: Record<string, NativeAttributeValue>;
 };
 
-type UnmarshalledConditionCheck = Omit<ConditionCheck, 'TableName' | 'Key' | 'ExpressionAttributeValues'> & {
-    Key: UnmarshalledAttributeValue;
-    ExpressionAttributeValues?: Record<string, any>;
+type UpdateOperation = Omit<Update, "Key" | "ExpressionAttributeValues"> & {
+    Key: Record<string, NativeAttributeValue> | undefined;
+    ExpressionAttributeValues?: Record<string, NativeAttributeValue>;
 };
 
-export type TransactionOperation =
-    | { action: 'Put'; params: UnmarshalledPut }
-    | { action: 'Delete'; params: UnmarshalledDelete }
-    | { action: 'Update'; params: UnmarshalledUpdate }
-    | { action: 'ConditionCheck'; params: UnmarshalledConditionCheck };
+export type TransactGetItemNoTableName = (Omit<TransactGetItem, "Get"> & {
+    Get: Omit<GetOperation, "TableName">
+});
+type TransactGetItemWithTableName = (Omit<TransactGetItem, "Get"> & { Get: GetOperation | undefined });
+
+export type TransactWriteItemNoTableName = Omit<TransactWriteItem, "ConditionCheck" | "Put" | "Delete" | "Update"> & {
+    ConditionCheck?: Omit<ConditionCheckOperation, "TableName">;
+    Put?: Omit<PutOperation, "TableName">;
+    Delete?: Omit<DeleteOperation, "TableName">;
+    Update?: Omit<UpdateOperation, "TableName">;
+}
+
+type TransactWriteItemWithTableName = Omit<TransactWriteItem, "ConditionCheck" | "Put" | "Delete" | "Update"> & {
+    ConditionCheck?: ConditionCheckOperation;
+    Put?: PutOperation;
+    Delete?: DeleteOperation;
+    Update?: UpdateOperation;
+}
 
 
 export class Database {
-    private client: DynamoDBClient;
+    private static instance: Database | null = null;
+    private rawClient: DynamoDBClient;
+    private client: DynamoDBDocumentClient;
     private tableName: string;
 
-    constructor(config: DynamoDBConfig) {
-        this.client = new DynamoDBClient(
-            config.region ? { region: config.region } : {}
+    private constructor(config: DynamoDBConfig) {
+        if (Resource.App.stage === "production" && config.tableName.toLowerCase().includes("test")) {
+            throw Error("ERROR: Trying to instantiate test database in production stage!")
+        }
+
+        this.rawClient = new DynamoDBClient(
+            config.region ? { region: config.region } : {},
         );
+
+        this.client = DynamoDBDocumentClient.from(this.rawClient);
         this.tableName = config.tableName;
     }
 
-    async put<T extends Record<string, any>>(item: T): Promise<void> {
-        const command = new PutItemCommand({
+    public static instantiate(config: DynamoDBConfig): Database {
+        if (Database.instance) {
+            throw new Error("Trying to instantiate already instantiated database singleton.");
+        }
+        Database.instance = new Database(config);
+        return Database.instance
+    }
+
+    public static getInstance(): Database | null {
+        return Database.instance;
+    }
+
+    public static getInstanceOrThrow(): Database {
+        if (!Database.instance) {
+            throw Error("Database has not been instantiated.");
+        }
+        return Database.instance;
+    }
+
+    public getTableName(): string {
+        return this.tableName;
+    }
+
+    public getClient(): DynamoDBDocumentClient {
+        return this.client;
+    }
+
+    private close(): void {
+        if (this.rawClient) {
+            this.rawClient.destroy();
+        }
+    }
+
+    public static reset(): void {
+        if (Database.instance) {
+            Database.instance.close();
+            Database.instance = null;
+        }
+    }
+
+    async put(putParams: Omit<PutCommandInput, 'TableName'>): Promise<void> {
+        const command = new PutCommand({
             TableName: this.tableName,
-            Item: marshall(item)
+            ...putParams
         });
 
         await this.client.send(command);
     }
 
-    async get<T>(key: Record<string, any>): Promise<T | null> {
-        const command = new GetItemCommand({
+    async get(getParams: Omit<GetCommandInput, 'TableName'>): Promise<Record<string, any> | null> {
+        const command = new GetCommand({
             TableName: this.tableName,
-            Key: marshall(key)
+            Key: getParams.Key
         });
 
         const response = await this.client.send(command);
@@ -79,119 +150,149 @@ export class Database {
             return null;
         }
 
-        return unmarshall(response.Item) as T;
+        return response.Item;
     }
 
-    async query<T>(
-        keyConditionExpression: string,
-        expressionAttributeValues: Record<string, any>,
-        expressionAttributeNames?: Record<string, string>
-    ): Promise<T[]> {
+    async query(queryParams: Omit<QueryCommandInput, 'TableName'>): Promise<Record<string, any>[]> {
         const command = new QueryCommand({
             TableName: this.tableName,
-            KeyConditionExpression: keyConditionExpression,
-            ExpressionAttributeValues: marshall(expressionAttributeValues),
-            ExpressionAttributeNames: expressionAttributeNames
+            ...queryParams
         });
 
         const response = await this.client.send(command);
-        return (response.Items || []).map(item => unmarshall(item)) as T[];
+
+        if (!response.Items || response.Items.length === 0) {
+            return [];
+        }
+
+        return response.Items;
     }
 
-    async delete(key: Record<string, any>): Promise<void> {
-        const command = new DeleteItemCommand({
-            TableName: this.tableName,
-            Key: marshall(key)
-        });
-
-        await this.client.send(command);
-    }
-
-    async scan<T>(
-        filterExpression?: string,
-        expressionAttributeValues?: Record<string, any>
-    ): Promise<T[]> {
+    async scan(scanParams: Omit<ScanCommandInput, 'TableName'>): Promise<Record<string, any>[]> {
         const command = new ScanCommand({
             TableName: this.tableName,
-            FilterExpression: filterExpression,
-            ExpressionAttributeValues: expressionAttributeValues ? marshall(expressionAttributeValues) : undefined
+            ...scanParams
         });
 
         const response = await this.client.send(command);
-        return (response.Items || []).map(item => unmarshall(item)) as T[];
+
+        if (!response.Items || response.Items.length === 0) {
+            return [];
+        }
+
+        return response.Items;
     }
 
-    async transactWrite(operations: TransactionOperation[]): Promise<void> {
-        const transactItems = operations.map(operation => {
-            switch (operation.action) {
-                case 'Put':
-                    return {
-                        Put: {
-                            TableName: this.tableName,
-                            ...operation.params,
-                            Item: marshall(operation.params.Item),
-                            ExpressionAttributeValues: operation.params.ExpressionAttributeValues
-                                ? marshall(operation.params.ExpressionAttributeValues)
-                                : undefined
-                        }
-                    };
-                case 'Delete':
-                    return {
-                        Delete: {
-                            TableName: this.tableName,
-                            ...operation.params,
-                            Key: marshall(operation.params.Key),
-                            ExpressionAttributeValues: operation.params.ExpressionAttributeValues
-                                ? marshall(operation.params.ExpressionAttributeValues)
-                                : undefined
-                        }
-                    };
-                case 'Update':
-                    return {
-                        Update: {
-                            TableName: this.tableName,
-                            ...operation.params,
-                            Key: marshall(operation.params.Key),
-                            ExpressionAttributeValues: operation.params.ExpressionAttributeValues
-                                ? marshall(operation.params.ExpressionAttributeValues)
-                                : undefined
-                        }
-                    };
-                case 'ConditionCheck':
-                    return {
-                        ConditionCheck: {
-                            TableName: this.tableName,
-                            ...operation.params,
-                            Key: marshall(operation.params.Key),
-                            ExpressionAttributeValues: operation.params.ExpressionAttributeValues
-                                ? marshall(operation.params.ExpressionAttributeValues)
-                                : undefined
-                        }
-                    };
-            }
-        });
+    async scanAll(scanParams: Omit<ScanCommandInput, 'TableName'>): Promise<Record<string, any>[]> {
+        let lastEvaluatedKey: Record<string, any> | undefined;
+        const items: Record<string, any>[] = [];
 
-        const command = new TransactWriteItemsCommand({ TransactItems: transactItems });
+        do {
+            const command = new ScanCommand({
+                TableName: this.tableName,
+                ...scanParams,
+                ExclusiveStartKey: lastEvaluatedKey
+            });
+
+            const response = await this.client.send(command);
+
+            if (response.Items) {
+                items.push(...response.Items);
+            }
+
+            lastEvaluatedKey = response.LastEvaluatedKey;
+        } while (lastEvaluatedKey);
+
+        return items;
+    }
+
+    async delete(deleteParams: Omit<DeleteCommandInput, 'TableName'>): Promise<void> {
+        const command = new DeleteCommand({
+            TableName: this.tableName,
+            ...deleteParams
+        });
 
         await this.client.send(command);
     }
 
-    async transactGet<T>(keys: Record<string, any>[]): Promise<(T | null)[]> {
-        const transactItems: TransactGetItem[] = keys.map(key => ({
-            Get: {
-                TableName: this.tableName,
-                Key: marshall(key)
-            }
-        }));
+    async deleteAllItems(): Promise<void> {
+        const items = await this.scanAll({});
 
-        const command = new TransactGetItemsCommand({
-            TransactItems: transactItems
-        });
+        for (let i = 0; i < items.length; i += 25) {
+            const batchItems = items.slice(i, i + 25).map(item => ({
+                DeleteRequest: {
+                    Key: {
+                        PK: item.PK,
+                        SK: item.SK
+                    }
+                }
+            }));
 
-        const response = await this.client.send(command);
+            const command = new BatchWriteCommand({
+                RequestItems: {
+                    [this.tableName]: batchItems
+                }
+            });
+
+            await this.client.send(command);
+        }
+    }
+
+    async transactWrite(transactItems: TransactWriteItemNoTableName[]): Promise<void> {
+        const transactInput: TransactWriteCommandInput = {
+            TransactItems: transactItems.map(item => {
+
+                if (item.ConditionCheck !== undefined) {
+                    item.ConditionCheck = {
+                        ...item.ConditionCheck,
+                        TableName: this.tableName
+                    } as ConditionCheckOperation;
+                } else if (item.Put !== undefined) {
+                    item.Put = {
+                        ...item.Put,
+                        TableName: this.tableName
+                    } as PutOperation;
+                } else if (item.Delete !== undefined) {
+                    item.Delete = {
+                        ...item.Delete,
+                        TableName: this.tableName
+                    } as DeleteOperation;
+                } else if (item.Update !== undefined) {
+                    item.Update = {
+                        ...item.Update,
+                        TableName: this.tableName
+                    } as UpdateOperation;
+                }
+
+                return item as TransactWriteItemWithTableName;
+            })
+        }
+
+        const command = new TransactWriteCommand(transactInput);
+
+        await this.client.send(command);
+    }
+
+    async transactGet(transactItems: TransactGetItemNoTableName[] | undefined): Promise<(Record<string, any> | null)[]> {
+        const transactInput: TransactGetCommandInput = {
+            TransactItems: transactItems?.map((item): TransactGetItemWithTableName => {
+
+                if (item.Get !== undefined) {
+                    item.Get = {
+                        ...item.Get,
+                        TableName: this.tableName
+                    } as GetOperation;
+                }
+
+                return item as TransactGetItemWithTableName;
+            })
+        }
+
+        const command = new TransactGetCommand(transactInput);
+        const response: TransactGetCommandOutput = await this.client.send(command);
 
         return (response.Responses || []).map(response =>
-            response.Item ? (unmarshall(response.Item) as T) : null
+            response.Item ? response.Item : null
         );
     }
 }
