@@ -4,7 +4,7 @@ import { Resource } from 'sst';
 import { ulid } from 'ulid';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { EmailEntity, UserEntity, UsernameEntity } from '../types';
-import { createUser, UserExistsError } from './user';
+import { createUser, EmailExistsError, UsernameExistsError } from './user';
 
 const originalStage = Resource.App.stage;
 const getRandomUserInput = () => {
@@ -137,10 +137,35 @@ describe('createUser with real db', () => {
         expect(userItem?.password).toBe(mockInput.password);
     });
 
-    it('should throw a UserExistsError if either the username or email already exists', async () => {
-        const mockInput = getRandomUserInput();
-        const userId = await createUser(mockInput);
+    it('should throw an EmailExistsError if only email already exists', async () => {
+        const mockRandomInput = getRandomUserInput();
+        const mockInputSameEmail = {
+            ...getRandomUserInput(),
+            email: mockRandomInput.email
+        }
 
-        await expect(createUser(mockInput)).rejects.toThrowError(UserExistsError);
+        await createUser(mockRandomInput);
+
+        await expect(createUser(mockInputSameEmail)).rejects.toThrowError(EmailExistsError);
+    });
+
+    it('should throw a UsernameExistsError if only username already exists', async () => {
+        const mockRandomInput = getRandomUserInput();
+        const mockInputSameUsername = {
+            ...getRandomUserInput(),
+            username: mockRandomInput.username
+        };
+
+        await createUser(mockRandomInput);
+
+        await expect(createUser(mockInputSameUsername)).rejects.toThrowError(UsernameExistsError);
+    });
+
+    it('should throw an EmailExistsError if both email and username already exist', async () => {
+        const mockRandomInput = getRandomUserInput();
+
+        await createUser(mockRandomInput);
+
+        await expect(createUser(mockRandomInput)).rejects.toThrowError(EmailExistsError);
     });
 });

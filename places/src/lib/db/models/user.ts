@@ -9,10 +9,17 @@ export type CreateUserInput = {
     password: string;
 }
 
-export class UserExistsError extends Error {
+export class UsernameExistsError extends Error {
     constructor(message: string) {
         super(message);
-        this.name = 'UserExistsError';
+        this.name = 'UsernameExistsError';
+    }
+}
+
+export class EmailExistsError extends Error {
+    constructor(message: string) {
+        super(message);
+        this.name = 'EmailExistsError';
     }
 }
 
@@ -78,12 +85,11 @@ export async function createUser(input: CreateUserInput) {
     catch (error) {
         if (error instanceof TransactionCanceledException) {
             const cancelReasons = error.CancellationReasons;
-
             if (cancelReasons?.[0]?.Code === 'ConditionalCheckFailed') {
-                throw new UserExistsError('Email already exists');
+                throw new EmailExistsError('Email already exists');
             }
             if (cancelReasons?.[1]?.Code === 'ConditionalCheckFailed') {
-                throw new UserExistsError('Username already exists');
+                throw new UsernameExistsError('Username already exists');
             }
         }
 
