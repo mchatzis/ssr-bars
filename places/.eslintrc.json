@@ -1,8 +1,21 @@
 {
-  "extends": ["next/core-web-vitals", "next/typescript"],
+  "extends": [
+    "next/core-web-vitals",
+    "next/typescript"
+  ],
   "rules": {
-    "comma-dangle": ["error", "always-multiline"], // Ensures commas after each item in multiline lists
-    "comma-style": ["error", "last"], // Enforces commas to be placed at the end of each line
-    "no-multi-spaces": ["error"] // Optional: Enforces single spaces between properties
+    "comma-dangle": [
+      "error",
+      "always-multiline"
+    ],
+    "comma-style": [
+      "error",
+      "last"
+    ],
+    "no-multi-spaces": [
+      "error"
+    ],
+    "no-unused-vars": "error",
+    "import/no-unresolved": "error"
   }
 }
