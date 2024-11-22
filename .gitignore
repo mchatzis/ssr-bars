@@ -7,5 +7,4 @@ scrap.ts
 
 # other
 .swc
-claude.ts
-scrap.*
+_ignore*
