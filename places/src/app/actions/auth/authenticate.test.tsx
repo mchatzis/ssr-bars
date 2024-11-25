@@ -5,13 +5,11 @@ import { redirect } from "next/navigation";
 import { beforeEach, describe, expect, it, Mock, vi } from "vitest";
 import { register } from './authenticate';
 
-
 vi.mock('@/app/actions/auth/schema', () => ({
     SignupFormSchema: {
         safeParse: vi.fn()
     }
 }));
-
 vi.mock(import("@/lib/db/models/user"), async (importOriginal) => {
     const actual = await importOriginal()
     return {
@@ -19,9 +17,10 @@ vi.mock(import("@/lib/db/models/user"), async (importOriginal) => {
         createUser: vi.fn()
     }
 });
-
-vi.mock("next/navigation", () => ({
-    redirect: vi.fn(),
+vi.mock('next/navigation', () => ({
+    redirect: vi.fn(() => {
+        throw new Error('NEXT_REDIRECT');
+    }),
 }));
 
 const mockSafeParse = SignupFormSchema.safeParse as Mock;
@@ -62,7 +61,7 @@ describe('register function', () => {
         });
     });
 
-    it('should return success when form data is valid and registration is successful', async () => {
+    it('should redirect when registration is successful', async () => {
         const state: RegisterFormState = {};
         const formData = new FormData();
 
@@ -72,8 +71,7 @@ describe('register function', () => {
         });
         mockCreateUser.mockResolvedValue('user-123');
 
-        await register(state, formData);
-
+        await expect(register(state, formData)).rejects.toThrow('NEXT_REDIRECT');
         expect(redirect).toHaveBeenCalledWith("/auth/login");
     });
 

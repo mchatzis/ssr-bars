@@ -24,7 +24,7 @@ export class EmailExistsError extends Error {
 }
 
 export async function createUser(input: CreateUserInput) {
-    let db = Database.getInstanceOrThrow();
+    let db = Database.getInstance();
 
     const { username, email, password } = input;
 

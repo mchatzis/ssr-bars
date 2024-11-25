@@ -7,7 +7,7 @@
     "dev": "next dev",
     "lint": "next lint",
     "start": "next start",
-    "test": "vitest"
+    "test": "NODE_ENV=test vitest"
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.687.0",

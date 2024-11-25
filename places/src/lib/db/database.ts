@@ -19,12 +19,7 @@ import {
     TransactWriteCommand,
     TransactWriteCommandInput
 } from "@aws-sdk/lib-dynamodb";
-import { Resource } from "sst";
-
-interface DynamoDBConfig {
-    region?: string;
-    tableName: string;
-}
+import { DatabaseConfig, getDatabaseConfig } from "./config";
 
 type GetOperation = (Omit<Get, "Key"> & {
     Key: Record<string, NativeAttributeValue> | undefined;
@@ -69,41 +64,22 @@ type TransactWriteItemWithTableName = Omit<TransactWriteItem, "ConditionCheck" |
     Update?: UpdateOperation;
 }
 
-
 export class Database {
     private static instance: Database | null = null;
     private rawClient: DynamoDBClient;
     private client: DynamoDBDocumentClient;
     private tableName: string;
 
-    private constructor(config: DynamoDBConfig) {
-        if (Resource.App.stage === "production" && config.tableName.toLowerCase().includes("test")) {
-            throw Error("ERROR: Trying to instantiate test database in production stage!")
-        }
-
-        this.rawClient = new DynamoDBClient(
-            config.region ? { region: config.region } : {},
-        );
-
+    private constructor(config: DatabaseConfig) {
+        this.rawClient = new DynamoDBClient();
         this.client = DynamoDBDocumentClient.from(this.rawClient);
         this.tableName = config.tableName;
     }
 
-    public static instantiate(config: DynamoDBConfig): Database {
-        if (Database.instance) {
-            throw new Error("Trying to instantiate already instantiated database singleton.");
-        }
-        Database.instance = new Database(config);
-        return Database.instance
-    }
-
-    public static getInstance(): Database | null {
-        return Database.instance;
-    }
-
-    public static getInstanceOrThrow(): Database {
+    public static getInstance(): Database {
         if (!Database.instance) {
-            throw Error("Database has not been instantiated.");
+            const config = getDatabaseConfig();
+            Database.instance = new Database(config);
         }
         return Database.instance;
     }

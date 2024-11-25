@@ -1,101 +1,8 @@
-import { testTableName } from "@/__tests__/global-setup";
-import { DynamoDBClient, TransactionCanceledException } from "@aws-sdk/client-dynamodb";
-import { DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
-import { Resource } from "sst";
+import { TransactionCanceledException } from "@aws-sdk/client-dynamodb";
 import { ulid } from "ulid";
-import { afterAll, beforeEach, describe, expect, it, test, vi } from 'vitest';
+import { beforeAll, describe, expect, it } from 'vitest';
 import { Database, TransactWriteItemNoTableName } from './Database';
 import { BaseEntity, PkEntityType, SkEntityType } from "./types";
-
-const originalStage = Resource.App.stage;
-
-describe('Database singleton checks', () => {
-    const tableName = "myMockTestTable";
-
-    beforeEach(() => {
-        Database.reset();
-        Resource.App.stage = 'development';
-    });
-
-    afterAll(() => {
-        Resource.App.stage = originalStage;
-    });
-
-    test('successful instantiation with valid config', () => {
-        expect(() => {
-            Database.instantiate({ tableName: tableName });
-        }).not.toThrow();
-    });
-
-    test('fails when creating second instance', () => {
-        Database.instantiate({ tableName: tableName });
-        expect(() => {
-            Database.instantiate({ tableName: 'anotherTable' });
-        }).toThrow('Trying to instantiate already instantiated database singleton.');
-    });
-
-    test('getInstance returns null when database not instantiated', () => {
-        const instance = Database.getInstance();
-        expect(instance).toBeNull();
-    });
-
-    test('test database name throws error in production', () => {
-        Resource.App.stage = 'production';
-        expect(() => {
-            Database.instantiate({ tableName: tableName });
-        }).toThrow('ERROR: Trying to instantiate test database in production stage!');
-    });
-
-    test('getInstance returns same instance multiple times', () => {
-        Database.instantiate({ tableName: tableName });
-        const instance1 = Database.getInstance();
-        const instance2 = Database.getInstance();
-        expect(instance1).toBe(instance2);
-    });
-
-    test('reset allows new instantiation', () => {
-        Database.instantiate({ tableName: tableName });
-        Database.reset();
-        expect(() => {
-            Database.instantiate({ tableName: tableName });
-        }).not.toThrow();
-    });
-
-    test('getInstance returns null after reset', () => {
-        Database.instantiate({ tableName: tableName });
-        Database.reset();
-        const instance = Database.getInstance();
-        expect(instance).toBeNull();
-    });
-
-    test('tableName is correctly stored and retrieved', () => {
-        const instance = Database.instantiate({ tableName: tableName });
-        expect(instance.getTableName()).toBe(tableName);
-    });
-
-    test('test database name allowed in non-production', () => {
-        Resource.App.stage = 'development';
-        expect(() => {
-            Database.instantiate({ tableName: tableName });
-        }).not.toThrow();
-    });
-
-    test('getClient returns valid DynamoDBDocumentClient', () => {
-        const instance = Database.instantiate({ tableName: tableName });
-        const client = instance.getClient();
-        expect(client).toBeInstanceOf(DynamoDBDocumentClient);
-    });
-
-    test('client is properly destroyed on reset', () => {
-        Database.instantiate({ tableName: tableName });
-
-        const clientSpy = vi.spyOn(DynamoDBClient.prototype, 'destroy');
-
-        Database.reset();
-        expect(clientSpy).toHaveBeenCalledOnce();
-        clientSpy.mockRestore();
-    });
-});
 
 interface TestEntity extends BaseEntity<PkEntityType.USER, SkEntityType.METADATA> {
     attribute1?: string;
@@ -117,11 +24,9 @@ function generateTestItem(): TestEntity {
 describe('Database transactWrite Method', () => {
     let db: Database;
 
-    // TODO: Can we do beforeAll here or will we run into race conditions?
-    // TODO: Can this be moved to setup.ts? Then we would need to Database.getInstance() instead.
-    beforeEach(() => {
+    beforeAll(() => {
         Database.reset();
-        db = Database.instantiate({ tableName: testTableName });
+        db = Database.getInstance();
     });
 
     it('should successfully execute a single Put operation', async () => {
