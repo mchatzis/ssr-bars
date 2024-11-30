@@ -1,10 +1,14 @@
+// @vitest-environment node
+
 import { Database, TransactWriteItemNoTableName } from '@/lib/db/Database';
+import bcrypt from "bcrypt";
 import { Resource } from 'sst';
 import { afterAll, describe, expect, it, Mock, vi } from 'vitest';
 import { EmailEntity, UserEntity, UsernameEntity } from '../types';
 import { createUser } from './user';
 
 vi.mock('@/lib/db/Database');
+vi.mock('bcrypt');
 
 
 const originalStage = Resource.App.stage;
@@ -22,6 +26,9 @@ describe('createUser with mocks', () => {
             password: 'testpassword'
         }
 
+        const hashedPassword = "hashed-password";
+        vi.mocked(bcrypt.hash).mockImplementation(() => Promise.resolve(hashedPassword));
+
         const mockTransactWrite = vi.fn();
         const mockGetInstance = vi.mocked(Database.getInstance) as Mock;
         mockGetInstance.mockReturnValue({ transactWrite: mockTransactWrite });
@@ -32,6 +39,8 @@ describe('createUser with mocks', () => {
             PK: 'EMAIL#test@example.com',
             SK: 'METADATA',
             userId: userId,
+            username: 'testuser',
+            password: hashedPassword,
             createdAt: expect.any(Number),
             updatedAt: expect.any(Number),
         };
@@ -41,7 +50,7 @@ describe('createUser with mocks', () => {
             SK: 'METADATA',
             username: 'testuser',
             email: 'test@example.com',
-            password: 'testpassword',
+            password: hashedPassword,
             userId: userId,
             createdAt: expect.any(Number),
             updatedAt: expect.any(Number),

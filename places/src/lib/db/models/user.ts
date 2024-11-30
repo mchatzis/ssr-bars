@@ -1,10 +1,18 @@
 import { Database, TransactWriteItemNoTableName } from "@/lib/db/Database";
-import { EmailEntity, UserEntity, UsernameEntity } from "@/lib/db/types";
+import { EmailEntity, SkEntityType, UserEntity, UsernameEntity } from "@/lib/db/types";
 import { TransactionCanceledException } from "@aws-sdk/client-dynamodb";
+import bcrypt from "bcrypt";
 import { ulid } from "ulid";
+import { EmailEntityError } from "../type-guard-errors";
+import { isEmailEntity } from "../type-guards";
 
 export type CreateUserInput = {
     username: string;
+    email: string;
+    password: string;
+}
+
+export type GetUserInput = {
     email: string;
     password: string;
 }
@@ -27,6 +35,8 @@ export async function createUser(input: CreateUserInput) {
     let db = Database.getInstance();
 
     const { username, email, password } = input;
+    const saltRounds = 12;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
 
     const userId = ulid();
     const now = Date.now()
@@ -35,6 +45,8 @@ export async function createUser(input: CreateUserInput) {
         PK: `EMAIL#${input.email.toLowerCase()}`,
         SK: 'METADATA',
         userId,
+        username: username,
+        password: hashedPassword,
         createdAt: now,
         updatedAt: now,
     }
@@ -45,7 +57,7 @@ export async function createUser(input: CreateUserInput) {
         userId: userId,
         username: username,
         email: email,
-        password: password,
+        password: hashedPassword,
         createdAt: now,
         updatedAt: now
     }

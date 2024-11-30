@@ -1,9 +1,13 @@
+// @vitest-environment node
+
 import { Database } from '@/lib/db/Database';
+import bcrypt from "bcrypt";
 import { ulid } from 'ulid';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createUser, EmailExistsError, UsernameExistsError } from './user';
 
 
+vi.mock('bcrypt');
 const getRandomUserInput = () => {
     return {
         username: `username-${ulid()}`,
@@ -12,8 +16,17 @@ const getRandomUserInput = () => {
     };
 };
 
+const hashedPassword = 'hashed-password';
 describe('createUser with real db', () => {
     let db: Database;
+
+    beforeAll(() => {
+        vi.mocked(bcrypt.hash).mockImplementation(() => Promise.resolve(hashedPassword));
+    })
+
+    afterAll(() => {
+        vi.resetAllMocks();
+    })
 
     beforeEach(() => {
         Database.reset();
@@ -32,6 +45,8 @@ describe('createUser with real db', () => {
         });
         expect(emailItem).toBeDefined();
         expect(emailItem?.userId).toBe(userId);
+        expect(emailItem?.username).toBe(mockInput.username);
+        expect(emailItem?.password).toBe(hashedPassword);
 
         const usernameItem = await db.get({
             Key: {
@@ -52,7 +67,7 @@ describe('createUser with real db', () => {
         expect(userItem?.userId).toBe(userId);
         expect(userItem?.username).toBe(mockInput.username);
         expect(userItem?.email).toBe(mockInput.email);
-        expect(userItem?.password).toBe(mockInput.password);
+        expect(userItem?.password).toBe(hashedPassword);
     });
 
     it('should throw an EmailExistsError if only email already exists', async () => {
