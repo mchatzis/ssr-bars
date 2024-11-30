@@ -1,3 +1,5 @@
+// @vitest-environment node
+
 import { TransactionCanceledException } from "@aws-sdk/client-dynamodb";
 import { ulid } from "ulid";
 import { beforeAll, describe, expect, it } from 'vitest';

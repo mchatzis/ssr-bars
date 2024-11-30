@@ -1,5 +1,10 @@
 import { Database } from "@/lib/db/Database";
+import { loadEnvConfig } from '@next/env';
 
+export default async () => {
+    const projectDir = process.cwd()
+    loadEnvConfig(projectDir)
+}
 
 export async function setup() {
     console.log("Setting up tests...")

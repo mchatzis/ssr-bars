@@ -1,3 +1,5 @@
+// @vitest-environment node
+
 import { Resource } from 'sst';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { getDatabaseConfig } from './config';
