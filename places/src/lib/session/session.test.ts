@@ -3,11 +3,9 @@ import { InvalidEnvironmentVariableError } from '@/lib/session/types';
 import { JWSSignatureVerificationFailed, JWTExpired } from 'jose/errors';
 import { cookies } from 'next/headers';
 import { afterEach, beforeAll, beforeEach, describe, expect, it, Mock, vi } from 'vitest';
-import { createSession, decrypt, encrypt, getEncodedKey, getExpirationTimeInSeconds, SessionPayload } from './session/session';
+import { createSession, decrypt, encrypt, getEncodedKey, getExpirationTimeInSeconds, SessionPayload } from './session';
 
-vi.mock('next/headers', () => ({
-    cookies: vi.fn()
-}));
+vi.mock('next/headers');
 
 describe('Session management tests', () => {
     const FIXED_TIMESTAMP_MILLI = 1732725656854;

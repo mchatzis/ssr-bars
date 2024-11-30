@@ -5,6 +5,7 @@ import { LoginFormState } from "@/components/auth/LoginForm";
 import { RegisterFormState } from "@/components/auth/RegisterForm";
 import { createUser, EmailDoesNotExistError, EmailExistsError, getUserIdentity, UsernameExistsError, WrongPasswordError } from "@/lib/db/models/user";
 import { createSession } from "@/lib/session/session";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { beforeEach, describe, expect, it, Mock, vi } from "vitest";
 import { authenticate, register } from './authenticate';
@@ -30,9 +31,10 @@ vi.mock(import("@/lib/db/models/user"), async (importOriginal) => {
         getUserIdentity: vi.fn()
     }
 });
-vi.mock("@/lib/session", () => ({
+vi.mock("@/lib/session/session", () => ({
     createSession: vi.fn(),
 }));
+vi.mock('next/headers');
 
 
 const mockSafeParseSignupForm = SignupFormSchema.safeParse as Mock;
@@ -157,6 +159,10 @@ describe('register function', () => {
 const mockSafeParseLoginForm = LoginFormSchema.safeParse as Mock;
 const mockGetUserIdentity = vi.mocked(getUserIdentity);
 const mockCreateSession = vi.mocked(createSession);
+const mockSet = vi.fn();
+(vi.mocked(cookies) as Mock).mockReturnValue({
+    set: mockSet
+});
 
 describe("authenticate function", () => {
     beforeEach(() => {
@@ -195,14 +201,25 @@ describe("authenticate function", () => {
     it("should redirect when authentication is successful", async () => {
         const state: LoginFormState = {};
         const formData = new FormData();
+        const userIdentity = {
+            userId: "user-123",
+            username: "testuser"
+        }
+        const validatedData = {
+            email: "test@example.com",
+            password: "password123"
+        }
 
         mockSafeParseLoginForm.mockReturnValue({
             success: true,
-            data: { email: "test@example.com", password: "password123" },
+            data: validatedData,
         });
-        mockGetUserIdentity.mockResolvedValue({ userId: "user-123", username: "testuser" });
+        mockGetUserIdentity.mockResolvedValue(userIdentity);
 
         await expect(authenticate(state, formData)).rejects.toThrow("NEXT_REDIRECT");
+
+        expect(mockGetUserIdentity).toHaveBeenCalledWith(validatedData);
+        expect(mockSet).toHaveBeenCalledWith('username', userIdentity.username);
         expect(redirect).toHaveBeenCalledWith("/");
     });
 
