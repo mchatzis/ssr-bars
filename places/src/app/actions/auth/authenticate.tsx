@@ -1,8 +1,11 @@
 'use server'
 
-import { SignupFormSchema } from "@/app/actions/auth/schema";
+import { LoginFormSchema, SignupFormSchema } from "@/app/actions/auth/schema";
+import { LoginFormState } from "@/components/auth/LoginForm";
 import { RegisterFormState } from "@/components/auth/RegisterForm";
-import { createUser, CreateUserInput, EmailExistsError, UsernameExistsError } from "@/lib/db/models/user";
+import { createUser, CreateUserInput, EmailDoesNotExistError, EmailExistsError, getUserIdentity, GetUserInput, UsernameExistsError, WrongPasswordError } from "@/lib/db/models/user";
+import { createSession } from "@/lib/session/session";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 export async function register(state: RegisterFormState, formData: FormData): Promise<RegisterFormState> {
@@ -43,11 +46,51 @@ export async function register(state: RegisterFormState, formData: FormData): Pr
     redirect('/auth/login')
 }
 
+export async function authenticate(state: LoginFormState, formData: FormData): Promise<LoginFormState> {
+    const attempts = (state?.attempts ?? 0) + 1;
 
+    try {
+        const validatedFields = LoginFormSchema.safeParse({
+            email: formData.get('email'),
+            password: formData.get('password'),
+        });
 
+        if (!validatedFields.success) {
+            return {
+                errors: validatedFields.error.flatten().fieldErrors,
+                attempts,
+            };
+        }
 
+        const validatedData: GetUserInput = validatedFields.data;
+        const { userId, username } = await getUserIdentity(validatedData);
+        console.log("Successful login of user: ", userId);
 
-export async function authenticate(formData: FormData) {
-    console.log(formData)
+        await createSession({
+            sub: userId,
+            username: username
+        });
+
+        cookies().set('username', username);
+
+    } catch (error) {
+        let passwordError = error instanceof WrongPasswordError ? [error.message] : undefined;
+        let emailError = error instanceof EmailDoesNotExistError ? [error.message] : undefined;
+        let otherError = (!passwordError && !emailError) ? ['An unexpected error occurred.'] : undefined;
+
+        if (otherError) {
+            console.error("Error while trying to authenticate user with error: ", error)
+        }
+
+        return {
+            errors: {
+                password: passwordError,
+                email: emailError,
+                general: otherError
+            },
+            attempts,
+        };
+    }
+
     redirect('/')
 }

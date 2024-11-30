@@ -1,12 +1,24 @@
-import { SignupFormSchema } from "@/app/actions/auth/schema";
+// @vitest-environment node
+
+import { LoginFormSchema, SignupFormSchema } from "@/app/actions/auth/schema";
+import { LoginFormState } from "@/components/auth/LoginForm";
 import { RegisterFormState } from "@/components/auth/RegisterForm";
-import { createUser, EmailExistsError, UsernameExistsError } from "@/lib/db/models/user";
+import { createUser, EmailDoesNotExistError, EmailExistsError, getUserIdentity, UsernameExistsError, WrongPasswordError } from "@/lib/db/models/user";
+import { createSession } from "@/lib/session/session";
 import { redirect } from "next/navigation";
 import { beforeEach, describe, expect, it, Mock, vi } from "vitest";
-import { register } from './authenticate';
+import { authenticate, register } from './authenticate';
 
+vi.mock('next/navigation', () => ({
+    redirect: vi.fn(() => {
+        throw new Error('NEXT_REDIRECT');
+    }),
+}));
 vi.mock('@/app/actions/auth/schema', () => ({
     SignupFormSchema: {
+        safeParse: vi.fn()
+    },
+    LoginFormSchema: {
         safeParse: vi.fn()
     }
 }));
@@ -14,21 +26,21 @@ vi.mock(import("@/lib/db/models/user"), async (importOriginal) => {
     const actual = await importOriginal()
     return {
         ...actual,
-        createUser: vi.fn()
+        createUser: vi.fn(),
+        getUserIdentity: vi.fn()
     }
 });
-vi.mock('next/navigation', () => ({
-    redirect: vi.fn(() => {
-        throw new Error('NEXT_REDIRECT');
-    }),
+vi.mock("@/lib/session", () => ({
+    createSession: vi.fn(),
 }));
 
-const mockSafeParse = SignupFormSchema.safeParse as Mock;
+
+const mockSafeParseSignupForm = SignupFormSchema.safeParse as Mock;
 const mockCreateUser = vi.mocked(createUser);
 
 describe('register function', () => {
     beforeEach(() => {
-        mockSafeParse.mockReset();
+        mockSafeParseSignupForm.mockReset();
         mockCreateUser.mockReset();
     });
 
@@ -36,7 +48,7 @@ describe('register function', () => {
         const state: RegisterFormState = {};
         const formData = new FormData();
 
-        mockSafeParse.mockReturnValue({
+        mockSafeParseSignupForm.mockReturnValue({
             success: false,
             error: {
                 flatten: () => ({
@@ -65,7 +77,7 @@ describe('register function', () => {
         const state: RegisterFormState = {};
         const formData = new FormData();
 
-        mockSafeParse.mockReturnValue({
+        mockSafeParseSignupForm.mockReturnValue({
             success: true,
             data: { username: 'testuser', email: 'test@example.com', password: 'password123' },
         });
@@ -79,7 +91,7 @@ describe('register function', () => {
         const state: RegisterFormState = {};
         const formData = new FormData();
 
-        mockSafeParse.mockReturnValue({
+        mockSafeParseSignupForm.mockReturnValue({
             success: true,
             data: { username: 'existinguser', email: 'existing@example.com', password: 'password123' },
         });
@@ -101,7 +113,7 @@ describe('register function', () => {
         const state: RegisterFormState = {};
         const formData = new FormData();
 
-        mockSafeParse.mockReturnValue({
+        mockSafeParseSignupForm.mockReturnValue({
             success: true,
             data: { username: 'newuser', email: 'existing@example.com', password: 'password123' },
         });
@@ -123,7 +135,7 @@ describe('register function', () => {
         const state: RegisterFormState = {};
         const formData = new FormData();
 
-        mockSafeParse.mockReturnValue({
+        mockSafeParseSignupForm.mockReturnValue({
             success: true,
             data: { username: 'testuser', email: 'test@example.com', password: 'password123' },
         });
@@ -136,6 +148,125 @@ describe('register function', () => {
                 general: ['An unexpected error occurred.'],
                 username: undefined,
                 email: undefined,
+            },
+            attempts: 1,
+        });
+    });
+});
+
+const mockSafeParseLoginForm = LoginFormSchema.safeParse as Mock;
+const mockGetUserIdentity = vi.mocked(getUserIdentity);
+const mockCreateSession = vi.mocked(createSession);
+
+describe("authenticate function", () => {
+    beforeEach(() => {
+        mockSafeParseLoginForm.mockReset();
+        mockGetUserIdentity.mockReset();
+        mockCreateSession.mockReset();
+    });
+
+    it("should return errors when form data is invalid", async () => {
+        const state: LoginFormState = {};
+        const formData = new FormData();
+
+        mockSafeParseLoginForm.mockReturnValue({
+            success: false,
+            error: {
+                flatten: () => ({
+                    fieldErrors: {
+                        email: ["Required"],
+                        password: ["Required"],
+                    },
+                }),
+            },
+        });
+
+        const result = await authenticate(state, formData);
+
+        expect(result).toEqual({
+            errors: {
+                email: ["Required"],
+                password: ["Required"],
+            },
+            attempts: 1,
+        });
+    });
+
+    it("should redirect when authentication is successful", async () => {
+        const state: LoginFormState = {};
+        const formData = new FormData();
+
+        mockSafeParseLoginForm.mockReturnValue({
+            success: true,
+            data: { email: "test@example.com", password: "password123" },
+        });
+        mockGetUserIdentity.mockResolvedValue({ userId: "user-123", username: "testuser" });
+
+        await expect(authenticate(state, formData)).rejects.toThrow("NEXT_REDIRECT");
+        expect(redirect).toHaveBeenCalledWith("/");
+    });
+
+    it("should return error when email does not exist", async () => {
+        const state: LoginFormState = {};
+        const formData = new FormData();
+
+        mockSafeParseLoginForm.mockReturnValue({
+            success: true,
+            data: { email: "nonexistent@example.com", password: "password123" },
+        });
+        mockGetUserIdentity.mockRejectedValue(new EmailDoesNotExistError("Email does not exist"));
+
+        const result = await authenticate(state, formData);
+
+        expect(result).toEqual({
+            errors: {
+                email: ["Email does not exist"],
+                password: undefined,
+                general: undefined,
+            },
+            attempts: 1,
+        });
+    });
+
+    it("should return error when password is wrong", async () => {
+        const state: LoginFormState = {};
+        const formData = new FormData();
+
+        mockSafeParseLoginForm.mockReturnValue({
+            success: true,
+            data: { email: "test@example.com", password: "wrongpassword" },
+        });
+        mockGetUserIdentity.mockRejectedValue(new WrongPasswordError("Wrong password"));
+
+        const result = await authenticate(state, formData);
+
+        expect(result).toEqual({
+            errors: {
+                password: ["Wrong password"],
+                email: undefined,
+                general: undefined,
+            },
+            attempts: 1,
+        });
+    });
+
+    it("should return error for unexpected failures", async () => {
+        const state: LoginFormState = {};
+        const formData = new FormData();
+
+        mockSafeParseLoginForm.mockReturnValue({
+            success: true,
+            data: { email: "test@example.com", password: "password123" },
+        });
+        mockGetUserIdentity.mockRejectedValue(new Error("Unexpected error"));
+
+        const result = await authenticate(state, formData);
+
+        expect(result).toEqual({
+            errors: {
+                general: ["An unexpected error occurred."],
+                email: undefined,
+                password: undefined,
             },
             attempts: 1,
         });
