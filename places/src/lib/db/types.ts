@@ -27,6 +27,8 @@ export interface UserEntity extends BaseEntity<PkEntityType.USER, SkEntityType.M
 
 export interface EmailEntity extends BaseEntity<PkEntityType.EMAIL, SkEntityType.METADATA> {
     userId: string;
+    password: string;
+    username: string;
 }
 
 export interface UsernameEntity extends BaseEntity<PkEntityType.USERNAME, SkEntityType.METADATA> {

@@ -31,6 +31,20 @@ export class EmailExistsError extends Error {
     }
 }
 
+export class EmailDoesNotExistError extends Error {
+    constructor(message: string) {
+        super(message);
+        this.name = 'EmailDoesNotExistErro';
+    }
+}
+
+export class WrongPasswordError extends Error {
+    constructor(message: string = "Wrong password.") {
+        super(message);
+        this.name = 'WrongPasswordError';
+    }
+}
+
 export async function createUser(input: CreateUserInput) {
     let db = Database.getInstance();
 
@@ -109,4 +123,33 @@ export async function createUser(input: CreateUserInput) {
     }
 
     return userId;
+}
+
+export async function getUserIdentity(input: GetUserInput): Promise<Pick<EmailEntity, 'userId' | 'username'>> {
+    let db = Database.getInstance();
+    const { email, password } = input;
+
+    const emailItem = await db.get({
+        Key: {
+            PK: `EMAIL#${email}`,
+            SK: SkEntityType.METADATA
+        }
+    })
+
+    if (!emailItem) {
+        throw new EmailDoesNotExistError("Email does not exist.");
+    }
+    if (!isEmailEntity(emailItem)) {
+        throw new EmailEntityError();
+    }
+
+    const matchingPasswords = await bcrypt.compare(password, emailItem.password);
+    if (!matchingPasswords) {
+        throw new WrongPasswordError();
+    }
+
+    return {
+        userId: emailItem.userId,
+        username: emailItem.username,
+    }
 }
