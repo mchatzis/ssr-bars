@@ -5,14 +5,14 @@ import FormInput from '@/components/auth/FormInput';
 import Link from "next/link";
 import { useFormState, useFormStatus } from 'react-dom';
 
-export type RegisterFormError = {
+export type RegisterFormErrors = {
   username?: string[];
   email?: string[];
   password?: string[];
   general?: string[];
 }
 export type RegisterFormState = {
-  errors?: RegisterFormError;
+  errors?: RegisterFormErrors;
   success?: boolean;
   submittedEmail?: string;
   attempts?: number;
@@ -22,30 +22,26 @@ export default function RegisterForm() {
   const [state, action] = useFormState<RegisterFormState, FormData>(register, { attempts: 0 })
 
   return (
-    <form action={action} className='min-w-32 max-w-52 m-2'>
-      <FormInput id="username" name="username" placeholder="username" />
-      {state?.errors?.username && <p>{state.errors.username}</p>}
+    <div className="flex absolute">
+      <form action={action} className='min-w-32 max-w-52'>
+        <FormInput id="username" name="username" placeholder="username" />
+        <FormInput id="email" name="email" type="email" placeholder="email" />
+        <FormInput id="password" name="password" type="password" placeholder="password" />
 
-      <FormInput id="email" name="email" type="email" placeholder="email" />
-      {state?.errors?.email && <p>{state.errors.email}</p>}
-
-      <FormInput id="password" name="password" type="password" placeholder="password" />
-      {state?.errors?.password && (
-        <div>
-          <ul>
-            {state.errors.password.map((error) => (
-              <li key={error}>- {error}</li>
-            ))}
-          </ul>
+        <div className="w-full pt-1">
+          <SubmitButton />
+          <Link href='/auth/login' className='text-blue-700 rounded-full text-center flex items-center justify-center p-3 text-sm transform hover:scale-110 transition-transform duration-150'>login</Link>
         </div>
-      )}
-      {state?.errors?.general && <p>{state.errors.general}</p>}
-
-      <div className="w-full pt-1">
-        <SubmitButton />
-        <Link href='/auth/login' className='text-blue-700 rounded-full text-center flex items-center justify-center p-3 text-sm transform hover:scale-110 transition-transform duration-150'>login</Link>
+      </form>
+      <div className='relative right-0 ml-4 w-[20vw]'>
+        {state.errors ?
+          <ErrorList
+            errors={state.errors}
+            className="">
+          </ErrorList>
+          : null}
       </div>
-    </form>
+    </div>
   );
 }
 
@@ -53,8 +49,25 @@ function SubmitButton() {
   const { pending } = useFormStatus()
 
   return (
-    <button disabled={pending} type="submit" className='w-full border rounded-full p-2 bg-gray-400 hover:bg-gray-300 transition-colors duration-300'>
+    <button disabled={pending} type="submit" className='w-full border rounded-full p-2 bg-gray-400 hover:bg-gray-300 transition-colors duration-300 mt-1'>
       Sign Up
     </button>
+  )
+}
+
+function ErrorList({ errors, className }: { errors: RegisterFormErrors, className: string }) {
+  const errorList: JSX.Element[] = [];
+  Object.entries(errors).forEach(([key, value]) => {
+    value.forEach((error) => (
+      errorList.push(<li key={error}>- {error}</li>)
+    ));
+  })
+
+  return (
+    <div className={className}>
+      <ul>
+        {errorList}
+      </ul>
+    </div>
   )
 }

@@ -33,6 +33,7 @@ export async function register(state: RegisterFormState, formData: FormData): Pr
         let usernameError = error instanceof UsernameExistsError ? [error.message] : undefined;
         let emailError = error instanceof EmailExistsError ? [error.message] : undefined;
         let generalError = (!usernameError && !emailError) ? ['An unexpected error occurred.'] : undefined;
+
         return {
             errors: {
                 username: usernameError,

@@ -275,7 +275,7 @@ describe("authenticate function", () => {
             success: true,
             data: { email: "test@example.com", password: "password123" },
         });
-        mockGetUserIdentity.mockRejectedValue(new Error("Unexpected error"));
+        mockGetUserIdentity.mockRejectedValue(new Error("Unexpected mock error"));
 
         const result = await authenticate(state, formData);
 
