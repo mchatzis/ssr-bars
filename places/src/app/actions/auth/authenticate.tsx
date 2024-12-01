@@ -30,9 +30,9 @@ export async function register(state: RegisterFormState, formData: FormData): Pr
         console.log("Successful registration of user: ", userId)
 
     } catch (error) {
-        let usernameError = error instanceof UsernameExistsError ? [error.message] : undefined;
-        let emailError = error instanceof EmailExistsError ? [error.message] : undefined;
-        let generalError = (!usernameError && !emailError) ? ['An unexpected error occurred.'] : undefined;
+        const usernameError = error instanceof UsernameExistsError ? [error.message] : undefined;
+        const emailError = error instanceof EmailExistsError ? [error.message] : undefined;
+        const generalError = (!usernameError && !emailError) ? ['An unexpected error occurred.'] : undefined;
 
         return {
             errors: {
@@ -75,9 +75,9 @@ export async function authenticate(state: LoginFormState, formData: FormData): P
         cookies().set('username', username);
 
     } catch (error) {
-        let passwordError = error instanceof WrongPasswordError ? [error.message] : undefined;
-        let emailError = error instanceof EmailDoesNotExistError ? [error.message] : undefined;
-        let otherError = (!passwordError && !emailError) ? ['An unexpected error occurred.'] : undefined;
+        const passwordError = error instanceof WrongPasswordError ? [error.message] : undefined;
+        const emailError = error instanceof EmailDoesNotExistError ? [error.message] : undefined;
+        const otherError = (!passwordError && !emailError) ? ['An unexpected error occurred.'] : undefined;
 
         if (otherError) {
             console.error("Error while trying to authenticate user with error: ", error)

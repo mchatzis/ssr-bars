@@ -46,7 +46,7 @@ export class WrongPasswordError extends Error {
 }
 
 export async function createUser(input: CreateUserInput) {
-    let db = Database.getInstance();
+    const db = Database.getInstance();
 
     const { username, email, password } = input;
     const saltRounds = 12;
@@ -126,7 +126,7 @@ export async function createUser(input: CreateUserInput) {
 }
 
 export async function getUserIdentity(input: GetUserInput): Promise<Pick<EmailEntity, 'userId' | 'username'>> {
-    let db = Database.getInstance();
+    const db = Database.getInstance();
     const { email, password } = input;
 
     const emailItem = await db.get({

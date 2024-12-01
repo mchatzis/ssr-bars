@@ -96,9 +96,9 @@ describe('Session management tests', () => {
         });
 
         it('should throw an error for a decrypted payload that is not a valid SessionPayload', async () => {
-            //@ts-expect-error
-            const invalidPayload: SessionPayload = { notUsername: 'testValue' };
+            const invalidPayload = { notUsername: 'testValue' };
 
+            //@ts-expect-error, invalidPayload deliberately misses SessionPayload attributes
             const token = await encrypt(invalidPayload);
 
             await expect(decrypt(token)).rejects.toThrowError('Invalid session payload');

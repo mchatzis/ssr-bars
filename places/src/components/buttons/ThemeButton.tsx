@@ -5,7 +5,7 @@ import { selectTheme, setTheme, toggleTheme } from "@/lib/redux/slices/styleStat
 import { useEffect } from "react";
 
 export default function ThemeButton({ className = '' }) {
-    const theme = useAppSelector(selectTheme)
+    useAppSelector(selectTheme)
     const dispatch = useAppDispatch()
 
     useEffect(() => {

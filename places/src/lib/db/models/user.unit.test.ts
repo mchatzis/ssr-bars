@@ -2,16 +2,12 @@
 
 import { Database, TransactWriteItemNoTableName } from '@/lib/db/Database';
 import bcrypt from "bcrypt";
-import { Resource } from 'sst';
 import { afterAll, describe, expect, it, Mock, vi } from 'vitest';
 import { EmailEntity, UserEntity, UsernameEntity } from '../types';
 import { createUser } from './user';
 
 vi.mock('@/lib/db/Database');
 vi.mock('bcrypt');
-
-
-const originalStage = Resource.App.stage;
 
 describe('createUser with mocks', () => {
     afterAll(() => {

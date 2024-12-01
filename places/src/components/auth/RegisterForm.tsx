@@ -57,7 +57,7 @@ function SubmitButton() {
 
 function ErrorList({ errors, className }: { errors: RegisterFormErrors, className: string }) {
   const errorList: JSX.Element[] = [];
-  Object.entries(errors).forEach(([key, value]) => {
+  Object.entries(errors).forEach(([, value]) => {
     value.forEach((error) => (
       errorList.push(<li key={error}>- {error}</li>)
     ));
