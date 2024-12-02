@@ -30,16 +30,21 @@ export default $config({
     };
   },
   async run() {
-    const dynamoTables = [
-      new sst.aws.Dynamo("DynamoTable", dynamoTableArgs),
-      ...($app.stage === "dev"
-        ? [new sst.aws.Dynamo("DynamoTestTable", dynamoTableArgs)]
-        : []),
-    ];
+    const dynamoTable = new sst.aws.Dynamo("DynamoTable", dynamoTableArgs);
+    const dynamoTestTable = new sst.aws.Dynamo("DynamoTestTable", dynamoTableArgs);
 
     const app = new sst.aws.Nextjs("MyWeb", {
       path: "places",
-      link: dynamoTables,
+      link: [
+        dynamoTable,
+        dynamoTestTable
+      ],
+      server: {
+        architecture: "arm64"
+      },
+      imageOptimization: {
+        staticEtag: true,
+      }
     });
 
     return {
