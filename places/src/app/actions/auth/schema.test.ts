@@ -25,7 +25,7 @@ describe('SignupFormSchema', () => {
 
             const result = SignupFormSchema.safeParse(invalidData);
             expect(result.success).toBe(false);
-            expect(result.error.issues).toEqual(
+            expect(result.error?.issues).toEqual(
                 expect.arrayContaining([
                     expect.objectContaining({
                         code: 'too_small',
@@ -45,7 +45,7 @@ describe('SignupFormSchema', () => {
 
             const result = SignupFormSchema.safeParse(invalidData);
             expect(result.success).toBe(false);
-            expect(result.error.issues).toEqual(
+            expect(result.error?.issues).toEqual(
                 expect.arrayContaining([
                     expect.objectContaining({
                         code: 'too_big',
@@ -67,7 +67,7 @@ describe('SignupFormSchema', () => {
 
             const result = SignupFormSchema.safeParse(invalidData);
             expect(result.success).toBe(false);
-            expect(result.error.issues).toEqual(
+            expect(result.error?.issues).toEqual(
                 expect.arrayContaining([
                     expect.objectContaining({
                         code: 'invalid_string',
@@ -87,7 +87,7 @@ describe('SignupFormSchema', () => {
 
             const result = SignupFormSchema.safeParse(invalidData);
             expect(result.success).toBe(false);
-            expect(result.error.issues).toEqual(
+            expect(result.error?.issues).toEqual(
                 expect.arrayContaining([
                     expect.objectContaining({
                         code: 'too_big',
@@ -109,7 +109,7 @@ describe('SignupFormSchema', () => {
 
             const result = SignupFormSchema.safeParse(invalidData);
             expect(result.success).toBe(false);
-            expect(result.error.issues).toEqual(
+            expect(result.error?.issues).toEqual(
                 expect.arrayContaining([
                     expect.objectContaining({
                         code: 'too_small',
@@ -129,7 +129,7 @@ describe('SignupFormSchema', () => {
 
             const result = SignupFormSchema.safeParse(invalidData);
             expect(result.success).toBe(false);
-            expect(result.error.issues).toEqual(
+            expect(result.error?.issues).toEqual(
                 expect.arrayContaining([
                     expect.objectContaining({
                         code: 'too_big',
@@ -149,7 +149,7 @@ describe('SignupFormSchema', () => {
 
             const result = SignupFormSchema.safeParse(invalidData);
             expect(result.success).toBe(false);
-            expect(result.error.issues).toEqual(
+            expect(result.error?.issues).toEqual(
                 expect.arrayContaining([
                     expect.objectContaining({
                         code: 'invalid_string',
@@ -169,7 +169,7 @@ describe('SignupFormSchema', () => {
 
             const result = SignupFormSchema.safeParse(invalidData);
             expect(result.success).toBe(false);
-            expect(result.error.issues).toEqual(
+            expect(result.error?.issues).toEqual(
                 expect.arrayContaining([
                     expect.objectContaining({
                         code: 'invalid_string',
@@ -189,7 +189,7 @@ describe('SignupFormSchema', () => {
 
             const result = SignupFormSchema.safeParse(invalidData);
             expect(result.success).toBe(false);
-            expect(result.error.issues).toEqual(
+            expect(result.error?.issues).toEqual(
                 expect.arrayContaining([
                     expect.objectContaining({
                         code: 'invalid_string',
@@ -211,7 +211,7 @@ describe('SignupFormSchema', () => {
 
             const result = SignupFormSchema.safeParse(invalidData);
             expect(result.success).toBe(false);
-            expect(result.error.issues).toEqual(
+            expect(result.error?.issues).toEqual(
                 expect.arrayContaining([
                     expect.objectContaining({
                         code: 'too_small',

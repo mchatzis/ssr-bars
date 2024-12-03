@@ -7,8 +7,8 @@ import { useAppSelector } from '@/lib/redux/hooks';
 import { selectViewState } from '@/lib/redux/slices/mapStateSlice';
 import { selectTheme } from '@/lib/redux/slices/styleStateSlice';
 
-const darkMapStyle = "/dark-matter-style.json";
-const lightMapStyle = "/positron-style.json"
+const darkMapStyle = "mapStyles/dark-matter-style.json";
+const lightMapStyle = "mapStyles/positron-style.json"
 
 export default function MapComponent({ className = '' }) {
     const viewState = useAppSelector(selectViewState)
