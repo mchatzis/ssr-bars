@@ -33,7 +33,7 @@ describe('createUser with mocks', () => {
 
         const expectedEmailItem: EmailEntity = {
             PK: 'EMAIL#test@example.com',
-            SK: 'METADATA',
+            SK: 'METADATA#',
             userId: userId,
             username: 'testuser',
             password: hashedPassword,
@@ -43,7 +43,7 @@ describe('createUser with mocks', () => {
 
         const expectedUserItem: UserEntity = {
             PK: `USER#${userId}`,
-            SK: 'METADATA',
+            SK: 'METADATA#',
             username: 'testuser',
             email: 'test@example.com',
             password: hashedPassword,
@@ -54,7 +54,7 @@ describe('createUser with mocks', () => {
 
         const expectedUsernameItem: UsernameEntity = {
             PK: 'USERNAME#testuser',
-            SK: 'METADATA',
+            SK: 'METADATA#',
             userId: userId,
             createdAt: expect.any(Number),
             updatedAt: expect.any(Number),

@@ -1,5 +1,5 @@
 import { Database, TransactWriteItemNoTableName } from "@/lib/db/Database";
-import { EmailEntity, SkEntityType, UserEntity, UsernameEntity } from "@/lib/db/types";
+import { EmailEntity, SkEnum, UserEntity, UsernameEntity } from "@/lib/db/types";
 import { TransactionCanceledException } from "@aws-sdk/client-dynamodb";
 import bcrypt from "bcrypt";
 import { ulid } from "ulid";
@@ -57,7 +57,7 @@ export async function createUser(input: CreateUserInput) {
 
     const emailItem: EmailEntity = {
         PK: `EMAIL#${input.email.toLowerCase()}`,
-        SK: 'METADATA',
+        SK: 'METADATA#',
         userId,
         username: username,
         password: hashedPassword,
@@ -67,7 +67,7 @@ export async function createUser(input: CreateUserInput) {
 
     const userItem: UserEntity = {
         PK: `USER#${userId}`,
-        SK: 'METADATA',
+        SK: 'METADATA#',
         userId: userId,
         username: username,
         email: email,
@@ -78,7 +78,7 @@ export async function createUser(input: CreateUserInput) {
 
     const usernameItem: UsernameEntity = {
         PK: `USERNAME#${input.username.toLowerCase()}`,
-        SK: 'METADATA',
+        SK: 'METADATA#',
         userId,
         createdAt: now,
         updatedAt: now,
@@ -132,7 +132,7 @@ export async function getUserIdentity(input: GetUserInput): Promise<Pick<EmailEn
     const emailItem = await db.get({
         Key: {
             PK: `EMAIL#${email}`,
-            SK: SkEntityType.METADATA
+            SK: SkEnum.METADATA
         }
     })
 

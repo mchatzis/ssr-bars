@@ -4,6 +4,8 @@ import { Database } from '@/lib/db/Database';
 import bcrypt from "bcrypt";
 import { ulid } from 'ulid';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import { isEmailEntity, isUserEntity, isUsernameEntity } from '../type-guards';
+import { EmailEntity, UserEntity, UsernameEntity } from '../types';
 import { createUser, EmailExistsError, UsernameExistsError } from './user';
 
 
@@ -37,33 +39,34 @@ describe('createUser with real db', () => {
         const mockInput = getRandomUserInput();
         const userId = await createUser(mockInput);
 
-        const emailItem = await db.get({
-            Key: {
-                PK: `EMAIL#${mockInput.email.toLowerCase()}`,
-                SK: 'METADATA'
-            },
-        });
+        const emailKey: Pick<EmailEntity, 'PK' | 'SK'> = {
+            PK: `EMAIL#${mockInput.email.toLowerCase()}`,
+            SK: 'METADATA#'
+        }
+        const emailItem = await db.get({ Key: emailKey });
         expect(emailItem).toBeDefined();
+        expect(isEmailEntity(emailItem)).toBe(true);
         expect(emailItem?.userId).toBe(userId);
         expect(emailItem?.username).toBe(mockInput.username);
         expect(emailItem?.password).toBe(hashedPassword);
 
-        const usernameItem = await db.get({
-            Key: {
-                PK: `USERNAME#${mockInput.username.toLowerCase()}`,
-                SK: 'METADATA'
-            },
-        });
+
+        const usernameKey: Pick<UsernameEntity, 'PK' | 'SK'> = {
+            PK: `USERNAME#${mockInput.username.toLowerCase()}`,
+            SK: 'METADATA#'
+        }
+        const usernameItem = await db.get({ Key: usernameKey });
         expect(usernameItem).toBeDefined();
+        expect(isUsernameEntity(usernameItem)).toBe(true);
         expect(usernameItem?.userId).toBe(userId);
 
-        const userItem = await db.get({
-            Key: {
-                PK: `USER#${userId}`,
-                SK: 'METADATA'
-            },
-        });
+        const userKey: Pick<UserEntity, 'PK' | 'SK'> = {
+            PK: `USER#${userId}`,
+            SK: 'METADATA#'
+        }
+        const userItem = await db.get({ Key: userKey });
         expect(userItem).toBeDefined();
+        expect(isUserEntity(userItem)).toBe(true);
         expect(userItem?.userId).toBe(userId);
         expect(userItem?.username).toBe(mockInput.username);
         expect(userItem?.email).toBe(mockInput.email);

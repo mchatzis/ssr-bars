@@ -1,42 +1,63 @@
-import { BaseEntity, EmailEntity, PkEntityType, SkEntityType, UserEntity, UsernameEntity } from './types';
+import { BaseEntity, EmailEntity, Key, PkEnum, SkEnum, UserEntity, UsernameEntity } from './types';
 
-export function isBaseEntity<T extends PkEntityType, R extends SkEntityType>(
-    value: any,
-    pkPrefix: T,
-    skPrefix: R | `${R}#`
-): value is BaseEntity<T, R> {
+function isValidObject(obj: any) {
+    return typeof obj === 'object' && obj !== null
+}
+function isValidPK(pk: string): pk is Key<PkEnum, string> {
+    const parts = pk.split('#');
+    return parts[0] in PkEnum;
+}
+function isValidSK(sk: string): sk is Key<SkEnum, string> {
+    const parts = sk.split('#');
+    return parts[0] in SkEnum;
+}
+
+export function isBaseEntity<T extends Key<PkEnum, string>, R extends Key<SkEnum, string>>(
+    obj: any
+): obj is BaseEntity<T, R> {
     return (
-        typeof value.PK === 'string' &&
-        value.PK.startsWith(`${pkPrefix}#`) &&
-        typeof value.SK === 'string' &&
-        (value.SK.startsWith(`${skPrefix}#`) || value.SK === skPrefix) &&
-        typeof value.createdAt === 'number' &&
-        typeof value.updatedAt === 'number'
+        isValidObject(obj) &&
+        typeof obj.PK === 'string' &&
+        typeof obj.SK === 'string' &&
+        typeof obj.createdAt === 'number' &&
+        typeof obj.updatedAt === 'number' &&
+        isValidPK(obj.PK) &&
+        isValidSK(obj.SK)
     );
 }
 
-export function isUserEntity(value: any): value is UserEntity {
+export function isUserEntity(obj: any): obj is UserEntity {
     return (
-        typeof value.userId === 'string' &&
-        typeof value.username === 'string' &&
-        typeof value.email === 'string' &&
-        typeof value.password === 'string' &&
-        (value.age === undefined || typeof value.age === 'number') &&
-        isBaseEntity(value, PkEntityType.USER, SkEntityType.METADATA)
+        isValidObject(obj) &&
+        obj.PK.startsWith(`${PkEnum.USER}#`) &&
+        obj.SK === `${SkEnum.METADATA}#` &&
+        typeof obj.userId === 'string' &&
+        typeof obj.username === 'string' &&
+        typeof obj.email === 'string' &&
+        typeof obj.password === 'string' &&
+        (obj.age === undefined || typeof obj.age === 'number') &&
+        isBaseEntity<Key<PkEnum.USER, string>, Key<SkEnum.METADATA, ''>>(obj)
     );
 }
 
-export function isEmailEntity(value: any): value is EmailEntity {
+export function isEmailEntity(obj: any): obj is EmailEntity {
     return (
-        typeof value.userId === 'string' &&
-        typeof value.password === 'string' &&
-        isBaseEntity(value, PkEntityType.EMAIL, SkEntityType.METADATA)
+        isValidObject(obj) &&
+        obj.PK.startsWith(`${PkEnum.EMAIL}#`) &&
+        obj.SK === `${SkEnum.METADATA}#` &&
+        typeof obj.userId === 'string' &&
+        typeof obj.password === 'string' &&
+        typeof obj.username === 'string' &&
+        isBaseEntity<Key<PkEnum.EMAIL, string>, Key<SkEnum.METADATA, ''>>(obj)
     );
 }
 
-export function isUsernameEntity(value: any): value is UsernameEntity {
+export function isUsernameEntity(obj: any): obj is UsernameEntity {
     return (
-        typeof value.userId === 'string' &&
-        isBaseEntity(value, PkEntityType.USERNAME, SkEntityType.METADATA)
+        isValidObject(obj) &&
+        obj.PK.startsWith(`${PkEnum.USERNAME}#`) &&
+        obj.SK === `${SkEnum.METADATA}#` &&
+        typeof obj.userId === 'string' &&
+        isBaseEntity<Key<PkEnum.USERNAME, string>, Key<SkEnum.METADATA, ''>>(obj)
     );
 }

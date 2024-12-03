@@ -4,9 +4,12 @@ import { TransactionCanceledException } from "@aws-sdk/client-dynamodb";
 import { ulid } from "ulid";
 import { beforeAll, describe, expect, it } from 'vitest';
 import { Database, TransactWriteItemNoTableName } from './Database';
-import { BaseEntity, PkEntityType, SkEntityType } from "./types";
+import { BaseEntity, Key, PkEnum, SkEnum } from "./types";
 
-interface TestEntity extends BaseEntity<PkEntityType.USER, SkEntityType.METADATA> {
+interface TestEntity extends BaseEntity<
+    Key<PkEnum.USER, string>,
+    Key<SkEnum.METADATA, ''>
+> {
     attribute1?: string;
     attribute2?: number;
 }
@@ -15,7 +18,7 @@ const now = Date.now()
 function generateTestItem(): TestEntity {
     return {
         PK: `USER#${ulid()}`,
-        SK: "METADATA",
+        SK: "METADATA#",
         createdAt: now,
         updatedAt: now,
         attribute1: "test",
