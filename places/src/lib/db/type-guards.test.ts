@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest';
+import { KeyEnum } from './enums';
 import { isBaseEntity, isEmailEntity, isUserEntity, isUsernameEntity } from './type-guards';
-import { PkEnum, SkEnum } from './types';
 
 const validUserEntity = {
-    PK: `${PkEnum.USER}#123`,
-    SK: `${SkEnum.METADATA}#`,
+    PK: `${KeyEnum.USER}#123`,
+    SK: `${KeyEnum.METADATA}#`,
     createdAt: Date.now(),
     updatedAt: Date.now(),
     userId: '123',
@@ -15,8 +15,8 @@ const validUserEntity = {
 };
 
 const validEmailEntity = {
-    PK: `${PkEnum.EMAIL}#456`,
-    SK: `${SkEnum.METADATA}#`,
+    PK: `${KeyEnum.EMAIL}#456`,
+    SK: `${KeyEnum.METADATA}#`,
     createdAt: Date.now(),
     updatedAt: Date.now(),
     userId: '456',
@@ -25,8 +25,8 @@ const validEmailEntity = {
 };
 
 const validUsernameEntity = {
-    PK: `${PkEnum.USERNAME}#789`,
-    SK: `${SkEnum.METADATA}#`,
+    PK: `${KeyEnum.USERNAME}#789`,
+    SK: `${KeyEnum.METADATA}#`,
     createdAt: Date.now(),
     updatedAt: Date.now(),
     userId: '789',
@@ -42,7 +42,7 @@ describe('Type Guards', () => {
         expect(
             isBaseEntity({
                 ...validUserEntity,
-                PK: `${PkEnum.USER}missingHash`,
+                PK: `${KeyEnum.USER}missingHash`,
             })
         ).toBe(false);
     });
@@ -52,7 +52,7 @@ describe('Type Guards', () => {
         expect(
             isUserEntity({
                 ...validUserEntity,
-                PK: `${PkEnum.EMAIL}#123`,
+                PK: `${KeyEnum.EMAIL}#123`,
             })
         ).toBe(false);
     });
@@ -62,7 +62,7 @@ describe('Type Guards', () => {
         expect(
             isEmailEntity({
                 ...validEmailEntity,
-                PK: `${PkEnum.USER}#456`,
+                PK: `${KeyEnum.USER}#456`,
             })
         ).toBe(false);
     });
@@ -72,7 +72,7 @@ describe('Type Guards', () => {
         expect(
             isUsernameEntity({
                 ...validUsernameEntity,
-                PK: `${PkEnum.EMAIL}#789`,
+                PK: `${KeyEnum.EMAIL}#789`,
             })
         ).toBe(false);
     });

@@ -1,8 +1,9 @@
 import { Database, TransactWriteItemNoTableName } from "@/lib/db/Database";
-import { EmailEntity, SkEnum, UserEntity, UsernameEntity } from "@/lib/db/types";
+import { EmailEntity, UserEntity, UsernameEntity } from "@/lib/db/types";
 import { TransactionCanceledException } from "@aws-sdk/client-dynamodb";
 import bcrypt from "bcrypt";
 import { ulid } from "ulid";
+import { KeyEnum } from "../enums";
 import { EmailEntityError } from "../type-guard-errors";
 import { isEmailEntity } from "../type-guards";
 
@@ -125,6 +126,7 @@ export async function createUser(input: CreateUserInput) {
     return userId;
 }
 
+// TODO: TESTTTTTT
 export async function getUserIdentity(input: GetUserInput): Promise<Pick<EmailEntity, 'userId' | 'username'>> {
     const db = Database.getInstance();
     const { email, password } = input;
@@ -132,7 +134,7 @@ export async function getUserIdentity(input: GetUserInput): Promise<Pick<EmailEn
     const emailItem = await db.get({
         Key: {
             PK: `EMAIL#${email}`,
-            SK: SkEnum.METADATA
+            SK: `${KeyEnum.METADATA}#`
         }
     })
 

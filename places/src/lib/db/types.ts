@@ -1,33 +1,37 @@
-export enum PkEnum {
-    USER = 'USER',
-    EMAIL = 'EMAIL',
-    USERNAME = 'USERNAME',
-    AREA = 'AREA'
-}
+import { KeyEnum } from "./enums";
 
-export enum SkEnum {
-    METADATA = 'METADATA',
-}
-
-export enum OtherEnum {
-    XMPLE = 'XMPLE'
-}
 
 export type Key<T extends string, R extends string> = `${T}#${R}`;
 
 export interface BaseEntity<
-    T extends Key<PkEnum, string>,
-    R extends Key<SkEnum, string>,
+    P extends Key<string, string>,
+    S extends Key<string, string>,
 > {
-    PK: T;
-    SK: R;
+    PK: P;
+    SK: S;
     readonly createdAt: number;
     updatedAt: number;
 }
 
+// Example: PK: Area#London#Type#Bar, SK: Category#Modern#Place#123
+export interface PlacesOfPlaceTypeInArea extends BaseEntity<
+    Key<
+        Key<KeyEnum.AREA, string>,
+        Key<KeyEnum.PLACE_TYPE, string>
+    >,
+    Key<
+        Key<KeyEnum.CATEGORY, string>,
+        Key<KeyEnum.PLACE, string>
+    >
+> {
+    name: string,
+    longitude: number,
+    latitude: number,
+}
+
 export interface UserEntity extends BaseEntity<
-    Key<PkEnum.USER, string>,
-    Key<SkEnum.METADATA, ''>
+    Key<KeyEnum.USER, string>,
+    Key<KeyEnum.METADATA, ''>
 > {
     userId: string;
     username: string;
@@ -37,8 +41,8 @@ export interface UserEntity extends BaseEntity<
 }
 
 export interface EmailEntity extends BaseEntity<
-    Key<PkEnum.EMAIL, string>,
-    Key<SkEnum.METADATA, ''>
+    Key<KeyEnum.EMAIL, string>,
+    Key<KeyEnum.METADATA, ''>
 > {
     userId: string;
     password: string;
@@ -46,8 +50,8 @@ export interface EmailEntity extends BaseEntity<
 }
 
 export interface UsernameEntity extends BaseEntity<
-    Key<PkEnum.USERNAME, string>,
-    Key<SkEnum.METADATA, ''>
+    Key<KeyEnum.USERNAME, string>,
+    Key<KeyEnum.METADATA, ''>
 > {
     userId: string;
 }

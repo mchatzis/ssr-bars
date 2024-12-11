@@ -4,11 +4,12 @@ import { TransactionCanceledException } from "@aws-sdk/client-dynamodb";
 import { ulid } from "ulid";
 import { beforeAll, describe, expect, it } from 'vitest';
 import { Database, TransactWriteItemNoTableName } from './Database';
-import { BaseEntity, Key, PkEnum, SkEnum } from "./types";
+import { KeyEnum } from "./enums";
+import { BaseEntity, Key } from "./types";
 
 interface TestEntity extends BaseEntity<
-    Key<PkEnum.USER, string>,
-    Key<SkEnum.METADATA, ''>
+    Key<KeyEnum.USER, string>,
+    Key<KeyEnum.METADATA, ''>
 > {
     attribute1?: string;
     attribute2?: number;
