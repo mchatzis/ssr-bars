@@ -23,6 +23,6 @@ export default function ThemeButton({ className = '' }) {
     }, [dispatch]);
 
     return (
-        <button className={className} onClick={() => dispatch(toggleTheme())}>Toggle theme</button>
+        <button className={`bg-red-400 ${className}`} onClick={() => dispatch(toggleTheme())}>Toggle theme</button>
     )
 }

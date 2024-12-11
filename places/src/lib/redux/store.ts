@@ -1,8 +1,9 @@
 import { combineSlices, configureStore } from '@reduxjs/toolkit';
+import appStateSlice from './slices/appStateSlice';
 import mapStateSlice from './slices/mapStateSlice';
 import styleStateSlice from "./slices/styleStateSlice";
 
-const rootReducer = combineSlices(mapStateSlice, styleStateSlice);
+const rootReducer = combineSlices(mapStateSlice, styleStateSlice, appStateSlice);
 export type RootState = ReturnType<typeof rootReducer>;
 
 // `makeStore` encapsulates the store configuration to allow

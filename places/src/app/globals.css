@@ -16,6 +16,12 @@
   --primary-dark: #bb86fc;
   --secondary-dark: #03dac6;
   --accent-dark: #ffab91;
+
+  --z-map: 10;
+  --z-controls: 20;
+  --z-display: 30;
+  --z-popup: 40;
+  --z-max: 50;
 }
 
 body {
@@ -23,22 +29,48 @@ body {
 }
 
 [data-theme="light"] body {
-  background: var(--background-light);
-  color: var(--text-light);
+  --background-color: var(--background-light);
+  --text-color: var(--text-light);
   --primary-color: var(--primary-light);
   --secondary-color: var(--secondary-light);
   --accent-color: var(--accent-light);
+
+  background: var(--background-color);
+  color: var(--text-color);
 }
 
 [data-theme="dark"] body {
-  background: var(--background-dark);
-  color: var(--text-dark);
+  --background-color: var(--background-dark);
+  --text-color: var(--text-dark);
   --primary-color: var(--primary-dark);
   --secondary-color: var(--secondary-dark);
   --accent-color: var(--accent-dark);
+
+  background: var(--background-color);
+  color: var(--text-color);
 }
 
 .maplibregl-ctrl-attrib.maplibregl-compact {
   background-color: #acacac !important;
   opacity: 0.7;
+}
+
+@layer utilities {
+  ::-webkit-scrollbar {
+    width: 1vw;
+  }
+
+  ::-webkit-scrollbar-track {
+    border-radius: 100vh;
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    border-radius: 100vh;
+    background: var(--background-color)
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #B2A59B;
+  }
 }

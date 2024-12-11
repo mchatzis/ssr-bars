@@ -2,8 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import type { RootState } from '../store';
 
 type Theme = 'light' | 'dark';
-const defaultTheme: Theme = 'light';
-
+const defaultTheme = 'light';
 function isValidTheme(theme: string): theme is Theme {
     return theme === 'light' || theme === 'dark';
 }
@@ -34,7 +33,7 @@ const getInitialState = (): StyleState => {
     }
 }
 
-export const styleStateSlice = createSlice({
+const styleStateSlice = createSlice({
     name: 'style',
     initialState: getInitialState,
     reducers: {
@@ -55,8 +54,7 @@ export const styleStateSlice = createSlice({
     }
 })
 
-export const { toggleTheme, setTheme } = styleStateSlice.actions
-
+export const { toggleTheme, setTheme } = styleStateSlice.actions;
 export const selectTheme = (state: RootState) => state.style.theme
 
 export default styleStateSlice
