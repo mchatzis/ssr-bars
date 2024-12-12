@@ -2,14 +2,14 @@
 
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 
-interface Props<P extends string> {
+interface Props {
     className?: string;
-    allOptions: P[];
-    currentChoice: P;
+    allOptions: string[];
+    currentChoice: string;
     value: string;
     setValue: Dispatch<SetStateAction<string>>;
 }
-export default function InputWithOptionsDropdown<P extends string>({ className = '', allOptions, currentChoice, value, setValue }: Props<P>) {
+export default function InputWithOptionsDropdown({ className = '', allOptions, currentChoice, value, setValue }: Props) {
     const [focused, setFocused] = useState(false);
     const [options, setOptions] = useState(allOptions);
 
@@ -23,7 +23,7 @@ export default function InputWithOptionsDropdown<P extends string>({ className =
         }
 
         setOptions(filteredSuggestions);
-    }, [value])
+    }, [value, allOptions])
 
     function handleFocus(e: React.FocusEvent<HTMLInputElement>) {
         e.target.setAttribute('placeholder', '');

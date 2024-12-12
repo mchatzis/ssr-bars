@@ -1,66 +1,70 @@
 'use client'
 
-import { AreaEnum, PlaceTypeEnum } from "@/lib/db/enums";
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
-import { selectArea, selectPlaceType, setArea, setPlaceType } from "@/lib/redux/slices/appStateSlice";
-import { useRef, useState } from "react";
+import { Area, PlaceType, selectAllAreas, selectAllPlaceTypes, selectArea, selectPlaceType, setArea, setPlaceType } from "@/lib/redux/slices/appStateSlice";
+import { setViewState } from "@/lib/redux/slices/mapStateSlice";
+import { useCallback, useRef, useState } from "react";
 import { useClickAway } from "react-use";
 import InputWithOptionsDropdown from "./InputWithOptionsDropdown";
 
-function isValidOption<P extends string>(value: string, options: P[]): value is P {
-    return options.includes(value as P);
-}
 
 export default function DoubleInputSearch({ className = '' }) {
-    const divRef = useRef<HTMLDivElement>(null);
-    const [areaValue, setAreaValue] = useState('');
-    const allAreas = Object.values(AreaEnum);
-    const [placeTypeValue, setPlaceTypeValue] = useState('');
-    const allPlaceTypes = Object.values(PlaceTypeEnum);
+    const enclosingDivRef = useRef<HTMLDivElement>(null);
+    const allAreas: Area[] = useAppSelector(selectAllAreas);
+    const allAreaNames: string[] = allAreas.map(area => area.name);
+    const allPlaceTypes: PlaceType[] = useAppSelector(selectAllPlaceTypes);
+    const allPlaceTypeNames: string[] = allPlaceTypes.map(placeType => placeType.name);
 
-    const currentArea = useAppSelector(selectArea);
-    const currentPlaceType = useAppSelector(selectPlaceType);
+    const [areaFieldValue, setAreaFieldValue] = useState('');
+    const [placeTypeFieldValue, setPlaceTypeFieldValue] = useState('');
+
+
+    const currentArea: Area = useAppSelector(selectArea);
+    const currentPlaceType: PlaceType = useAppSelector(selectPlaceType);
     const dispatch = useAppDispatch();
 
-    useClickAway(divRef, () => {
-        setAreaValue('');
-        setPlaceTypeValue('');
+    useClickAway(enclosingDivRef, () => {
+        setAreaFieldValue('');
+        setPlaceTypeFieldValue('');
     })
 
-    function handleSearchClick(e: React.MouseEvent<HTMLButtonElement>) {
-        const cleanAreaValue = areaValue.trim();
-        const cleanPlaceTypeValue = placeTypeValue.trim();
+    const handleSearchClick = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+        const cleanedAreaFieldValue = areaFieldValue.trim();
+        const cleanedPlaceTypeFieldValue = placeTypeFieldValue.trim();
 
-        if (!isValidOption<AreaEnum>(cleanAreaValue, allAreas)) {
-            alert(`${cleanAreaValue} is not a valid option`)
+        const chosenArea = allAreas.find((area) => area.name === cleanedAreaFieldValue);
+        if (!chosenArea) {
+            alert(`${cleanedAreaFieldValue} is not a valid option`)
             return
         }
-        if (!isValidOption<PlaceTypeEnum>(cleanPlaceTypeValue, allPlaceTypes)) {
-            alert(`${cleanPlaceTypeValue} is not a valid option`)
+        const chosenPlaceType = allPlaceTypes.find((placeType) => placeType.name === cleanedPlaceTypeFieldValue);
+        if (!chosenPlaceType) {
+            alert(`${cleanedPlaceTypeFieldValue} is not a valid option`)
             return
         }
 
-        dispatch(setArea(cleanAreaValue));
-        setAreaValue('');
-        dispatch(setPlaceType(cleanPlaceTypeValue));
-        setPlaceTypeValue('');
-    }
+        dispatch(setArea(chosenArea));
+        dispatch(setViewState({ longitude: chosenArea.longitude, latitude: chosenArea.latitude, zoom: chosenArea.initialZoom }));
+        setAreaFieldValue('');
+        dispatch(setPlaceType(chosenPlaceType));
+        setPlaceTypeFieldValue('');
+    }, [areaFieldValue, placeTypeFieldValue, allAreas, allPlaceTypes])
 
     return (
-        <div ref={divRef} className={`flex ${className}`}>
+        <div ref={enclosingDivRef} className={`flex ${className}`}>
             <InputWithOptionsDropdown
                 className=""
-                allOptions={Object.values(AreaEnum)}
-                currentChoice={currentArea}
-                value={areaValue}
-                setValue={setAreaValue}
+                allOptions={allAreaNames}
+                currentChoice={currentArea.name}
+                value={areaFieldValue}
+                setValue={setAreaFieldValue}
             />
             <InputWithOptionsDropdown
                 className=""
-                allOptions={Object.values(PlaceTypeEnum)}
-                currentChoice={currentPlaceType}
-                value={placeTypeValue}
-                setValue={setPlaceTypeValue}
+                allOptions={allPlaceTypeNames}
+                currentChoice={currentPlaceType.name}
+                value={placeTypeFieldValue}
+                setValue={setPlaceTypeFieldValue}
             />
             <button className="ml-1" onClick={handleSearchClick}>Search</button>
         </div>

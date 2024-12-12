@@ -1,6 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { FeatureCollection } from 'geojson';
-import { ViewState } from 'react-map-gl';
 import type { RootState } from '../store';
 
 export type Place = {
@@ -26,6 +25,11 @@ export function isPlace(obj: any): obj is Place {
     );
 }
 
+interface ViewState {
+    longitude: number,
+    latitude: number,
+    zoom: number
+}
 interface MapState {
     viewState: ViewState;
     data: Record<string, Place[]>;
