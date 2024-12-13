@@ -1,4 +1,3 @@
-import { PlaceTypeEnum } from "@/lib/db/enums";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
@@ -7,15 +6,20 @@ export async function GET(request: NextRequest) {
     const area = searchParams.get("area");
     const placeType = searchParams.get("placeType");
 
-    let data = await fetch("http://localhost:3001/mockData.json", {
-        cache: 'no-store',
-    })
-        .then(res => res.json());
+    let data;
 
-    if (!(area === "Vienna" && placeType === PlaceTypeEnum.BAR)) {
-        data = {};
+    if ((area === "Vienna" && placeType === "bar")) {
+        data = await fetch("http://localhost:3001/mockDataVienna.json", {
+            cache: 'no-store',
+        })
+            .then(res => res.json());
+    }
+    if ((area === "Thessaloniki" && placeType === "bar")) {
+        data = await fetch("http://localhost:3001/mockDataThessaloniki.json", {
+            cache: 'no-store',
+        })
+            .then(res => res.json());
     }
 
-    console.log(area, placeType);
     return NextResponse.json(data)
 }

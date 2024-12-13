@@ -18,6 +18,7 @@ interface AppState {
     placeType: PlaceType,
     availableCategories: string[];
     activeCategories: string[];
+    cachedCategories: string[];
 }
 
 const initialAppState: AppState = {
@@ -33,7 +34,8 @@ const initialAppState: AppState = {
         name: "bar"
     },
     availableCategories: [],
-    activeCategories: []
+    activeCategories: [],
+    cachedCategories: []
 }
 
 const appStateSlice = createSlice({
@@ -58,6 +60,9 @@ const appStateSlice = createSlice({
         setActiveCategories: (state, action: PayloadAction<string[]>) => {
             state.activeCategories = action.payload;
         },
+        setCachedCategories: (state, action: PayloadAction<string[]>) => {
+            state.cachedCategories = action.payload;
+        }
     }
 })
 
@@ -67,6 +72,7 @@ export const selectAllPlaceTypes = (state: RootState) => state.app.allPlaceTypes
 export const selectPlaceType = (state: RootState) => state.app.placeType;
 export const selectAppAvailableCategories = (state: RootState) => state.app.availableCategories;
 export const selectAppActiveCategories = (state: RootState) => state.app.activeCategories;
+export const selectCachedCategories = (state: RootState) => state.app.cachedCategories;
 
 export const {
     setAllAreas,
@@ -74,7 +80,8 @@ export const {
     setAllPlaceTypes,
     setPlaceType,
     setActiveCategories,
-    setAvailableCategories
+    setAvailableCategories,
+    setCachedCategories
 } = appStateSlice.actions;
 
 export default appStateSlice;

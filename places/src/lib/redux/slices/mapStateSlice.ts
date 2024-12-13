@@ -1,5 +1,4 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { FeatureCollection } from 'geojson';
 import type { RootState } from '../store';
 
 export type Place = {
@@ -8,8 +7,16 @@ export type Place = {
         longitude: number,
         latitude: number,
         title: string,
-        description: string
+        description: string,
+        primaryImage: string,
+        images: string[]
     };
+    imagesUrls: {
+        primaryImages: string[] //[sm, md, lg]
+        small: string[],
+        medium: string[],
+        large: string[],
+    }
 }
 
 export function isPlace(obj: any): obj is Place {
@@ -33,7 +40,7 @@ interface ViewState {
 interface MapState {
     viewState: ViewState;
     data: Record<string, Place[]>;
-    activeFeatures: FeatureCollection;
+    activePlaces: Place[];
 }
 
 const initialViewState: ViewState = {
@@ -42,15 +49,12 @@ const initialViewState: ViewState = {
     zoom: 13
 } as ViewState
 const initialData = {};
-const initialActiveFeatures: FeatureCollection = {
-    type: "FeatureCollection",
-    features: []
-}
+const initialActivePlaces: Place[] = []
 
 const initialMapState: MapState = {
     viewState: initialViewState,
     data: initialData,
-    activeFeatures: initialActiveFeatures
+    activePlaces: initialActivePlaces
 }
 
 const mapStateSlice = createSlice({
@@ -63,16 +67,16 @@ const mapStateSlice = createSlice({
         setData: (state, action: PayloadAction<Record<string, Place[]>>) => {
             state.data = action.payload;
         },
-        setActiveFeatures: (state, action: PayloadAction<FeatureCollection>) => {
-            state.activeFeatures = action.payload;
+        setActivePlaces: (state, action: PayloadAction<Place[]>) => {
+            state.activePlaces = action.payload;
         }
     }
 })
 
 export const selectViewState = (state: RootState) => state.map.viewState
 
-export const { setData, setActiveFeatures, setViewState } = mapStateSlice.actions;
+export const { setData, setActivePlaces, setViewState } = mapStateSlice.actions;
 export const selectMapData = (state: RootState) => state.map.data;
-export const selectMapActiveFeatures = (state: RootState) => state.map.activeFeatures;
+export const selectMapActivePlaces = (state: RootState) => state.map.activePlaces;
 
 export default mapStateSlice
