@@ -1,5 +1,5 @@
-import FullScreenButton from "./buttons/FullScreenButton";
-import ThemeButton from "./buttons/ThemeButton";
+import FullScreenButton from "@/components/buttons/FullScreenButton";
+import ThemeButton from "@/components/buttons/ThemeButton";
 
 
 export default function MapControlsComponent({ className = '' }) {

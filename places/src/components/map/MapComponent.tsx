@@ -6,7 +6,7 @@ import Map, { Layer, MapLayerMouseEvent, Popup, Source, SymbolLayer, ViewStateCh
 import { intersectionByUuid, to_geojson } from '@/lib/map/helpers';
 import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
 import { selectAppActiveCategories, selectArea, selectCachedCategories, selectPlaceType } from '@/lib/redux/slices/appStateSlice';
-import { selectMapActivePlaces, selectMapData, selectViewState, setActivePlaces, setData, setViewState } from '@/lib/redux/slices/mapStateSlice';
+import { Place, selectMapActivePlaces, selectMapData, selectViewState, setActivePlaces, setMapData, setViewState } from '@/lib/redux/slices/mapStateSlice';
 import { selectTheme } from '@/lib/redux/slices/styleStateSlice';
 import { MapLibreEvent } from 'maplibre-gl';
 import { getImageProps } from 'next/image';
@@ -53,19 +53,62 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
     useEffect(() => {
         fetch(`/api/data/places?area=${area.name}&placeType=${placeType.name}`, { cache: 'no-store' })
             .then(res => res.json())
-            .then(data => dispatch(setData(data)));
+            .then(data => dispatch(setMapData(data)));
     }, [area, placeType])
 
     useEffect(() => {
         const placesByCategory = activeCategories.map((category) => mapData[category]);
         const activePlaces = intersectionByUuid(...placesByCategory);
 
+        console.log(mapData)
         dispatch(setActivePlaces(activePlaces));
     }, [activeCategories, mapData])
 
+    async function getImageUrl(src: string) {
+        return fetch(src)
+            .then(response => {
+                return response.blob();
+            })
+            .then(blob => {
+                const objectUrl = URL.createObjectURL(blob);
+                // console.log('Created object URL:', objectUrl);
+                return objectUrl
+            });
+    }
+    async function fetchImagesWithSize(places: Place[], width: number): Promise<Place[]> {
+        const imageUrls: Promise<string>[] = places.map((place) => {
+            const imageSources = [place.properties.primaryImage];
+            const imageUrls = imageSources.map(getImageUrl);
+
+            return imageUrls;
+        })
+        const updatedPlaces = places.map((place) => {
+            const imageSources = [place.properties.primaryImage];
+            const imageUrls = imageSources.map(getImageUrl);
+
+            return {
+                ...place,
+                imagesUrls: {
+                    ...place.imagesUrls,
+                    small: imageUrls
+                }
+            }
+        })
+
+        console.log(updatedPlaces)
+        return updatedPlaces;
+    }
     useEffect(() => {
-        // const placesByCategory = activeCategories.map((category) => mapData[category]);
-        console.log(cachedCategories);
+        if (cachedCategories.length === 0) { return }
+        console.log("useEffect")
+        const lastAddedCategory = cachedCategories[cachedCategories.length - 1];
+        fetchImagesWithSize(mapData[lastAddedCategory], 100)
+            .then((updatedPlaces) => {
+                dispatch(setMapData({
+                    ...mapData,
+                    [lastAddedCategory]: updatedPlaces
+                }))
+            })
     }, [cachedCategories])
 
     const onMove = useCallback((evt: ViewStateChangeEvent) => {
@@ -111,14 +154,14 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
     })
 
     useEffect(() => {
-        console.log(props.src)
+        // console.log(props.src)
         fetch(props.src)
             .then(response => {
                 return response.blob();
             })
             .then(blob => {
                 const objectUrl = URL.createObjectURL(blob);
-                console.log('Created object URL:', objectUrl);
+                // console.log('Created object URL:', objectUrl);
 
                 setUrl(objectUrl);
             });

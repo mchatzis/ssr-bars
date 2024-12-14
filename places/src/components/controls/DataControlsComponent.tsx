@@ -1,10 +1,10 @@
 'use client'
 
+import DoubleInputSearch from "@/components/dropdowns/DoubleInputSearch";
+import FilterCategoryDropdown from "@/components/dropdowns/FilterCategoryDropdown";
 import { useAppDispatch } from "@/lib/redux/hooks";
 import { setAllAreas, setAllPlaceTypes } from "@/lib/redux/slices/appStateSlice";
 import { useEffect } from "react";
-import DoubleInputSearch from "./dropdowns/DoubleInputSearch";
-import FilterCategoryDropdown from "./dropdowns/FilterCategoryDropdown";
 
 
 export default function DataControlsComponent({ className = '' }) {

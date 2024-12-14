@@ -1,7 +1,7 @@
 import LoginButton from "@/components/buttons/LoginButton"
-import DataControlsComponent from "@/components/DataControlsComponent"
+import DataControlsComponent from "@/components/controls/DataControlsComponent"
+import MapControlsComponent from "@/components/controls/MapControlsComponent"
 import MapComponent from "@/components/map/MapComponent"
-import MapControlsComponent from "@/components/MapControlsComponent"
 
 
 export default async function Page() {

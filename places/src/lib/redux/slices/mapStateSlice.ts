@@ -12,7 +12,6 @@ export type Place = {
         images: string[]
     };
     imagesUrls: {
-        primaryImages: string[] //[sm, md, lg]
         small: string[],
         medium: string[],
         large: string[],
@@ -64,7 +63,7 @@ const mapStateSlice = createSlice({
         setViewState: (state, action: PayloadAction<ViewState>) => {
             state.viewState = action.payload;
         },
-        setData: (state, action: PayloadAction<Record<string, Place[]>>) => {
+        setMapData: (state, action: PayloadAction<Record<string, Place[]>>) => {
             state.data = action.payload;
         },
         setActivePlaces: (state, action: PayloadAction<Place[]>) => {
@@ -75,7 +74,7 @@ const mapStateSlice = createSlice({
 
 export const selectViewState = (state: RootState) => state.map.viewState
 
-export const { setData, setActivePlaces, setViewState } = mapStateSlice.actions;
+export const { setMapData, setActivePlaces, setViewState } = mapStateSlice.actions;
 export const selectMapData = (state: RootState) => state.map.data;
 export const selectMapActivePlaces = (state: RootState) => state.map.activePlaces;
 
