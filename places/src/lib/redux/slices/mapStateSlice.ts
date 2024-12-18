@@ -1,9 +1,26 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import type { RootState } from '../store';
 
+type Size = 'small' | 'medium' | 'large';
+export const ImageSizeOptions: Record<Size, {width: number, height: number}> = {
+    small: {
+        width: 100,
+        height: 100
+    },
+    medium: {
+        width: 256,
+        height: 256
+    },
+    large: {
+        width: 1024,
+        height: 1024
+    }
+} as const;
+
 export type Place = {
     uuid: string;
     properties: {
+        categories: string[],
         longitude: number,
         latitude: number,
         title: string,

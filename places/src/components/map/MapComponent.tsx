@@ -6,7 +6,7 @@ import Map, { Layer, MapLayerMouseEvent, Popup, Source, SymbolLayer, ViewStateCh
 import { intersectionByUuid, to_geojson } from '@/lib/map/helpers';
 import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
 import { selectAppActiveCategories, selectArea, selectCachedCategories, selectPlaceType } from '@/lib/redux/slices/appStateSlice';
-import { Place, selectMapActivePlaces, selectMapData, selectViewState, setActivePlaces, setMapData, setViewState } from '@/lib/redux/slices/mapStateSlice';
+import { ImageSizeOptions, Place, selectMapActivePlaces, selectMapData, selectViewState, setActivePlaces, setMapData, setViewState } from '@/lib/redux/slices/mapStateSlice';
 import { selectTheme } from '@/lib/redux/slices/styleStateSlice';
 import { MapLibreEvent } from 'maplibre-gl';
 import { getImageProps } from 'next/image';
@@ -48,7 +48,6 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
     const cachedCategories = useAppSelector(selectCachedCategories);
 
     const [popupInfo, setPopupInfo] = useState<PopUpInfo | null>(null);
-    const [url, setUrl] = useState('');
 
     useEffect(() => {
         fetch(`/api/data/places?area=${area.name}&placeType=${placeType.name}`, { cache: 'no-store' })
@@ -75,34 +74,40 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
                 return objectUrl
             });
     }
-    async function fetchImagesWithSize(places: Place[], width: number): Promise<Place[]> {
-        const imageUrls: Promise<string>[] = places.map((place) => {
-            const imageSources = [place.properties.primaryImage];
+    async function addImagesToPlaces(places: Place[], size: keyof typeof ImageSizeOptions): Promise<Place[]> {
+        const sizeOption = ImageSizeOptions[size];
+
+        const placesWithImages = places.map((place) => {
+            const imagePaths = [place.properties.primaryImage];
+            const imageSources = imagePaths.map((path) => {
+                return getImageProps({
+                    src: path, 
+                    alt: '', 
+                    width: sizeOption.width, 
+                    height: sizeOption.height
+                }).props.src
+            });
             const imageUrls = imageSources.map(getImageUrl);
 
-            return imageUrls;
-        })
-        const updatedPlaces = places.map((place) => {
-            const imageSources = [place.properties.primaryImage];
-            const imageUrls = imageSources.map(getImageUrl);
-
-            return {
-                ...place,
-                imagesUrls: {
-                    ...place.imagesUrls,
-                    small: imageUrls
-                }
-            }
+            const placeWithImages: Promise<Place> = Promise.all(imageUrls)
+                .then(urls => ({
+                    ...place,
+                    imagesUrls: {
+                        ...place.imagesUrls,
+                        [size]: urls
+                    }
+                }))
+            
+            return placeWithImages;
         })
 
-        console.log(updatedPlaces)
-        return updatedPlaces;
+        return Promise.all(placesWithImages);
     }
     useEffect(() => {
         if (cachedCategories.length === 0) { return }
         console.log("useEffect")
         const lastAddedCategory = cachedCategories[cachedCategories.length - 1];
-        fetchImagesWithSize(mapData[lastAddedCategory], 100)
+        addImagesToPlaces(mapData[lastAddedCategory], 'small')
             .then((updatedPlaces) => {
                 dispatch(setMapData({
                     ...mapData,
@@ -131,12 +136,12 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
             return
         }
 
-        const enteredFeature = e.features[0];
+        const featureProperties = e.features[0].properties;
         setPopupInfo({
             longitude: e.lngLat.lng,
             latitude: e.lngLat.lat,
-            name: enteredFeature.properties.name,
-            icon: enteredFeature.properties.icon,
+            name: featureProperties.name,
+            icon: featureProperties.icon,
             imgSrc: 'https://assets.vercel.com/image/upload/v1538361091/repositories/next-js/next-js-bg.png'
         });
     }, [])
@@ -145,27 +150,27 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
         // setPopupInfo(null);
     }, [])
 
-    const { props } = getImageProps({
-        src: 'https://assets.vercel.com/image/upload/v1538361091/repositories/next-js/next-js-bg.png',
-        alt: 'popupInfo.name',
-        width: 100,
-        height: 100,
-        loading: 'eager',
-    })
+    // const { props } = getImageProps({
+    //     src: 'https://assets.vercel.com/image/upload/v1538361091/repositories/next-js/next-js-bg.png',
+    //     alt: 'popupInfo.name',
+    //     width: 100,
+    //     height: 100,
+    //     loading: 'eager',
+    // })
 
-    useEffect(() => {
-        // console.log(props.src)
-        fetch(props.src)
-            .then(response => {
-                return response.blob();
-            })
-            .then(blob => {
-                const objectUrl = URL.createObjectURL(blob);
-                // console.log('Created object URL:', objectUrl);
+    // useEffect(() => {
+    //     // console.log(props.src)
+    //     fetch(props.src)
+    //         .then(response => {
+    //             return response.blob();
+    //         })
+    //         .then(blob => {
+    //             const objectUrl = URL.createObjectURL(blob);
+    //             // console.log('Created object URL:', objectUrl);
 
-                setUrl(objectUrl);
-            });
-    }, []);
+    //             setUrl(objectUrl);
+    //         });
+    // }, []);
 
     return (
         <div id="map-container" className={`${className}`}>
@@ -188,7 +193,7 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
                         latitude={popupInfo.latitude}
                         anchor='bottom'
                     >
-                        <img src={url} width={props.width} height={props.height}></img>
+                        <img src={url} {...ImageSizeOptions['small']}></img>
                     </Popup>
                 }
             </Map>
