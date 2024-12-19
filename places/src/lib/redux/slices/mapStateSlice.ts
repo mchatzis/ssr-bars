@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import type { RootState } from '../store';
 
 type Size = 'small' | 'medium' | 'large';
-export const ImageSizeOptions: Record<Size, {width: number, height: number}> = {
+export const ImageSizeOptions: Record<Size, { width: number, height: number }> = {
     small: {
         width: 100,
         height: 100
@@ -18,9 +18,9 @@ export const ImageSizeOptions: Record<Size, {width: number, height: number}> = {
 } as const;
 
 export type Place = {
-    uuid: string;
     properties: {
-        categories: string[],
+        uuid: string,
+        category: string,
         longitude: number,
         latitude: number,
         title: string,
@@ -38,9 +38,9 @@ export type Place = {
 export function isPlace(obj: any): obj is Place {
     return (
         typeof obj === 'object' && obj !== null &&
-        typeof obj.uuid === 'string' &&
         typeof obj.properties === 'object' &&
         obj.properties !== null &&
+        typeof obj.properties.uuid === 'string' &&
         typeof obj.properties.longitude === 'number' &&
         typeof obj.properties.latitude === 'number' &&
         typeof obj.properties.title === 'string' &&
@@ -53,9 +53,14 @@ interface ViewState {
     latitude: number,
     zoom: number
 }
+type ApiData = {
+    [category: string]: {
+        [uuid: string]: Place
+    }
+}
 interface MapState {
     viewState: ViewState;
-    data: Record<string, Place[]>;
+    data: ApiData;
     activePlaces: Place[];
 }
 
@@ -80,7 +85,7 @@ const mapStateSlice = createSlice({
         setViewState: (state, action: PayloadAction<ViewState>) => {
             state.viewState = action.payload;
         },
-        setMapData: (state, action: PayloadAction<Record<string, Place[]>>) => {
+        setMapData: (state, action: PayloadAction<ApiData>) => {
             state.data = action.payload;
         },
         setActivePlaces: (state, action: PayloadAction<Place[]>) => {

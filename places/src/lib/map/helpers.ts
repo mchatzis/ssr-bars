@@ -1,8 +1,8 @@
 import { Feature, FeatureCollection, GeoJsonProperties, Geometry } from "geojson";
 import { Place } from "../redux/slices/mapStateSlice";
 
-export function to_geojson(dbData: Place[]): FeatureCollection {
-    let feature_list = dbData.map((dataPoint) => {
+export function to_geojson(apiData: Place[]): FeatureCollection {
+    let feature_list = apiData.map((dataPoint) => {
         const feature: Feature<Geometry, GeoJsonProperties> = {
             type: "Feature",
             geometry: {
@@ -13,7 +13,8 @@ export function to_geojson(dbData: Place[]): FeatureCollection {
                 ]
             },
             properties: {
-                "id": dataPoint.uuid,
+                "uuid": dataPoint.properties.uuid,
+                "category": dataPoint.properties.category,
                 "title": dataPoint.properties.title,
                 "description": dataPoint.properties.description,
             }
@@ -27,14 +28,3 @@ export function to_geojson(dbData: Place[]): FeatureCollection {
         features: feature_list
     }
 }
-
-export function intersectionByUuid(...lists: Place[][]): Place[] {
-    if (!lists[0]) { return [] }
-
-    //TODO: Check for performance improvements
-    const commonUuids = lists[0].filter((item: Place) =>
-        lists.every(list => list.some((obj: Place) => obj.uuid === item.uuid))
-    );
-
-    return commonUuids
-};

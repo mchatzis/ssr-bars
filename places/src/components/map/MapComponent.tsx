@@ -3,7 +3,7 @@
 import 'maplibre-gl/dist/maplibre-gl.css';
 import Map, { Layer, MapLayerMouseEvent, Popup, Source, SymbolLayer, ViewStateChangeEvent } from 'react-map-gl/maplibre';
 
-import { intersectionByUuid, to_geojson } from '@/lib/map/helpers';
+import { to_geojson } from '@/lib/map/helpers';
 import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
 import { selectAppActiveCategories, selectArea, selectCachedCategories, selectPlaceType } from '@/lib/redux/slices/appStateSlice';
 import { ImageSizeOptions, Place, selectMapActivePlaces, selectMapData, selectViewState, setActivePlaces, setMapData, setViewState } from '@/lib/redux/slices/mapStateSlice';
@@ -29,6 +29,7 @@ interface PopUpInfo {
     longitude: number;
     latitude: number;
     name: string;
+    category: string;
     icon: string;
     imgSrc: string;
 }
@@ -56,11 +57,17 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
     }, [area, placeType])
 
     useEffect(() => {
+        if (activeCategories.length === 0) { return }
         const placesByCategory = activeCategories.map((category) => mapData[category]);
-        const activePlaces = intersectionByUuid(...placesByCategory);
+
+        const uuidsIntersection = placesByCategory
+            .map(Object.keys)
+            .reduce((acc, keys) => acc.filter(key => keys.includes(key)));
+        const activePlaces = uuidsIntersection.map((uuid) => placesByCategory[0][uuid])
+
+        dispatch(setActivePlaces(activePlaces));
 
         console.log(mapData)
-        dispatch(setActivePlaces(activePlaces));
     }, [activeCategories, mapData])
 
     async function getImageUrl(src: string) {
@@ -81,9 +88,9 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
             const imagePaths = [place.properties.primaryImage];
             const imageSources = imagePaths.map((path) => {
                 return getImageProps({
-                    src: path, 
-                    alt: '', 
-                    width: sizeOption.width, 
+                    src: path,
+                    alt: '',
+                    width: sizeOption.width,
                     height: sizeOption.height
                 }).props.src
             });
@@ -97,7 +104,7 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
                         [size]: urls
                     }
                 }))
-            
+
             return placeWithImages;
         })
 
@@ -107,11 +114,18 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
         if (cachedCategories.length === 0) { return }
         console.log("useEffect")
         const lastAddedCategory = cachedCategories[cachedCategories.length - 1];
-        addImagesToPlaces(mapData[lastAddedCategory], 'small')
+
+        //TODO: Why not use activePlaces somehow instead and maybe cache already fetched places?
+        const addedPlaces = Object.values(mapData[lastAddedCategory])
+        addImagesToPlaces(addedPlaces, 'small')
             .then((updatedPlaces) => {
+                const updatedRecords: Record<string, Place> = {}
+                updatedPlaces.forEach((place) => {
+                    updatedRecords[place.properties.uuid] = place
+                })
                 dispatch(setMapData({
                     ...mapData,
-                    [lastAddedCategory]: updatedPlaces
+                    [lastAddedCategory]: updatedRecords
                 }))
             })
     }, [cachedCategories])
@@ -141,6 +155,7 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
             longitude: e.lngLat.lng,
             latitude: e.lngLat.lat,
             name: featureProperties.name,
+            category: featureProperties.category,
             icon: featureProperties.icon,
             imgSrc: 'https://assets.vercel.com/image/upload/v1538361091/repositories/next-js/next-js-bg.png'
         });
@@ -149,28 +164,6 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
     const onMouseLeaveFeature = useCallback((e: MapLayerMouseEvent) => {
         // setPopupInfo(null);
     }, [])
-
-    // const { props } = getImageProps({
-    //     src: 'https://assets.vercel.com/image/upload/v1538361091/repositories/next-js/next-js-bg.png',
-    //     alt: 'popupInfo.name',
-    //     width: 100,
-    //     height: 100,
-    //     loading: 'eager',
-    // })
-
-    // useEffect(() => {
-    //     // console.log(props.src)
-    //     fetch(props.src)
-    //         .then(response => {
-    //             return response.blob();
-    //         })
-    //         .then(blob => {
-    //             const objectUrl = URL.createObjectURL(blob);
-    //             // console.log('Created object URL:', objectUrl);
-
-    //             setUrl(objectUrl);
-    //         });
-    // }, []);
 
     return (
         <div id="map-container" className={`${className}`}>
