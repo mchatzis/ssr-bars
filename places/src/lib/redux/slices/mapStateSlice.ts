@@ -67,7 +67,7 @@ interface MapState {
 const initialViewState: ViewState = {
     longitude: 16.37,
     latitude: 48.206,
-    zoom: 13
+    zoom: 13.3
 } as ViewState
 const initialData = {};
 const initialActivePlaces: Place[] = []

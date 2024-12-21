@@ -24,16 +24,6 @@ const pinLayer: SymbolLayer = {
         "icon-image": "pin"
     },
 };
-
-interface PopUpInfo {
-    longitude: number;
-    latitude: number;
-    name: string;
-    category: string;
-    icon: string;
-    imgSrc: string;
-}
-
 interface MapComponentProps {
     className?: string;
 }
@@ -48,7 +38,7 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
     const activePlaces = useAppSelector(selectMapActivePlaces);
     const cachedCategories = useAppSelector(selectCachedCategories);
 
-    const [popupInfo, setPopupInfo] = useState<PopUpInfo | null>(null);
+    const [popupPlace, setPopupPlace] = useState<Place | null>(null);
 
     useEffect(() => {
         fetch(`/api/data/places?area=${area.name}&placeType=${placeType.name}`, { cache: 'no-store' })
@@ -66,20 +56,13 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
         const activePlaces = uuidsIntersection.map((uuid) => placesByCategory[0][uuid])
 
         dispatch(setActivePlaces(activePlaces));
-
-        console.log(mapData)
     }, [activeCategories, mapData])
 
     async function getImageUrl(src: string) {
+        //TODO: Cache places to avoid re-fetching for places in multiple categories
         return fetch(src)
-            .then(response => {
-                return response.blob();
-            })
-            .then(blob => {
-                const objectUrl = URL.createObjectURL(blob);
-                // console.log('Created object URL:', objectUrl);
-                return objectUrl
-            });
+            .then(response => response.blob())
+            .then(blob => URL.createObjectURL(blob));
     }
     async function addImagesToPlaces(places: Place[], size: keyof typeof ImageSizeOptions): Promise<Place[]> {
         const sizeOption = ImageSizeOptions[size];
@@ -146,23 +129,17 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
 
     const onMouseEnterFeature = useCallback((e: MapLayerMouseEvent) => {
         if (!e.features) {
-            console.error("onMouseEnter triggered with no features");
+            console.error("onMouseEnter triggered with undefined features");
             return
         }
 
-        const featureProperties = e.features[0].properties;
-        setPopupInfo({
-            longitude: e.lngLat.lng,
-            latitude: e.lngLat.lat,
-            name: featureProperties.name,
-            category: featureProperties.category,
-            icon: featureProperties.icon,
-            imgSrc: 'https://assets.vercel.com/image/upload/v1538361091/repositories/next-js/next-js-bg.png'
-        });
-    }, [])
+        const feature = e.features[0];
+        const hoveredPlace = mapData[feature.properties.category][feature.properties.uuid];
+        setPopupPlace(hoveredPlace);
+    }, [mapData])
 
     const onMouseLeaveFeature = useCallback((e: MapLayerMouseEvent) => {
-        // setPopupInfo(null);
+        setPopupPlace(null);
     }, [])
 
     return (
@@ -180,13 +157,22 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
                 <Source id="my-data" type="geojson" data={to_geojson(activePlaces)}>
                     <Layer {...pinLayer} />
                 </Source>
-                {popupInfo &&
+                {popupPlace &&
                     <Popup
-                        longitude={popupInfo.longitude}
-                        latitude={popupInfo.latitude}
-                        anchor='bottom'
+                        longitude={popupPlace.properties.longitude}
+                        latitude={popupPlace.properties.latitude}
+                        closeButton={false}
+                        maxWidth='none'
+                        className='w-64 h-44 bg-[var(--background-color)] rounded-xl overflow-clip'
+                        offset={20}
                     >
-                        <img src={url} {...ImageSizeOptions['small']}></img>
+                        <div className='flex flex-col'>
+                            <img
+                                src={popupPlace.imagesUrls.small[0]}
+                                className='w-64 h-32'
+                            />
+                            <p className='text-red-600 text-left pl-3'>Other stuff</p>
+                        </div>
                     </Popup>
                 }
             </Map>

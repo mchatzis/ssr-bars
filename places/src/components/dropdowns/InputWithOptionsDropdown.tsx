@@ -40,10 +40,10 @@ export default function InputWithOptionsDropdown({ className = '', allOptions, c
     };
 
     return (
-        <div className={`h-[3vh] w-[8vw] ${className}`}>
+        <div className={`h-7 w-36 ${className}`}>
             <input
-                className="h-full w-full bg-[var(--background)] border border-gray-300 rounded-md focus:outline-none
-                  placeholder-gray-500 pl-2"
+                className="h-full w-full bg-[var(--background)] border border-gray-300 rounded-full focus:outline-none
+                  placeholder-gray-500 pl-3"
                 type="text"
                 value={value}
                 placeholder={currentChoice}
@@ -62,8 +62,8 @@ interface DropdownProps {
 }
 export function DropDown({ options, setValue }: DropdownProps) {
     return (
-        <div className="w-full h-[13vh] relative z-[var(--z-popup)]">
-            <ul className='w-full h-full text-sm text-gray-700 bg-white rounded-lg shadow overflow-y-scroll'>
+        <div className="w-full h-[15vh] relative z-[var(--z-popup)] rounded-xl overflow-clip">
+            <ul className='w-full h-full text-base text-gray-700 bg-white shadow overflow-y-scroll'>
                 {options.map((option, index) => {
                     return (
                         <li
