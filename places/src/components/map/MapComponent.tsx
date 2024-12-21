@@ -3,13 +3,12 @@
 import 'maplibre-gl/dist/maplibre-gl.css';
 import Map, { Layer, MapLayerMouseEvent, Popup, Source, SymbolLayer, ViewStateChangeEvent } from 'react-map-gl/maplibre';
 
-import { to_geojson } from '@/lib/map/helpers';
+import { addImagesToPlaces, to_geojson } from '@/lib/map/helpers';
 import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
-import { selectAppActiveCategories, selectArea, selectCachedCategories, selectPlaceType } from '@/lib/redux/slices/appStateSlice';
-import { ImageSizeOptions, Place, selectMapActivePlaces, selectMapData, selectViewState, setActivePlaces, setMapData, setViewState } from '@/lib/redux/slices/mapStateSlice';
+import { selectAppActiveCategories, selectArea, selectCachedCategories, selectPlaceType, setActiveCategories, setCachedCategories } from '@/lib/redux/slices/appStateSlice';
+import { Place, selectMapActivePlaces, selectMapData, selectViewState, setActivePlaces, setMapData, setViewState } from '@/lib/redux/slices/mapStateSlice';
 import { selectTheme } from '@/lib/redux/slices/styleStateSlice';
 import { MapLibreEvent } from 'maplibre-gl';
-import { getImageProps } from 'next/image';
 import { useCallback, useEffect, useState } from 'react';
 
 
@@ -43,7 +42,12 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
     useEffect(() => {
         fetch(`/api/data/places?area=${area.name}&placeType=${placeType.name}`, { cache: 'no-store' })
             .then(res => res.json())
-            .then(data => dispatch(setMapData(data)));
+            .then(data => {
+                dispatch(setActiveCategories([]));
+                dispatch(setCachedCategories([]));
+                dispatch(setMapData(data));
+            }
+            );
     }, [area, placeType])
 
     useEffect(() => {
@@ -58,41 +62,6 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
         dispatch(setActivePlaces(activePlaces));
     }, [activeCategories, mapData])
 
-    async function getImageUrl(src: string) {
-        //TODO: Cache places to avoid re-fetching for places in multiple categories
-        return fetch(src)
-            .then(response => response.blob())
-            .then(blob => URL.createObjectURL(blob));
-    }
-    async function addImagesToPlaces(places: Place[], size: keyof typeof ImageSizeOptions): Promise<Place[]> {
-        const sizeOption = ImageSizeOptions[size];
-
-        const placesWithImages = places.map((place) => {
-            const imagePaths = [place.properties.primaryImage];
-            const imageSources = imagePaths.map((path) => {
-                return getImageProps({
-                    src: path,
-                    alt: '',
-                    width: sizeOption.width,
-                    height: sizeOption.height
-                }).props.src
-            });
-            const imageUrls = imageSources.map(getImageUrl);
-
-            const placeWithImages: Promise<Place> = Promise.all(imageUrls)
-                .then(urls => ({
-                    ...place,
-                    imagesUrls: {
-                        ...place.imagesUrls,
-                        [size]: urls
-                    }
-                }))
-
-            return placeWithImages;
-        })
-
-        return Promise.all(placesWithImages);
-    }
     useEffect(() => {
         if (cachedCategories.length === 0) { return }
         console.log("useEffect")
