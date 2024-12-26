@@ -51,7 +51,11 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
     }, [area, placeType])
 
     useEffect(() => {
-        if (activeCategories.length === 0) { return }
+        console.log("Setting active places...")
+        if (activeCategories.length === 0) {
+            dispatch(setActivePlaces([]));
+            return
+        }
         const placesByCategory = activeCategories.map((category) => mapData[category]);
 
         const uuidsIntersection = placesByCategory
@@ -59,12 +63,12 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
             .reduce((acc, keys) => acc.filter(key => keys.includes(key)));
         const activePlaces = uuidsIntersection.map((uuid) => placesByCategory[0][uuid])
 
+        console.log(activePlaces)
         dispatch(setActivePlaces(activePlaces));
     }, [activeCategories, mapData])
 
     useEffect(() => {
         if (cachedCategories.length === 0) { return }
-        console.log("useEffect")
         const lastAddedCategory = cachedCategories[cachedCategories.length - 1];
 
         //TODO: Why not use activePlaces somehow instead and maybe cache already fetched places?
