@@ -51,7 +51,6 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
     }, [area, placeType])
 
     useEffect(() => {
-        console.log("Setting active places...")
         if (activeCategories.length === 0) {
             dispatch(setActivePlaces([]));
             return
@@ -63,7 +62,6 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
             .reduce((acc, keys) => acc.filter(key => keys.includes(key)));
         const activePlaces = uuidsIntersection.map((uuid) => placesByCategory[0][uuid])
 
-        console.log(activePlaces)
         dispatch(setActivePlaces(activePlaces));
     }, [activeCategories, mapData])
 
@@ -86,11 +84,11 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
             })
     }, [cachedCategories])
 
-    const onMove = useCallback((evt: ViewStateChangeEvent) => {
+    const handleMapMove = useCallback((evt: ViewStateChangeEvent) => {
         dispatch(setViewState(evt.viewState));
     }, []);
 
-    const onMapLoad = useCallback((e: MapLibreEvent) => {
+    const handleMapLoad = useCallback((e: MapLibreEvent) => {
         const map = e.target;
 
         const pinImage = new Image(30, 30)
@@ -100,7 +98,7 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
         }
     }, []);
 
-    const onMouseEnterFeature = useCallback((e: MapLayerMouseEvent) => {
+    const handleMouseEnterFeature = useCallback((e: MapLayerMouseEvent) => {
         if (!e.features) {
             console.error("onMouseEnter triggered with undefined features");
             return
@@ -111,10 +109,6 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
         setPopupPlace(hoveredPlace);
     }, [mapData])
 
-    const onMouseLeaveFeature = useCallback((e: MapLayerMouseEvent) => {
-        setPopupPlace(null);
-    }, [])
-
     return (
         <div id="map-container" className={`${className}`}>
             <Map
@@ -122,32 +116,40 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
                 mapStyle={(theme === 'light') ? lightMapStyle : darkMapStyle}
                 {...viewState}
                 interactiveLayerIds={[pinLayer.id]}
-                onMove={onMove}
-                onLoad={onMapLoad}
-                onMouseEnter={onMouseEnterFeature}
-                onMouseLeave={onMouseLeaveFeature}
+                onMove={handleMapMove}
+                onLoad={handleMapLoad}
+                onMouseEnter={handleMouseEnterFeature}
+                onMouseLeave={() => setPopupPlace(null)}
             >
                 <Source id="my-data" type="geojson" data={to_geojson(activePlaces)}>
                     <Layer {...pinLayer} />
                 </Source>
-                {popupPlace &&
+                {popupPlace && (
                     <Popup
                         longitude={popupPlace.properties.longitude}
                         latitude={popupPlace.properties.latitude}
                         closeButton={false}
-                        maxWidth='none'
-                        className='w-64 h-44 bg-[var(--background-color)] rounded-xl overflow-clip'
-                        offset={20}
+                        maxWidth="none"
+                        className=""
+                        anchor='bottom'
+                        offset={7}
                     >
-                        <div className='flex flex-col'>
-                            <img
-                                src={popupPlace.imagesUrls.small[0]}
-                                className='w-64 h-32'
-                            />
-                            <p className='text-red-600 text-left pl-3'>Other stuff</p>
+                        <div className='w-64 h-52'>
+                            <div className="flex flex-col overflow-clip rounded-xl">
+                                <img
+                                    src={popupPlace.imagesUrls.small[0]}
+                                    className="w-64 h-32"
+                                />
+                                <div className='w-64 h-16 bg-[var(--background-color)]'>
+                                    <p className="text-red-600 text-left pl-3">Other stuff</p>
+                                </div>
+                            </div>
+                            {/* The following should be a transparent buffer that breaches the gap 
+                            between the popup and its anchor for mouseEnter and mouseLeave to work */}
+                            <div className='w-64 h-5'></div>
                         </div>
                     </Popup>
-                }
+                )}
             </Map>
         </div>
     )
