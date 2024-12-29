@@ -2,6 +2,26 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer utilities {
+  ::-webkit-scrollbar {
+    width: 1vw;
+  }
+
+  ::-webkit-scrollbar-track {
+    border-radius: 100vh;
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    border-radius: 100vh;
+    background: var(--background-color)
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #B2A59B;
+  }
+}
+
 :root {
   /* Light theme colors */
   --background-light: #ffffff;
@@ -68,22 +88,8 @@ body {
   display: none !important;
 }
 
-@layer utilities {
-  ::-webkit-scrollbar {
-    width: 1vw;
-  }
-
-  ::-webkit-scrollbar-track {
-    border-radius: 100vh;
-    background: transparent;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    border-radius: 100vh;
-    background: var(--background-color)
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    background: #B2A59B;
-  }
+.popup-active {
+  transform: translateX(20vw);
+  opacity: 0;
+  transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
 }

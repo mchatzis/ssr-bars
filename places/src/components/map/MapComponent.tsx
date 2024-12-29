@@ -6,7 +6,7 @@ import Map, { Layer, MapLayerMouseEvent, Popup, Source, SymbolLayer, ViewStateCh
 import { addImagesToPlaces, to_geojson } from '@/lib/map/helpers';
 import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
 import { selectAppActiveCategories, selectArea, selectCachedCategories, selectPlaceType, setActiveCategories, setCachedCategories } from '@/lib/redux/slices/appStateSlice';
-import { Place, selectMapActivePlaces, selectMapData, selectViewState, setActivePlaces, setMapData, setViewState } from '@/lib/redux/slices/mapStateSlice';
+import { Place, selectMapActivePlaces, selectMapData, selectViewState, setActivePlaces, setMapData, setSelectedPlace, setViewState } from '@/lib/redux/slices/mapStateSlice';
 import { selectTheme } from '@/lib/redux/slices/styleStateSlice';
 import { MapLibreEvent } from 'maplibre-gl';
 import { useCallback, useEffect, useState } from 'react';
@@ -38,6 +38,7 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
     const cachedCategories = useAppSelector(selectCachedCategories);
 
     const [popupPlace, setPopupPlace] = useState<Place | null>(null);
+    const [popupActive, setPopupActive] = useState(false);
 
     useEffect(() => {
         fetch(`/api/data/places?area=${area.name}&placeType=${placeType.name}`, { cache: 'no-store' })
@@ -99,15 +100,60 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
     }, []);
 
     const handleMouseEnterFeature = useCallback((e: MapLayerMouseEvent) => {
-        if (!e.features) {
+        if (!e.features || e.features?.length === 0) {
             console.error("onMouseEnter triggered with undefined features");
             return
         }
+        e.target.getCanvas().style.cursor = 'pointer';
 
         const feature = e.features[0];
         const hoveredPlace = mapData[feature.properties.category][feature.properties.uuid];
         setPopupPlace(hoveredPlace);
     }, [mapData])
+
+    const handleMouseLeaveFeature = useCallback((e: MapLayerMouseEvent) => {
+        e.target.getCanvas().style.cursor = '';
+
+        setPopupPlace(null);
+    }, [])
+
+    const addAnimationClosePopup = useCallback(() => {
+        setPopupActive(true);
+        setTimeout(() => {
+            setPopupActive(false);
+            setPopupPlace(null);
+        }, 150);
+    }, []);
+
+    const handleClickFeature = useCallback((e: MapLayerMouseEvent) => {
+        if (!e.features || e.features?.length === 0) {
+            console.error("onClick triggered with undefined features");
+            return
+        }
+
+        const feature = e.features[0];
+        const clickedPlace = mapData[feature.properties.category][feature.properties.uuid];
+
+        setPopupActive(true);
+        setTimeout(() => {
+            setPopupActive(false);
+            setPopupPlace(null);
+            dispatch(setSelectedPlace(clickedPlace));
+        }, 150);
+    }, [mapData])
+
+    const handleClickPopup = useCallback((e: any) => {
+        if (!popupPlace) {
+            console.error("PopupPlace was null when popup clicked");
+            return
+        }
+        setPopupActive(true);
+        setTimeout(() => {
+            setPopupActive(false);
+            setPopupPlace(null);
+            dispatch(setSelectedPlace(popupPlace));
+        }, 150);
+    }, [popupPlace]);
 
     return (
         <div id="map-container" className={`${className}`}>
@@ -119,7 +165,8 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
                 onMove={handleMapMove}
                 onLoad={handleMapLoad}
                 onMouseEnter={handleMouseEnterFeature}
-                onMouseLeave={() => setPopupPlace(null)}
+                onMouseLeave={handleMouseLeaveFeature}
+                onClick={handleClickFeature}
             >
                 <Source id="my-data" type="geojson" data={to_geojson(activePlaces)}>
                     <Layer {...pinLayer} />
@@ -130,18 +177,18 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
                         latitude={popupPlace.properties.latitude}
                         closeButton={false}
                         maxWidth="none"
-                        className=""
                         anchor='bottom'
                         offset={7}
+                        closeOnClick={false}
                     >
-                        <div className='w-64 h-52'>
+                        <div className={`w-64 h-52 ${popupActive ? 'popup-active' : ''}`} onClick={handleClickPopup}>
                             <div className="flex flex-col overflow-clip rounded-xl">
                                 <img
                                     src={popupPlace.imagesUrls.small[0]}
-                                    className="w-64 h-32"
+                                    className="w-64 h-32 cursor-pointer"
                                 />
                                 <div className='w-64 h-16 bg-[var(--background-color)]'>
-                                    <p className="text-red-600 text-left pl-3">Other stuff</p>
+                                    <p className="text-red-600 text-left pl-3 cursor-pointer">Other stuff</p>
                                 </div>
                             </div>
                             {/* The following should be a transparent buffer that breaches the gap 

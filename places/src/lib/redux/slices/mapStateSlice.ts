@@ -62,6 +62,7 @@ interface MapState {
     viewState: ViewState;
     data: ApiData;
     activePlaces: Place[];
+    selectedPlace: Place | null;
 }
 
 const initialViewState: ViewState = {
@@ -75,7 +76,8 @@ const initialActivePlaces: Place[] = []
 const initialMapState: MapState = {
     viewState: initialViewState,
     data: initialData,
-    activePlaces: initialActivePlaces
+    activePlaces: initialActivePlaces,
+    selectedPlace: null
 }
 
 const mapStateSlice = createSlice({
@@ -90,14 +92,17 @@ const mapStateSlice = createSlice({
         },
         setActivePlaces: (state, action: PayloadAction<Place[]>) => {
             state.activePlaces = action.payload;
+        },
+        setSelectedPlace: (state, action: PayloadAction<Place>) => {
+            state.selectedPlace = action.payload;
         }
     }
 })
 
-export const selectViewState = (state: RootState) => state.map.viewState
-
-export const { setMapData, setActivePlaces, setViewState } = mapStateSlice.actions;
+export const { setMapData, setActivePlaces, setViewState, setSelectedPlace } = mapStateSlice.actions;
 export const selectMapData = (state: RootState) => state.map.data;
 export const selectMapActivePlaces = (state: RootState) => state.map.activePlaces;
+export const selectViewState = (state: RootState) => state.map.viewState
+export const selectSelectedPlace = (state: RootState) => state.map.selectedPlace;
 
 export default mapStateSlice
