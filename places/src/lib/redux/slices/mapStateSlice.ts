@@ -93,7 +93,7 @@ const mapStateSlice = createSlice({
         setActivePlaces: (state, action: PayloadAction<Place[]>) => {
             state.activePlaces = action.payload;
         },
-        setSelectedPlace: (state, action: PayloadAction<Place>) => {
+        setSelectedPlace: (state, action: PayloadAction<Place | null>) => {
             state.selectedPlace = action.payload;
         }
     }

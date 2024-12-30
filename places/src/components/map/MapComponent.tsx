@@ -53,6 +53,7 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
 
     useEffect(() => {
         if (activeCategories.length === 0) {
+            dispatch(setSelectedPlace(null));
             dispatch(setActivePlaces([]));
             return
         }
@@ -86,6 +87,7 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
     }, [cachedCategories])
 
     const handleMapMove = useCallback((evt: ViewStateChangeEvent) => {
+        dispatch(setSelectedPlace(null));
         dispatch(setViewState(evt.viewState));
     }, []);
 
@@ -99,7 +101,7 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
         }
     }, []);
 
-    const handleMouseEnterFeature = useCallback((e: MapLayerMouseEvent) => {
+    const handleMapMouseEnter = useCallback((e: MapLayerMouseEvent) => {
         if (!e.features || e.features?.length === 0) {
             console.error("onMouseEnter triggered with undefined features");
             return
@@ -111,21 +113,22 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
         setPopupPlace(hoveredPlace);
     }, [mapData])
 
-    const handleMouseLeaveFeature = useCallback((e: MapLayerMouseEvent) => {
+    const handleMapMouseLeave = useCallback((e: MapLayerMouseEvent) => {
         e.target.getCanvas().style.cursor = '';
 
         setPopupPlace(null);
     }, [])
 
-    const addAnimationClosePopup = useCallback(() => {
+    const setSelectedPlaceWithAnimation = useCallback((place: Place) => {
         setPopupActive(true);
         setTimeout(() => {
             setPopupActive(false);
             setPopupPlace(null);
+            dispatch(setSelectedPlace(place));
         }, 150);
     }, []);
 
-    const handleClickFeature = useCallback((e: MapLayerMouseEvent) => {
+    const handleMapClick = useCallback((e: MapLayerMouseEvent) => {
         if (!e.features || e.features?.length === 0) {
             console.error("onClick triggered with undefined features");
             return
@@ -134,12 +137,7 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
         const feature = e.features[0];
         const clickedPlace = mapData[feature.properties.category][feature.properties.uuid];
 
-        setPopupActive(true);
-        setTimeout(() => {
-            setPopupActive(false);
-            setPopupPlace(null);
-            dispatch(setSelectedPlace(clickedPlace));
-        }, 150);
+        setSelectedPlaceWithAnimation(clickedPlace);
     }, [mapData])
 
     const handleClickPopup = useCallback((e: any) => {
@@ -147,12 +145,8 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
             console.error("PopupPlace was null when popup clicked");
             return
         }
-        setPopupActive(true);
-        setTimeout(() => {
-            setPopupActive(false);
-            setPopupPlace(null);
-            dispatch(setSelectedPlace(popupPlace));
-        }, 150);
+
+        setSelectedPlaceWithAnimation(popupPlace);
     }, [popupPlace]);
 
     return (
@@ -164,9 +158,9 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
                 interactiveLayerIds={[pinLayer.id]}
                 onMove={handleMapMove}
                 onLoad={handleMapLoad}
-                onMouseEnter={handleMouseEnterFeature}
-                onMouseLeave={handleMouseLeaveFeature}
-                onClick={handleClickFeature}
+                onMouseEnter={handleMapMouseEnter}
+                onMouseLeave={handleMapMouseLeave}
+                onClick={handleMapClick}
             >
                 <Source id="my-data" type="geojson" data={to_geojson(activePlaces)}>
                     <Layer {...pinLayer} />
