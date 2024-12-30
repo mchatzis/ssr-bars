@@ -1,6 +1,7 @@
 'use client'
 
 import 'maplibre-gl/dist/maplibre-gl.css';
+import type { MapRef } from 'react-map-gl/maplibre';
 import Map, { Layer, MapLayerMouseEvent, Popup, Source, SymbolLayer, ViewStateChangeEvent } from 'react-map-gl/maplibre';
 
 import { addImagesToPlaces, to_geojson } from '@/lib/map/helpers';
@@ -9,7 +10,7 @@ import { selectAppActiveCategories, selectArea, selectCachedCategories, selectPl
 import { Place, selectMapActivePlaces, selectMapData, selectViewState, setActivePlaces, setMapData, setSelectedPlace, setViewState } from '@/lib/redux/slices/mapStateSlice';
 import { selectTheme } from '@/lib/redux/slices/styleStateSlice';
 import { MapLibreEvent } from 'maplibre-gl';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 
 const darkMapStyle = "mapStyles/dark-matter-style.json";
@@ -28,6 +29,8 @@ interface MapComponentProps {
 }
 export default function MapComponent({ className = '' }: MapComponentProps) {
     const dispatch = useAppDispatch();
+    const mapRef = useRef<MapRef>();
+
     const theme = useAppSelector(selectTheme);
     const viewState = useAppSelector(selectViewState);
     const area = useAppSelector(selectArea);
@@ -38,7 +41,6 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
     const cachedCategories = useAppSelector(selectCachedCategories);
 
     const [popupPlace, setPopupPlace] = useState<Place | null>(null);
-    const [popupActive, setPopupActive] = useState(false);
 
     useEffect(() => {
         fetch(`/api/data/places?area=${area.name}&placeType=${placeType.name}`, { cache: 'no-store' })
@@ -116,17 +118,31 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
     const handleMapMouseLeave = useCallback((e: MapLayerMouseEvent) => {
         e.target.getCanvas().style.cursor = '';
 
-        setPopupPlace(null);
+        const box = document.getElementById('myPopup');
+        box?.classList.add('fade-out');
+
+        setTimeout(() => {
+            setPopupPlace(null);
+        }, 200);
     }, [])
 
     const setSelectedPlaceWithAnimation = useCallback((place: Place) => {
-        setPopupActive(true);
+        mapRef.current?.flyTo({
+            center: [place.properties.longitude, place.properties.latitude],
+            zoom: viewState.zoom,
+            duration: 500,
+            easing: (t: number) => t * (2 - t)
+        })
+
         setTimeout(() => {
-            setPopupActive(false);
-            setPopupPlace(null);
             dispatch(setSelectedPlace(place));
-        }, 150);
-    }, []);
+            setPopupPlace(null);
+        }, 550)
+        setTimeout(() => {
+            const box = document.getElementById('myPopup');
+            box?.classList.add('popup-active');
+        }, 400);
+    }, [viewState]);
 
     const handleMapClick = useCallback((e: MapLayerMouseEvent) => {
         if (!e.features || e.features?.length === 0) {
@@ -138,7 +154,7 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
         const clickedPlace = mapData[feature.properties.category][feature.properties.uuid];
 
         setSelectedPlaceWithAnimation(clickedPlace);
-    }, [mapData])
+    }, [mapData, setSelectedPlaceWithAnimation])
 
     const handleClickPopup = useCallback((e: any) => {
         if (!popupPlace) {
@@ -147,11 +163,12 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
         }
 
         setSelectedPlaceWithAnimation(popupPlace);
-    }, [popupPlace]);
+    }, [popupPlace, setSelectedPlaceWithAnimation]);
 
     return (
         <div id="map-container" className={`${className}`}>
             <Map
+                ref={mapRef}
                 mapLib={import('maplibre-gl')}
                 mapStyle={(theme === 'light') ? lightMapStyle : darkMapStyle}
                 {...viewState}
@@ -175,7 +192,10 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
                         offset={7}
                         closeOnClick={false}
                     >
-                        <div className={`w-64 h-52 ${popupActive ? 'popup-active' : ''}`} onClick={handleClickPopup}>
+                        <div id="myPopup"
+                            className={`w-64 h-52 fade-in`}
+                            onClick={handleClickPopup}
+                        >
                             <div className="flex flex-col overflow-clip rounded-xl">
                                 <img
                                     src={popupPlace.imagesUrls.small[0]}

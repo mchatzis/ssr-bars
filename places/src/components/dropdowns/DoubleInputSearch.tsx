@@ -51,7 +51,7 @@ export default function DoubleInputSearch({ className = '' }) {
     }, [areaFieldValue, placeTypeFieldValue, allAreas, allPlaceTypes])
 
     return (
-        <div ref={enclosingDivRef} className={`flex ${className}`}>
+        <div ref={enclosingDivRef} className={`${className} flex w-fit`}>
             <InputWithOptionsDropdown
                 className=""
                 allOptions={allAreaNames}
