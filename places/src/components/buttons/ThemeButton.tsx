@@ -5,8 +5,8 @@ import { selectTheme, setTheme, toggleTheme } from "@/lib/redux/slices/styleStat
 import { useEffect } from "react";
 
 export default function ThemeButton({ className = '' }) {
-    useAppSelector(selectTheme)
-    const dispatch = useAppDispatch()
+    const theme = useAppSelector(selectTheme);
+    const dispatch = useAppDispatch();
 
     useEffect(() => {
         const mediaQueryList = window.matchMedia('(prefers-color-scheme: dark)');
@@ -23,6 +23,15 @@ export default function ThemeButton({ className = '' }) {
     }, [dispatch]);
 
     return (
-        <button className={`bg-red-400 ${className}`} onClick={() => dispatch(toggleTheme())}>Toggle theme</button>
+        <div className={`${className} w-[30px] h-[30px] bg-[var(--accent-color)] m-1`}>
+            <img
+                id="fullscreen-button"
+                className='relative cursor-pointer'
+                onClick={() => dispatch(toggleTheme())}
+                src={theme === 'light' ? 'images/night-mode.png' : 'images/light-mode.png'}
+                width={30}
+                height={30}
+            />
+        </div>
     )
 }
