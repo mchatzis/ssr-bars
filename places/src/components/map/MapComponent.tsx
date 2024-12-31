@@ -11,6 +11,7 @@ import { Place, selectMapActivePlaces, selectMapData, selectViewState, setActive
 import { selectTheme } from '@/lib/redux/slices/styleStateSlice';
 import { MapLibreEvent } from 'maplibre-gl';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import ImageCarousel from '../display/ImageCarousel';
 
 
 const darkMapStyle = "mapStyles/dark-matter-style.json";
@@ -176,7 +177,7 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
                 onMove={handleMapMove}
                 onLoad={handleMapLoad}
                 onMouseEnter={handleMapMouseEnter}
-                onMouseLeave={handleMapMouseLeave}
+                // onMouseLeave={handleMapMouseLeave}
                 onClick={handleMapClick}
             >
                 <Source id="my-data" type="geojson" data={to_geojson(activePlaces)}>
@@ -197,10 +198,7 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
                             onClick={handleClickPopup}
                         >
                             <div className="flex flex-col overflow-clip rounded-xl">
-                                <img
-                                    src={popupPlace.imagesUrls.small[0]}
-                                    className="w-64 h-32 cursor-pointer"
-                                />
+                                <ImageCarousel images={popupPlace.imagesUrls.small} />
                                 <div className='w-64 h-16 bg-[var(--background-color)]'>
                                     <p className="text-red-600 text-left pl-3 cursor-pointer">Other stuff</p>
                                 </div>

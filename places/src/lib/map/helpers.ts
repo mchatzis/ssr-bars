@@ -1,6 +1,6 @@
 import { Feature, FeatureCollection, GeoJsonProperties, Geometry } from "geojson";
-import { ImageSizeOptions, Place } from "../redux/slices/mapStateSlice";
 import { getImageProps } from "next/image";
+import { ImageSizeOptions, Place } from "../redux/slices/mapStateSlice";
 
 export function to_geojson(apiData: Place[]): FeatureCollection {
     let feature_list = apiData.map((dataPoint) => {
@@ -41,7 +41,7 @@ export async function addImagesToPlaces(places: Place[], size: keyof typeof Imag
     const sizeOption = ImageSizeOptions[size];
 
     const placesWithImages = places.map((place) => {
-        const imagePaths = [place.properties.primaryImage];
+        const imagePaths = [place.properties.primaryImage, ...place.properties.images];
         const imageSources = imagePaths.map((path) => {
             return getImageProps({
                 src: path,

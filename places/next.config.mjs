@@ -8,6 +8,12 @@ const nextConfig = {
                 hostname: 'assets.vercel.com',
                 port: '',
                 pathname: '**',
+            },
+            {
+                protocol: 'https',
+                hostname: 'blog.logrocket.com',
+                port: '',
+                pathname: '**'
             }
         ]
     },
