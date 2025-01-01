@@ -28,6 +28,7 @@ const getInitialState = (): StyleState => {
             theme: defaultTheme
         };
     }
+    console.log(getInitialTheme())
     return {
         theme: getInitialTheme()
     }
@@ -38,7 +39,7 @@ const styleStateSlice = createSlice({
     initialState: getInitialState,
     reducers: {
         toggleTheme: (state) => {
-            state.theme = state.theme === 'light' ? 'dark' : 'light';
+            state.theme = (state.theme === 'light') ? 'dark' : 'light';
             document.documentElement.setAttribute('data-theme', state.theme);
             sessionStorage.setItem('theme', state.theme);
         },

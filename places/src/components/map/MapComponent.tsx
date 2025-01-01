@@ -177,7 +177,7 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
                 onMove={handleMapMove}
                 onLoad={handleMapLoad}
                 onMouseEnter={handleMapMouseEnter}
-                // onMouseLeave={handleMapMouseLeave}
+                onMouseLeave={handleMapMouseLeave}
                 onClick={handleMapClick}
             >
                 <Source id="my-data" type="geojson" data={to_geojson(activePlaces)}>

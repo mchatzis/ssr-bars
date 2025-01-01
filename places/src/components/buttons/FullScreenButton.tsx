@@ -18,10 +18,10 @@ export default function FullscreenToggle({ className = '' }) {
   }, []);
 
   return (
-    <div className={`${className} w-[30px] h-[30px] bg-[var(--accent-color)] m-1`}>
+    <div className={`${className} w-[36px] h-[36px] bg-[var(--accent-color)] m-1 flex items-center justify-center`}>
       <img
         id="fullscreen-button"
-        className='relative cursor-pointer'
+        className='cursor-pointer clickable-element'
         onClick={toggleFullScreen}
         src={isFullscreen ? 'images/minimize.png' : 'images/fullscreen.png'}
         width={30}

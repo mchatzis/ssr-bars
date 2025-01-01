@@ -42,14 +42,14 @@ const ImageCarousel = ({ images }: { images: string[] }) => {
             <img
                 src='images/right-arrow.png'
                 onClick={handleClickNext}
-                className="absolute top-1/2 right-0 transition-transform hover:scale-125"
+                className="absolute top-1/2 right-0 clickable-element"
                 width={30}
                 height={30}
             />
             <img
                 src='images/left-arrow.png'
                 onClick={handleClickPrevious}
-                className="absolute top-1/2 left-0 transition-transform hover:scale-125"
+                className="absolute top-1/2 left-0 clickable-element"
                 width={30}
                 height={30}
             />
