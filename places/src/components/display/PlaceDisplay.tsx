@@ -7,6 +7,7 @@ export default function PlaceDisplay({ className = '' }) {
     const selectedPlace = useAppSelector(selectSelectedPlace);
     if (!selectedPlace) { return null }
 
+    //TODO: Somehow show which pin is active
     return <div className="absolute top-[10vh] right-[1vw] h-[85vh] w-[30vw] rounded-xl
                 bg-[var(--background-color)] fade-in">
         <p>P1</p>

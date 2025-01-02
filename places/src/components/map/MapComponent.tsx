@@ -44,19 +44,24 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
     const [popupPlace, setPopupPlace] = useState<Place | null>(null);
 
     useEffect(() => {
+        dispatch(setActiveCategories([]));
+        dispatch(setCachedCategories([]));
+
+        //TODO: Add catch clauses to all fetch
+        //Fetches currently not cached? Maybe use React Query?
         fetch(`/api/data/places?area=${area.name}&placeType=${placeType.name}`, { cache: 'no-store' })
             .then(res => res.json())
-            .then(data => {
-                dispatch(setActiveCategories([]));
-                dispatch(setCachedCategories([]));
-                dispatch(setMapData(data));
-            }
-            );
+            .then(data => dispatch(setMapData(data)))
+            .catch((err) => {
+                console.log(err);
+                dispatch(setMapData({}));
+            })
     }, [area, placeType])
 
     useEffect(() => {
+        dispatch(setSelectedPlace(null));
+
         if (activeCategories.length === 0) {
-            dispatch(setSelectedPlace(null));
             dispatch(setActivePlaces([]));
             return
         }
@@ -74,7 +79,7 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
         if (cachedCategories.length === 0) { return }
         const lastAddedCategory = cachedCategories[cachedCategories.length - 1];
 
-        //TODO: Why not use activePlaces somehow instead and maybe cache already fetched places?
+        //TODO: Why not use activePlaces instead and maybe cache already fetched places?
         const addedPlaces = Object.values(mapData[lastAddedCategory])
         addImagesToPlaces(addedPlaces, 'small')
             .then((updatedPlaces) => {
