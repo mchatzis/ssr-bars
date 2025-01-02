@@ -34,15 +34,26 @@ export default function DoubleInputSearch({ className = '' }) {
         const cleanedAreaFieldValue = areaFieldValue.trim();
         const cleanedPlaceTypeFieldValue = placeTypeFieldValue.trim();
 
-        const chosenArea = allAreas.find((area) => area.name === cleanedAreaFieldValue);
-        if (!chosenArea) {
-            alert(`${cleanedAreaFieldValue} is not a valid option`)
-            return
+        let chosenArea: Area | undefined;
+        if (cleanedAreaFieldValue === '') {
+            chosenArea = currentArea;
+        } else {
+            chosenArea = allAreas.find((area) => area.name === cleanedAreaFieldValue);
+            if (!chosenArea) {
+                alert(`${cleanedAreaFieldValue} is not a valid option`)
+                return
+            }
         }
-        const chosenPlaceType = allPlaceTypes.find((placeType) => placeType.name === cleanedPlaceTypeFieldValue);
-        if (!chosenPlaceType) {
-            alert(`${cleanedPlaceTypeFieldValue} is not a valid option`)
-            return
+
+        let chosenPlaceType: PlaceType | undefined;
+        if (cleanedPlaceTypeFieldValue === '') {
+            chosenPlaceType = currentPlaceType;
+        } else {
+            chosenPlaceType = allPlaceTypes.find((placeType) => placeType.name === cleanedPlaceTypeFieldValue);
+            if (!chosenPlaceType) {
+                alert(`${cleanedPlaceTypeFieldValue} is not a valid option`)
+                return
+            }
         }
 
         dispatch(setArea(chosenArea));
