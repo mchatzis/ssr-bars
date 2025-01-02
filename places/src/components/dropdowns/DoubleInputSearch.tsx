@@ -1,15 +1,17 @@
 'use client'
 
+import { MapRefContext } from "@/lib/context/mapContext";
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 import { Area, PlaceType, selectAllAreas, selectAllPlaceTypes, selectArea, selectPlaceType, setArea, setPlaceType } from "@/lib/redux/slices/appStateSlice";
-import { setViewState } from "@/lib/redux/slices/mapStateSlice";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useContext, useRef, useState } from "react";
 import { useClickAway } from "react-use";
 import InputWithOptionsDropdown from "./InputWithOptionsDropdown";
 
 
 export default function DoubleInputSearch({ className = '' }) {
     const enclosingDivRef = useRef<HTMLDivElement>(null);
+    const mapRef = useContext(MapRefContext);
+
     const allAreas: Area[] = useAppSelector(selectAllAreas);
     const allAreaNames: string[] = allAreas.map(area => area.name);
     const allPlaceTypes: PlaceType[] = useAppSelector(selectAllPlaceTypes);
@@ -44,10 +46,19 @@ export default function DoubleInputSearch({ className = '' }) {
         }
 
         dispatch(setArea(chosenArea));
-        dispatch(setViewState({ longitude: chosenArea.longitude, latitude: chosenArea.latitude, zoom: chosenArea.initialZoom }));
         setAreaFieldValue('');
         dispatch(setPlaceType(chosenPlaceType));
         setPlaceTypeFieldValue('');
+
+        //TODO: All db record types should have a uuid, area and placeType included
+        if (chosenArea.name !== currentArea.name) {
+            mapRef?.current?.flyTo({
+                center: [chosenArea.longitude, chosenArea.latitude],
+                zoom: chosenArea.initialZoom,
+                duration: 5000,
+                easing: (t: number) => t * (2 - t)
+            })
+        }
     }, [areaFieldValue, placeTypeFieldValue, allAreas, allPlaceTypes])
 
     return (
@@ -66,7 +77,7 @@ export default function DoubleInputSearch({ className = '' }) {
                 value={placeTypeFieldValue}
                 setValue={setPlaceTypeFieldValue}
             />
-            <button className="ml-1" onClick={handleSearchClick}>Search</button>
+            <button className="ml-1 text-[var(--accent-color)]" onClick={handleSearchClick}>Search</button>
         </div>
     )
 }

@@ -28,7 +28,6 @@ const getInitialState = (): StyleState => {
             theme: defaultTheme
         };
     }
-    console.log(getInitialTheme())
     return {
         theme: getInitialTheme()
     }

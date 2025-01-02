@@ -1,3 +1,4 @@
+import { MapRefProvider } from "@/lib/context/mapContext";
 import type { Metadata } from "next";
 import "./globals.css";
 import { StoreProvider } from "./StoreProvider";
@@ -30,7 +31,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       </head>
       <body>
         <StoreProvider>
-          {children}
+          <MapRefProvider>
+            {children}
+          </MapRefProvider>
         </StoreProvider>
       </body>
     </html>

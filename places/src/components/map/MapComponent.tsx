@@ -1,16 +1,16 @@
 'use client'
 
 import 'maplibre-gl/dist/maplibre-gl.css';
-import type { MapRef } from 'react-map-gl/maplibre';
 import Map, { Layer, MapLayerMouseEvent, Popup, Source, SymbolLayer, ViewStateChangeEvent } from 'react-map-gl/maplibre';
 
+import { MapRefContext } from '@/lib/context/mapContext';
 import { addImagesToPlaces, to_geojson } from '@/lib/map/helpers';
 import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
 import { selectAppActiveCategories, selectArea, selectCachedCategories, selectPlaceType, setActiveCategories, setCachedCategories } from '@/lib/redux/slices/appStateSlice';
 import { Place, selectMapActivePlaces, selectMapData, selectViewState, setActivePlaces, setMapData, setSelectedPlace, setViewState } from '@/lib/redux/slices/mapStateSlice';
 import { selectTheme } from '@/lib/redux/slices/styleStateSlice';
 import { MapLibreEvent } from 'maplibre-gl';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import ImageCarousel from '../display/ImageCarousel';
 
 
@@ -30,7 +30,7 @@ interface MapComponentProps {
 }
 export default function MapComponent({ className = '' }: MapComponentProps) {
     const dispatch = useAppDispatch();
-    const mapRef = useRef<MapRef>();
+    const mapRef = useContext(MapRefContext);
 
     const theme = useAppSelector(selectTheme);
     const viewState = useAppSelector(selectViewState);
@@ -128,7 +128,7 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
     }, [])
 
     const setSelectedPlaceWithAnimation = useCallback((place: Place) => {
-        mapRef.current?.flyTo({
+        mapRef?.current?.flyTo({
             center: [place.properties.longitude, place.properties.latitude],
             zoom: viewState.zoom,
             duration: 500,

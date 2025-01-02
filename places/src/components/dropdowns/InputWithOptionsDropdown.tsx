@@ -42,7 +42,7 @@ export default function InputWithOptionsDropdown({ className = '', allOptions, c
     return (
         <div className={`h-7 w-36 ${className}`}>
             <input
-                className="h-full w-full bg-[var(--background)] border border-gray-300 rounded-full focus:outline-none
+                className="h-full w-full bg-[var(--background)] border border-[var(--accent-color)] rounded-full focus:outline-none
                   placeholder-gray-500 pl-3"
                 type="text"
                 value={value}

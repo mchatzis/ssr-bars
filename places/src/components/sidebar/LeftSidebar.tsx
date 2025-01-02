@@ -22,7 +22,7 @@ export default function LeftSidebar({ className = '' }) {
     return (
         <div className={`${className} flex flex-col gap-[5vh] justify-between`}>
             <DoubleInputSearch className="" />
-            <FilterCategoryDropdown className="h-[50vh] w-[10vw] border border-red-600 overflow-clip" />
+            <FilterCategoryDropdown className="h-[50vh] w-[10vw] border border-[var(--accent-color)] overflow-clip" />
             <MapControlsComponent className="w-fit" />
         </div>
     )
