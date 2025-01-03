@@ -1,0 +1,37 @@
+{
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    16.36326,
+                    48.21243
+                ]
+            },
+            "properties": {
+                "unique_id": "bars001",
+                "title": "Gorillas",
+                "image": "pin.png",
+                "description": "Dance-full bar"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    16.36666,
+                    48.21266
+                ]
+            },
+            "properties": {
+                "unique_id": "bars002",
+                "title": "test_bar",
+                "image": "tower.png",
+                "description": "test bar"
+            }
+        }
+    ]
+}

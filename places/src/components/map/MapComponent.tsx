@@ -127,9 +127,8 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
         const box = document.getElementById('myPopup');
         box?.classList.add('fade-out');
 
-        setTimeout(() => {
-            setPopupPlace(null);
-        }, 200);
+
+        setPopupPlace(null);
     }, [])
 
     const setSelectedPlaceWithAnimation = useCallback((place: Place) => {
@@ -195,11 +194,11 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
                         closeButton={false}
                         maxWidth="none"
                         anchor='bottom'
-                        offset={7}
+                        offset={18}
                         closeOnClick={false}
                     >
                         <div id="myPopup"
-                            className={`w-64 h-52 fade-in`}
+                            className={`w-64 h-48 fade-in`}
                             onClick={handleClickPopup}
                         >
                             <div className="flex flex-col overflow-clip rounded-xl">
@@ -210,7 +209,7 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
                             </div>
                             {/* The following should be a transparent buffer that breaches the gap 
                             between the popup and its anchor for mouseEnter and mouseLeave to work */}
-                            <div className='w-64 h-5'></div>
+                            <div className='relative left-1/4 w-32 h-5'></div>
                         </div>
                     </Popup>
                 )}
