@@ -95,6 +95,20 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
             })
     }, [cachedCategories])
 
+    useEffect(() => {
+        if (!mapRef || !mapRef.current) { return };
+        const map = mapRef.current;
+
+        const pinImage = new Image(45, 45);
+        pinImage.src = (theme === 'light') ? 'images/pin-light.png' : 'images/pin-dark.png';
+        pinImage.onload = () => {
+            if (map.hasImage('pin')) {
+                map.removeImage('pin');
+            }
+            map.addImage('pin', pinImage);
+        };
+    }, [theme]);
+
     const handleMapMove = useCallback((evt: ViewStateChangeEvent) => {
         // dispatch(setSelectedPlace(null));
         dispatch(setViewState(evt.viewState));
@@ -103,12 +117,10 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
     const handleMapLoad = useCallback((e: MapLibreEvent) => {
         const map = e.target;
 
-        const pinImage = new Image(30, 30)
-        pinImage.src = 'images/pin.png';
-        pinImage.onload = () => {
-            map.addImage('pin', pinImage);
-        }
-    }, []);
+        const pinImage = new Image(45, 45)
+        pinImage.src = (theme === 'light') ? 'images/pin-light.png' : 'images/pin-dark.png';
+        pinImage.onload = () => map.addImage('pin', pinImage);
+    }, [theme]);
 
     const handleMapMouseEnter = useCallback((e: MapLayerMouseEvent) => {
         if (!e.features || e.features?.length === 0) {
@@ -182,7 +194,7 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
                 onMove={handleMapMove}
                 onLoad={handleMapLoad}
                 onMouseEnter={handleMapMouseEnter}
-                onMouseLeave={handleMapMouseLeave}
+                // onMouseLeave={handleMapMouseLeave}
                 onClick={handleMapClick}
             >
                 <Source id="my-data" type="geojson" data={to_geojson(activePlaces)}>
@@ -195,7 +207,7 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
                         closeButton={false}
                         maxWidth="none"
                         anchor='bottom'
-                        offset={18}
+                        offset={25}
                         closeOnClick={false}
                     >
                         <div id="myPopup"
@@ -205,7 +217,7 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
                             <div className="flex flex-col overflow-clip rounded-xl">
                                 <ImageCarousel images={popupPlace.imagesUrls.small} className='relative w-64 h-32' />
                                 <div className='w-64 h-16 bg-[var(--background-color)]'>
-                                    <p className="text-red-600 text-left pl-3 cursor-pointer">Other stuff</p>
+                                    <p className="text-left pl-3 cursor-pointer">Other stuff</p>
                                 </div>
                             </div>
                             {/* The following should be a transparent buffer that breaches the gap 
