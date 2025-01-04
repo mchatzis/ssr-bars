@@ -2,6 +2,7 @@
 
 import { register } from '@/app/actions/auth/authenticate';
 import FormInput from '@/components/auth/FormInput';
+import ErrorList from '@/components/list/ErrorList';
 import Link from "next/link";
 import { useFormState, useFormStatus } from 'react-dom';
 
@@ -22,7 +23,7 @@ export default function RegisterForm() {
   const [state, action] = useFormState<RegisterFormState, FormData>(register, { attempts: 0 })
 
   return (
-    <div className="flex absolute">
+    <div className="flex">
       <form action={action} className='min-w-32 max-w-52'>
         <FormInput id="username" name="username" placeholder="username" />
         <FormInput id="email" name="email" type="email" placeholder="email" />
@@ -52,22 +53,5 @@ function SubmitButton() {
     <button disabled={pending} type="submit" className='w-full border rounded-full p-2 bg-gray-400 hover:bg-gray-300 transition-colors duration-300 mt-1'>
       Sign Up
     </button>
-  )
-}
-
-function ErrorList({ errors, className }: { errors: RegisterFormErrors, className: string }) {
-  const errorList: JSX.Element[] = [];
-  Object.entries(errors).forEach(([, value]) => {
-    value.forEach((error) => (
-      errorList.push(<li key={error}>- {error}</li>)
-    ));
-  })
-
-  return (
-    <div className={className}>
-      <ul>
-        {errorList}
-      </ul>
-    </div>
   )
 }

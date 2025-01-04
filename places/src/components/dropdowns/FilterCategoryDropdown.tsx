@@ -36,7 +36,7 @@ export default function FilterCategoryDropdown({ className = '' }) {
         <div className={`${className}`}>
             {availableCategories.map((cat) =>
                 <button
-                    className={`block ${(activeCategories.includes(cat)) ? 'bg-blue-500 text-white' : 'bg-gray-300 text-black'} w-full`}
+                    className={`block ${(activeCategories.includes(cat)) ? 'bg-[var(--accent-color)]' : 'bg-gray-300'} w-full text-black`}
                     key={cat}
                     onClick={onClick}
                 >
