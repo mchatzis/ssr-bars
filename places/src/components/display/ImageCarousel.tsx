@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 
-const ImageCarousel = ({ images }: { images: string[] }) => {
+const ImageCarousel = ({ className = '', images }: { className: string, images: string[] }) => {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [lastWheelTime, setLastWheelTime] = useState(0);
     const WHEEL_TIMEOUT = 500;
@@ -33,7 +33,7 @@ const ImageCarousel = ({ images }: { images: string[] }) => {
     }, [lastWheelTime, images.length]);
 
     return (
-        <div className="relative w-64 h-32 cursor-pointer">
+        <div className={`${className} cursor-pointer`}>
             <img
                 src={images[currentIndex]}
                 className='w-full h-full'

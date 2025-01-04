@@ -44,6 +44,7 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
     const [popupPlace, setPopupPlace] = useState<Place | null>(null);
 
     useEffect(() => {
+        dispatch(setActivePlaces([]));
         dispatch(setActiveCategories([]));
         dispatch(setCachedCategories([]));
 
@@ -73,7 +74,7 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
         const activePlaces = uuidsIntersection.map((uuid) => placesByCategory[0][uuid])
 
         dispatch(setActivePlaces(activePlaces));
-    }, [activeCategories, mapData])
+    }, [activeCategories])
 
     useEffect(() => {
         if (cachedCategories.length === 0) { return }
@@ -95,7 +96,7 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
     }, [cachedCategories])
 
     const handleMapMove = useCallback((evt: ViewStateChangeEvent) => {
-        dispatch(setSelectedPlace(null));
+        // dispatch(setSelectedPlace(null));
         dispatch(setViewState(evt.viewState));
     }, []);
 
@@ -202,7 +203,7 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
                             onClick={handleClickPopup}
                         >
                             <div className="flex flex-col overflow-clip rounded-xl">
-                                <ImageCarousel images={popupPlace.imagesUrls.small} />
+                                <ImageCarousel images={popupPlace.imagesUrls.small} className='relative w-64 h-32' />
                                 <div className='w-64 h-16 bg-[var(--background-color)]'>
                                     <p className="text-red-600 text-left pl-3 cursor-pointer">Other stuff</p>
                                 </div>
