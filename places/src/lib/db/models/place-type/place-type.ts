@@ -9,7 +9,7 @@ export async function getAllPlaceTypes() {
         GSI1_PK: 'PLACE_TYPE#ALL',
         GSI1_SK: 'METADATA#'
     }
-    const placeTypesItems = await db.query({
+    const placeTypeItems = await db.query({
         IndexName: "GSI1",
         KeyConditionExpression: "#pk = :pkValue",
         ExpressionAttributeNames: {
@@ -20,12 +20,12 @@ export async function getAllPlaceTypes() {
         }
     })
 
-    if (!placeTypesItems) {
+    if (!placeTypeItems) {
         throw new Error("Could not retrieve place types.");
     }
-    if (!placeTypesItems.every(placeTypeItem => isPlaceTypeEntity(placeTypeItem))) {
+    if (!placeTypeItems.every(placeTypeItem => isPlaceTypeEntity(placeTypeItem))) {
         throw new Error("Database returned invalid place types record.");
     }
 
-    return placeTypesItems.map(placeType => ({ name: placeType.name }));
+    return placeTypeItems.map(placeType => ({ name: placeType.name }));
 }

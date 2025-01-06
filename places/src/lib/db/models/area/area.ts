@@ -9,7 +9,7 @@ export async function getAllAreas() {
         GSI1_PK: 'AREA#ALL',
         GSI1_SK: 'METADATA#'
     }
-    const areasItems = await db.query({
+    const areaItems = await db.query({
         IndexName: "GSI1",
         KeyConditionExpression: "#pk = :pkValue",
         ExpressionAttributeNames: {
@@ -20,14 +20,14 @@ export async function getAllAreas() {
         }
     })
 
-    if (!areasItems) {
+    if (!areaItems) {
         throw new Error("Could not retrieve areas.");
     }
-    if (!areasItems.every(areaItem => isAreaEntity(areaItem))) {
+    if (!areaItems.every(areaItem => isAreaEntity(areaItem))) {
         throw new Error("Database returned invalid areas record.");
     }
 
-    return areasItems.map(area => ({
+    return areaItems.map(area => ({
         name: area.name,
         longitude: area.longitude,
         latitude: area.latitude,

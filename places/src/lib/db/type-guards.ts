@@ -1,5 +1,5 @@
 import { KeyEnum } from './enums';
-import { AreaEntity, BaseEntity, EmailEntity, Key, PlaceTypeEntity, UserEntity, UsernameEntity } from './types';
+import { AreaEntity, BaseEntity, EmailEntity, Key, PlacesOfPlaceTypeInAreaEntity, PlaceTypeEntity, UserEntity, UsernameEntity } from './types';
 
 function isValidObject(obj: any) {
     return typeof obj === 'object' && obj !== null
@@ -80,6 +80,25 @@ export function isPlaceTypeEntity(obj: any): obj is PlaceTypeEntity {
         obj.GSI1_PK === `${KeyEnum.PLACE_TYPE}#ALL` &&
         obj.GSI1_SK === `${KeyEnum.METADATA}#` &&
         typeof obj.name === "string" &&
+        isBaseEntity(obj)
+    );
+}
+
+export function isPlacesOfPlaceTypeInAreaEntity(obj: any): obj is PlacesOfPlaceTypeInAreaEntity {
+    //TODO: Check second part of PK and SK, add unit test
+    return (
+        isValidObject(obj) &&
+        obj.PK.startsWith(`${KeyEnum.AREA}#`) &&
+        obj.SK.startsWith(`${KeyEnum.CATEGORY}#`) &&
+        typeof obj.uuid === "string" &&
+        typeof obj.name === "string" &&
+        typeof obj.longitude === "number" &&
+        typeof obj.latitude === "number" &&
+        typeof obj.category === "string" &&
+        typeof obj.area === "string" &&
+        typeof obj.description === "string" &&
+        typeof obj.primaryImage === "string" &&
+        Array.isArray(obj.images) && obj.images.every((image: any) => typeof image === "string") &&
         isBaseEntity(obj)
     );
 }

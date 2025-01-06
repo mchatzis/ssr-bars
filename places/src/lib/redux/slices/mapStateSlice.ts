@@ -20,10 +20,10 @@ export const ImageSizeOptions: Record<Size, { width: number, height: number }> =
 export type Place = {
     properties: {
         uuid: string,
-        category: string,
+        name: string,
         longitude: number,
         latitude: number,
-        name: string,
+        category: string,
         area: string,
         description: string,
         primaryImage: string,
@@ -67,14 +67,14 @@ interface ViewState {
     latitude: number,
     zoom: number
 }
-type ApiData = {
+export type PlacesApiData = {
     [category: string]: {
         [uuid: string]: Place
     }
 }
 interface MapState {
     viewState: ViewState;
-    data: ApiData;
+    data: PlacesApiData;
     activePlaces: Place[];
     selectedPlace: Place | null;
 }
@@ -101,7 +101,7 @@ const mapStateSlice = createSlice({
         setViewState: (state, action: PayloadAction<ViewState>) => {
             state.viewState = action.payload;
         },
-        setMapData: (state, action: PayloadAction<ApiData>) => {
+        setMapData: (state, action: PayloadAction<PlacesApiData>) => {
             state.data = action.payload;
         },
         setActivePlaces: (state, action: PayloadAction<Place[]>) => {
