@@ -3,6 +3,7 @@
 import 'maplibre-gl/dist/maplibre-gl.css';
 import Map, { Layer, MapLayerMouseEvent, Popup, Source, SymbolLayer, ViewStateChangeEvent } from 'react-map-gl/maplibre';
 
+import { STATIC_IMG_ICON_PREFIX } from '@/lib/constants';
 import { MapRefContext } from '@/lib/context/mapContext';
 import { addImagesToPlaces, to_geojson } from '@/lib/map/helpers';
 import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
@@ -103,7 +104,7 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
         const map = mapRef.current;
 
         const pinImage = new Image(45, 45);
-        pinImage.src = (theme === 'light') ? 'images/pin-light.png' : 'images/pin-dark.png';
+        pinImage.src = STATIC_IMG_ICON_PREFIX + '/' + (theme === 'light' ? 'pin-light.png' : 'pin-dark.png');
         pinImage.onload = () => {
             if (map.hasImage('pin')) {
                 map.removeImage('pin');
@@ -121,7 +122,7 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
         const map = e.target;
 
         const pinImage = new Image(45, 45)
-        pinImage.src = (theme === 'light') ? 'images/pin-light.png' : 'images/pin-dark.png';
+        pinImage.src = STATIC_IMG_ICON_PREFIX + '/' + (theme === 'light' ? 'pin-light.png' : 'pin-dark.png');
         pinImage.onload = () => map.addImage('pin', pinImage);
     }, [theme]);
 

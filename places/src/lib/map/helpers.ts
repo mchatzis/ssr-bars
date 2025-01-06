@@ -1,5 +1,6 @@
 import { Feature, FeatureCollection, GeoJsonProperties, Geometry } from "geojson";
 import { getImageProps } from "next/image";
+import { S3_IMAGES_DIR } from "../constants";
 import { ImageSizeOptions, Place } from "../redux/slices/mapStateSlice";
 
 export function to_geojson(apiData: Place[]): FeatureCollection {
@@ -44,7 +45,7 @@ export async function addImagesToPlaces(places: Place[], size: keyof typeof Imag
         const imagePaths = [place.properties.primaryImage, ...place.properties.images];
         const imageSources = imagePaths.map((path) => {
             return getImageProps({
-                src: path,
+                src: S3_IMAGES_DIR + '/' + path,
                 alt: '',
                 width: sizeOption.width,
                 height: sizeOption.height

@@ -1,5 +1,6 @@
 'use client'
 
+import { STATIC_IMG_ICON_PREFIX } from "@/lib/constants";
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 import { selectTheme, setTheme, toggleTheme } from "@/lib/redux/slices/styleStateSlice";
 import { useEffect, useState } from "react";
@@ -36,7 +37,7 @@ export default function ThemeButton({ className = '' }) {
                 id="fullscreen-button"
                 className='cursor-pointer clickable-element'
                 onClick={() => dispatch(toggleTheme())}
-                src={theme === 'light' ? 'images/night-mode.png' : 'images/light-mode.png'}
+                src={STATIC_IMG_ICON_PREFIX + '/' + (theme === 'light' ? 'night-mode.png' : 'light-mode.png')}
                 width={30}
                 height={30}
             />

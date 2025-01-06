@@ -1,5 +1,5 @@
 import { KeyEnum } from './enums';
-import { AreaEntity, BaseEntity, EmailEntity, Key, PlacesOfPlaceTypeInAreaEntity, PlaceTypeEntity, UserEntity, UsernameEntity } from './types';
+import { AreaEntity, BaseEntity, EmailEntity, Key, PlaceOfPlaceTypeInAreaEntity, PlaceTypeEntity, UserEntity, UsernameEntity } from './types';
 
 function isValidObject(obj: any) {
     return typeof obj === 'object' && obj !== null
@@ -84,7 +84,7 @@ export function isPlaceTypeEntity(obj: any): obj is PlaceTypeEntity {
     );
 }
 
-export function isPlacesOfPlaceTypeInAreaEntity(obj: any): obj is PlacesOfPlaceTypeInAreaEntity {
+export function isPlaceOfPlaceTypeInAreaEntity(obj: any): obj is PlaceOfPlaceTypeInAreaEntity {
     //TODO: Check second part of PK and SK, add unit test
     return (
         isValidObject(obj) &&

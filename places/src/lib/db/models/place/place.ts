@@ -1,11 +1,11 @@
 import { Database } from "@/lib/db/Database";
-import { PlacesOfPlaceTypeInAreaEntity } from "@/lib/db/types";
-import { isPlacesOfPlaceTypeInAreaEntity } from "../../type-guards";
+import { PlaceOfPlaceTypeInAreaEntity } from "@/lib/db/types";
+import { isPlaceOfPlaceTypeInAreaEntity } from "../../type-guards";
 
 export async function getAllPlaces(area: string, placeType: string) {
     const db = Database.getInstance();
 
-    const placesKey: Pick<PlacesOfPlaceTypeInAreaEntity, 'PK'> = {
+    const placesKey: Pick<PlaceOfPlaceTypeInAreaEntity, 'PK'> = {
         PK: `AREA#${area}#PLACE_TYPE#${placeType}`,
     }
 
@@ -22,7 +22,7 @@ export async function getAllPlaces(area: string, placeType: string) {
     if (!placeItems) {
         throw new Error("Could not retrieve places.");
     }
-    if (!placeItems.every(placeItem => isPlacesOfPlaceTypeInAreaEntity(placeItem))) {
+    if (!placeItems.every(placeItem => isPlaceOfPlaceTypeInAreaEntity(placeItem))) {
         throw new Error("Database returned invalid place record.");
     }
 

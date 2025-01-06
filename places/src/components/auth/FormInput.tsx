@@ -3,16 +3,18 @@ interface InputFieldProps {
   name: string;
   type?: string;
   placeholder?: string;
+  required?: boolean;
 }
 
-export default function FormInput({ id, name, type = "text", placeholder }: InputFieldProps) {
+export default function FormInput({ id, name, type = "text", placeholder, required = false }: InputFieldProps) {
   return (
     <input
       id={id}
       name={name}
       type={type}
       placeholder={placeholder}
-      className="border border-gray-300 rounded-md px-4 py-2 w-full text-[var(--primary-color)]"
+      required={required}
+      className="border border-gray-300 rounded-md px-4 py-2 w-full text-[var(--primary-color)] bg-slate-700"
     />
   );
 }

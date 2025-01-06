@@ -1,3 +1,4 @@
+import { STATIC_IMG_ICON_PREFIX } from '@/lib/constants';
 import { useCallback, useState } from 'react';
 
 const ImageCarousel = ({ className = '', images }: { className: string, images: string[] }) => {
@@ -40,14 +41,14 @@ const ImageCarousel = ({ className = '', images }: { className: string, images: 
                 onWheel={handleWheel}
             />
             <img
-                src='images/right-arrow.png'
+                src={STATIC_IMG_ICON_PREFIX + '/' + 'right-arrow.png'}
                 onClick={handleClickNext}
                 className="absolute top-1/2 right-0 clickable-element"
                 width={30}
                 height={30}
             />
             <img
-                src='images/left-arrow.png'
+                src={STATIC_IMG_ICON_PREFIX + '/' + 'left-arrow.png'}
                 onClick={handleClickPrevious}
                 className="absolute top-1/2 left-0 clickable-element"
                 width={30}

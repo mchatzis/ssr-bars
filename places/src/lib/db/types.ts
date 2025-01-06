@@ -11,7 +11,7 @@ export interface BaseEntity<P, S extends Key<string, string>> {
 }
 
 // Example: PK: Area#London#Type#Bar, SK: Category#Modern#Place#123
-export interface PlacesOfPlaceTypeInAreaEntity extends BaseEntity<
+export interface PlaceOfPlaceTypeInAreaEntity extends BaseEntity<
     Key<
         Key<KeyEnum.AREA, string>,
         Key<KeyEnum.PLACE_TYPE, string>

@@ -1,5 +1,6 @@
 'use client'
 
+import { STATIC_IMG_ICON_PREFIX } from '@/lib/constants';
 import { useEffect, useState } from 'react';
 
 export default function FullscreenToggle({ className = '' }) {
@@ -23,7 +24,7 @@ export default function FullscreenToggle({ className = '' }) {
         id="fullscreen-button"
         className='cursor-pointer clickable-element'
         onClick={toggleFullScreen}
-        src={isFullscreen ? 'images/minimize.png' : 'images/fullscreen.png'}
+        src={STATIC_IMG_ICON_PREFIX + '/' + (isFullscreen ? 'minimize.png' : 'fullscreen.png')}
         width={30}
         height={30}
       />
