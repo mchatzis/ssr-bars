@@ -1,11 +1,11 @@
 // @vitest-environment node
 
 import { Database } from '@/lib/db/Database';
+import { isEmailEntity, isUserEntity, isUsernameEntity } from '@/lib/db/type-guards';
+import { EmailEntity, UserEntity, UsernameEntity } from '@/lib/db/types';
 import bcrypt from "bcrypt";
 import { ulid } from 'ulid';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
-import { isEmailEntity, isUserEntity, isUsernameEntity } from '../type-guards';
-import { EmailEntity, UserEntity, UsernameEntity } from '../types';
 import { createUser, EmailExistsError, UsernameExistsError } from './user';
 
 

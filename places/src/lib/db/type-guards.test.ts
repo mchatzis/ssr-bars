@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { KeyEnum } from './enums';
-import { isBaseEntity, isEmailEntity, isUserEntity, isUsernameEntity } from './type-guards';
+import { isAreaEntity, isBaseEntity, isEmailEntity, isPlaceTypeEntity, isUserEntity, isUsernameEntity } from './type-guards';
 
 const validUserEntity = {
     PK: `${KeyEnum.USER}#123`,
@@ -31,6 +31,29 @@ const validUsernameEntity = {
     updatedAt: Date.now(),
     userId: '789',
 };
+
+const validAreaEntity = {
+    PK: `${KeyEnum.AREA}#myArea`,
+    SK: `${KeyEnum.METADATA}#`,
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+    name: 'myArea',
+    longitude: 5,
+    latitude: 10,
+    initialZoom: 13,
+    GSI1_PK: 'AREA#ALL',
+    GSI1_SK: 'METADATA#'
+}
+
+const validPlaceTypeEntity = {
+    PK: `${KeyEnum.PLACE_TYPE}#myPlaceType`,
+    SK: `${KeyEnum.METADATA}#`,
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+    name: 'myPlaceType',
+    GSI1_PK: 'PLACE_TYPE#ALL',
+    GSI1_SK: 'METADATA#'
+}
 
 describe('Type Guards', () => {
     it('validates BaseEntity', () => {
@@ -72,6 +95,26 @@ describe('Type Guards', () => {
         expect(
             isUsernameEntity({
                 ...validUsernameEntity,
+                PK: `${KeyEnum.EMAIL}#789`,
+            })
+        ).toBe(false);
+    });
+
+    it('validates AreaEntity', () => {
+        expect(isAreaEntity(validAreaEntity)).toBe(true);
+        expect(
+            isAreaEntity({
+                ...validAreaEntity,
+                PK: `${KeyEnum.EMAIL}#789`,
+            })
+        ).toBe(false);
+    });
+
+    it('validates PlaceTypeEntity', () => {
+        expect(isPlaceTypeEntity(validPlaceTypeEntity)).toBe(true);
+        expect(
+            isPlaceTypeEntity({
+                ...validPlaceTypeEntity,
                 PK: `${KeyEnum.EMAIL}#789`,
             })
         ).toBe(false);

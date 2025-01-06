@@ -1,8 +1,8 @@
 import { Place } from "@/lib/redux/slices/mapStateSlice";
 import { useCallback } from "react";
 
-function createUrl(title: string, city: string) {
-    let splitName = title.split(" ")
+function createUrl(name: string, city: string) {
+    let splitName = name.split(" ")
     let query = splitName.reduce((acc, word) => {
         return acc + word + "+";
     }, "");
@@ -12,7 +12,7 @@ function createUrl(title: string, city: string) {
 
 export default function DirectionsBox({ selectedPlace, className = '' }: { selectedPlace: Place, className?: string }) {
     const handleClick = useCallback(() => {
-        const url = createUrl(selectedPlace.properties.title, selectedPlace.properties.area)
+        const url = createUrl(selectedPlace.properties.name, selectedPlace.properties.area)
         console.log("opening" + url)
         window.open(url)
         return

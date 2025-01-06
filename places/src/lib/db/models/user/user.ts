@@ -1,11 +1,10 @@
 import { Database, TransactWriteItemNoTableName } from "@/lib/db/Database";
+import { EmailEntityError } from "@/lib/db/type-guard-errors";
+import { isEmailEntity } from "@/lib/db/type-guards";
 import { EmailEntity, UserEntity, UsernameEntity } from "@/lib/db/types";
 import { TransactionCanceledException } from "@aws-sdk/client-dynamodb";
 import bcrypt from "bcrypt";
 import { ulid } from "ulid";
-import { KeyEnum } from "../enums";
-import { EmailEntityError } from "../type-guard-errors";
-import { isEmailEntity } from "../type-guards";
 
 export type CreateUserInput = {
     username: string;
@@ -131,12 +130,12 @@ export async function getUserIdentity(input: GetUserInput): Promise<Pick<EmailEn
     const db = Database.getInstance();
     const { email, password } = input;
 
-    const emailItem = await db.get({
-        Key: {
-            PK: `EMAIL#${email}`,
-            SK: `${KeyEnum.METADATA}#`
-        }
-    })
+    const emailKey: Pick<EmailEntity, 'PK' | 'SK'> = {
+        PK: `EMAIL#${email}`,
+        SK: `METADATA#`
+    };
+
+    const emailItem = await db.get({ Key: emailKey });
 
     if (!emailItem) {
         throw new EmailDoesNotExistError("Email does not exist.");

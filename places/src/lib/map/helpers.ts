@@ -16,7 +16,7 @@ export function to_geojson(apiData: Place[]): FeatureCollection {
             properties: {
                 "uuid": dataPoint.properties.uuid,
                 "category": dataPoint.properties.category,
-                "title": dataPoint.properties.title,
+                "name": dataPoint.properties.name,
                 "description": dataPoint.properties.description,
             }
         };

@@ -6,7 +6,7 @@ import Map, { Layer, MapLayerMouseEvent, Popup, Source, SymbolLayer, ViewStateCh
 import { MapRefContext } from '@/lib/context/mapContext';
 import { addImagesToPlaces, to_geojson } from '@/lib/map/helpers';
 import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
-import { selectAppActiveCategories, selectArea, selectCachedCategories, selectPlaceType, setActiveCategories, setCachedCategories } from '@/lib/redux/slices/appStateSlice';
+import { selectAppActiveCategories, selectArea, selectCachedCategories, selectPlaceType, setActiveCategories, setAvailableCategories, setCachedCategories } from '@/lib/redux/slices/appStateSlice';
 import { Place, selectMapActivePlaces, selectMapData, selectViewState, setActivePlaces, setMapData, setSelectedPlace, setViewState } from '@/lib/redux/slices/mapStateSlice';
 import { selectTheme } from '@/lib/redux/slices/styleStateSlice';
 import { MapLibreEvent } from 'maplibre-gl';
@@ -52,7 +52,10 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
         //Fetches currently not cached? Maybe use React Query?
         fetch(`/api/data/places?area=${area.name}&placeType=${placeType.name}`, { cache: 'no-store' })
             .then(res => res.json())
-            .then(data => dispatch(setMapData(data)))
+            .then(data => {
+                dispatch(setMapData(data))
+                dispatch(setAvailableCategories(Object.keys(data)))
+            })
             .catch((err) => {
                 console.log(err);
                 dispatch(setMapData({}));

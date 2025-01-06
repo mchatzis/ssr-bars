@@ -62,8 +62,8 @@ interface DropdownProps {
 }
 export function DropDown({ options, setValue }: DropdownProps) {
     return (
-        <div className="w-full h-[15vh] relative z-[var(--z-popup)] rounded-xl overflow-clip">
-            <ul className='w-full h-full text-base text-gray-700 bg-white shadow overflow-y-scroll'>
+        <div className="w-full h-fit max-h-[15vh] relative z-[var(--z-popup)] rounded-xl overflow-y-scroll bg-white">
+            <ul className='w-full h-full text-base text-gray-700'>
                 {options.map((option, index) => {
                     return (
                         <li

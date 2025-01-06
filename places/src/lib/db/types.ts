@@ -3,10 +3,7 @@ import { KeyEnum } from "./enums";
 
 export type Key<T extends string, R extends string> = `${T}#${R}`;
 
-export interface BaseEntity<
-    P extends Key<string, string>,
-    S extends Key<string, string>,
-> {
+export interface BaseEntity<P, S extends Key<string, string>> {
     PK: P;
     SK: S;
     readonly createdAt: number;
@@ -27,6 +24,11 @@ export interface PlacesOfPlaceTypeInArea extends BaseEntity<
     name: string,
     longitude: number,
     latitude: number,
+    category: string,
+    area: string,
+    description: string,
+    primaryImage: string,
+    images: string[]
 }
 
 export interface UserEntity extends BaseEntity<
@@ -54,4 +56,25 @@ export interface UsernameEntity extends BaseEntity<
     Key<KeyEnum.METADATA, ''>
 > {
     userId: string;
+}
+
+export interface AreaEntity extends BaseEntity<
+    Key<KeyEnum.AREA, string>,
+    Key<KeyEnum.METADATA, ''>
+> {
+    name: string,
+    longitude: number,
+    latitude: number,
+    initialZoom: number,
+    GSI1_PK: Key<KeyEnum.AREA, 'ALL'>,
+    GSI1_SK: Key<KeyEnum.METADATA, string>
+}
+
+export interface PlaceTypeEntity extends BaseEntity<
+    Key<KeyEnum.PLACE_TYPE, string>,
+    Key<KeyEnum.METADATA, ''>
+> {
+    name: string,
+    GSI1_PK: Key<KeyEnum.PLACE_TYPE, 'ALL'>,
+    GSI1_SK: Key<KeyEnum.METADATA, string>
 }

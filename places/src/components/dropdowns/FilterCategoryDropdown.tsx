@@ -1,8 +1,8 @@
 'use client'
 
 import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
-import { selectAppActiveCategories, selectAppAvailableCategories, selectCachedCategories, setActiveCategories, setAvailableCategories, setCachedCategories } from '@/lib/redux/slices/appStateSlice';
-import { useCallback, useEffect } from "react";
+import { selectAppActiveCategories, selectAppAvailableCategories, selectCachedCategories, setActiveCategories, setCachedCategories } from '@/lib/redux/slices/appStateSlice';
+import { useCallback } from "react";
 
 
 export default function FilterCategoryDropdown({ className = '' }) {
@@ -23,14 +23,6 @@ export default function FilterCategoryDropdown({ className = '' }) {
             dispatch(setCachedCategories([...cachedCategories, category]));
         }
     }, [activeCategories]);
-
-    useEffect(() => {
-        fetch("/api/data/categories", {
-            cache: 'force-cache',
-        })
-            .then(res => res.json())
-            .then(data => dispatch(setAvailableCategories(data)));
-    }, []);
 
     return (
         <div className={`${className}`}>

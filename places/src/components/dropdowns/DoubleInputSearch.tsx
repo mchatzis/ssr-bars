@@ -2,19 +2,17 @@
 
 import { MapRefContext } from "@/lib/context/mapContext";
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
-import { Area, PlaceType, selectAllAreas, selectAllPlaceTypes, selectArea, selectPlaceType, setArea, setPlaceType } from "@/lib/redux/slices/appStateSlice";
+import { Area, PlaceType, selectArea, selectPlaceType, setArea, setPlaceType } from "@/lib/redux/slices/appStateSlice";
 import { useCallback, useContext, useRef, useState } from "react";
 import { useClickAway } from "react-use";
 import InputWithOptionsDropdown from "./InputWithOptionsDropdown";
 
 
-export default function DoubleInputSearch({ className = '' }) {
+export default function DoubleInputSearch({ className = '', allAreas, allPlaceTypes }: { className: string, allAreas: Area[], allPlaceTypes: PlaceType[] }) {
     const enclosingDivRef = useRef<HTMLDivElement>(null);
     const mapRef = useContext(MapRefContext);
 
-    const allAreas: Area[] = useAppSelector(selectAllAreas);
     const allAreaNames: string[] = allAreas.map(area => area.name);
-    const allPlaceTypes: PlaceType[] = useAppSelector(selectAllPlaceTypes);
     const allPlaceTypeNames: string[] = allPlaceTypes.map(placeType => placeType.name);
 
     const [areaFieldValue, setAreaFieldValue] = useState('');

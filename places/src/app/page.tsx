@@ -1,10 +1,9 @@
-import LoginButton from "@/components/buttons/LoginButton"
-import PlaceDisplay from "@/components/display/PlaceDisplay"
-import MapComponent from "@/components/map/MapComponent"
-import LeftSidebar from "@/components/sidebar/LeftSidebar"
+import LoginButton from "@/components/buttons/LoginButton";
+import PlaceDisplay from "@/components/display/PlaceDisplay";
+import MapComponent from "@/components/map/MapComponent";
+import LeftSidebar from "@/components/sidebar/LeftSidebar";
 
 export default async function Page() {
-
     return (
         <div className="fixed inset-0">
             <MapComponent className="absolute inset-0" />

@@ -1,29 +1,23 @@
 import { KeyEnum } from './enums';
-import { BaseEntity, EmailEntity, Key, UserEntity, UsernameEntity } from './types';
+import { AreaEntity, BaseEntity, EmailEntity, Key, PlaceTypeEntity, UserEntity, UsernameEntity } from './types';
 
 function isValidObject(obj: any) {
     return typeof obj === 'object' && obj !== null
 }
-function isValidPK(pk: string): pk is Key<KeyEnum, string> {
-    const parts = pk.split('#');
-    return parts[0] in KeyEnum;
-}
-function isValidSK(sk: string): sk is Key<KeyEnum, string> {
-    const parts = sk.split('#');
+function isValidKey(key: string): key is Key<KeyEnum, string> {
+    const parts = key.split('#');
     return parts[0] in KeyEnum;
 }
 
-export function isBaseEntity<T extends Key<KeyEnum, string>, R extends Key<KeyEnum, string>>(
-    obj: any
-): obj is BaseEntity<T, R> {
+export function isBaseEntity(obj: any): obj is BaseEntity<any, any> {
     return (
         isValidObject(obj) &&
         typeof obj.PK === 'string' &&
         typeof obj.SK === 'string' &&
         typeof obj.createdAt === 'number' &&
         typeof obj.updatedAt === 'number' &&
-        isValidPK(obj.PK) &&
-        isValidSK(obj.SK)
+        isValidKey(obj.PK) &&
+        isValidKey(obj.SK)
     );
 }
 
@@ -37,7 +31,7 @@ export function isUserEntity(obj: any): obj is UserEntity {
         typeof obj.email === 'string' &&
         typeof obj.password === 'string' &&
         (obj.age === undefined || typeof obj.age === 'number') &&
-        isBaseEntity<Key<KeyEnum.USER, string>, Key<KeyEnum.METADATA, ''>>(obj)
+        isBaseEntity(obj)
     );
 }
 
@@ -49,7 +43,7 @@ export function isEmailEntity(obj: any): obj is EmailEntity {
         typeof obj.userId === 'string' &&
         typeof obj.password === 'string' &&
         typeof obj.username === 'string' &&
-        isBaseEntity<Key<KeyEnum.EMAIL, string>, Key<KeyEnum.METADATA, ''>>(obj)
+        isBaseEntity(obj)
     );
 }
 
@@ -59,6 +53,33 @@ export function isUsernameEntity(obj: any): obj is UsernameEntity {
         obj.PK.startsWith(`${KeyEnum.USERNAME}#`) &&
         obj.SK === `${KeyEnum.METADATA}#` &&
         typeof obj.userId === 'string' &&
-        isBaseEntity<Key<KeyEnum.USERNAME, string>, Key<KeyEnum.METADATA, ''>>(obj)
+        isBaseEntity(obj)
+    );
+}
+
+export function isAreaEntity(obj: any): obj is AreaEntity {
+    return (
+        isValidObject(obj) &&
+        obj.PK.startsWith(`${KeyEnum.AREA}#`) &&
+        obj.SK === `${KeyEnum.METADATA}#` &&
+        obj.GSI1_PK === `${KeyEnum.AREA}#ALL` &&
+        obj.GSI1_SK === `${KeyEnum.METADATA}#` &&
+        typeof obj.name === "string" &&
+        typeof obj.longitude === "number" &&
+        typeof obj.latitude === "number" &&
+        typeof obj.initialZoom === "number" &&
+        isBaseEntity(obj)
+    );
+}
+
+export function isPlaceTypeEntity(obj: any): obj is PlaceTypeEntity {
+    return (
+        isValidObject(obj) &&
+        obj.PK.startsWith(`${KeyEnum.PLACE_TYPE}#`) &&
+        obj.SK === `${KeyEnum.METADATA}#` &&
+        obj.GSI1_PK === `${KeyEnum.PLACE_TYPE}#ALL` &&
+        obj.GSI1_SK === `${KeyEnum.METADATA}#` &&
+        typeof obj.name === "string" &&
+        isBaseEntity(obj)
     );
 }
