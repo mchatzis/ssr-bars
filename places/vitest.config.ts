@@ -10,6 +10,9 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: './src/__tests__/setup.ts',
     globalSetup: './src/__tests__/global-setup.ts',
+    coverage: {
+      include: ['src/lib/**']
+    }
   },
   resolve: {
     alias: {

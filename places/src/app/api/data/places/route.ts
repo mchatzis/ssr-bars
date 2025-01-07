@@ -12,21 +12,6 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({})
     }
 
-    // let data;
-
-    // if ((area === "Vienna" && placeType === "bar")) {
-    //     data = await fetch("http://localhost:3001/mockDataVienna.json", {
-    //         cache: 'no-store',
-    //     })
-    //         .then(res => res.json());
-    // }
-    // if ((area === "Thessaloniki" && placeType === "bar")) {
-    //     data = await fetch("http://localhost:3001/mockDataThessaloniki.json", {
-    //         cache: 'no-store',
-    //     })
-    //         .then(res => res.json());
-    // }
-
     //TODO: Use the fact that places come back from database sorted by category to optimize this
     const places = await getAllPlaces(area, placeType);
     const dataForFrontend: PlacesApiData = {};

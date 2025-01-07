@@ -3,7 +3,7 @@
 import { LoginFormSchema, SignupFormSchema } from "@/app/actions/auth/schema";
 import { LoginFormState } from "@/components/auth/LoginForm";
 import { RegisterFormState } from "@/components/auth/RegisterForm";
-import { createUser, CreateUserInput, EmailDoesNotExistError, EmailExistsError, getUserIdentity, GetUserInput, UsernameExistsError, WrongPasswordError } from "@/lib/db/models/user";
+import { createUser, CreateUserInput, EmailDoesNotExistError, EmailExistsError, getUserIdentity, GetUserInput, UsernameExistsError, WrongPasswordError } from "@/lib/db/models/user/user";
 import { createSession } from "@/lib/session/session";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";

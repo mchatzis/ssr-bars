@@ -3,7 +3,7 @@
 import { LoginFormSchema, SignupFormSchema } from "@/app/actions/auth/schema";
 import { LoginFormState } from "@/components/auth/LoginForm";
 import { RegisterFormState } from "@/components/auth/RegisterForm";
-import { createUser, EmailDoesNotExistError, EmailExistsError, getUserIdentity, UsernameExistsError, WrongPasswordError } from "@/lib/db/models/user";
+import { createUser, EmailDoesNotExistError, EmailExistsError, getUserIdentity, UsernameExistsError, WrongPasswordError } from "@/lib/db/models/user/user";
 import { createSession } from "@/lib/session/session";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
@@ -13,6 +13,7 @@ import { authenticate, register } from './authenticate';
 vi.mock('next/navigation', () => ({
     redirect: vi.fn(() => {
         throw new Error('NEXT_REDIRECT');
+
     }),
 }));
 vi.mock('@/app/actions/auth/schema', () => ({
@@ -23,7 +24,7 @@ vi.mock('@/app/actions/auth/schema', () => ({
         safeParse: vi.fn()
     }
 }));
-vi.mock(import("@/lib/db/models/user"), async (importOriginal) => {
+vi.mock(import("@/lib/db/models/user/user"), async (importOriginal) => {
     const actual = await importOriginal()
     return {
         ...actual,
