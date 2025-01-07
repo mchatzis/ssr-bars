@@ -85,17 +85,33 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
         const lastAddedCategory = cachedCategories[cachedCategories.length - 1];
 
         //TODO: Why not use activePlaces instead and maybe cache already fetched places?
+        //TODO: Refactor (DRY issues)
         const addedPlaces = Object.values(mapData[lastAddedCategory])
-        addImagesToPlaces(addedPlaces, 'small')
-            .then((updatedPlaces) => {
+        addImagesToPlaces(addedPlaces, 'medium')
+            .then((updatedPlacesSmall) => {
                 const updatedRecords: Record<string, Place> = {}
-                updatedPlaces.forEach((place) => {
+                updatedPlacesSmall.forEach((place) => {
                     updatedRecords[place.properties.uuid] = place
                 })
                 dispatch(setMapData({
                     ...mapData,
                     [lastAddedCategory]: updatedRecords
                 }))
+
+                return updatedPlacesSmall
+            })
+            .then((updatedPlacesSmall) => {
+                addImagesToPlaces(updatedPlacesSmall, 'large')
+                    .then((updatedPlacesLarge) => {
+                        const updatedRecords: Record<string, Place> = {}
+                        updatedPlacesLarge.forEach((place) => {
+                            updatedRecords[place.properties.uuid] = place
+                        })
+                        dispatch(setMapData({
+                            ...mapData,
+                            [lastAddedCategory]: updatedRecords
+                        }))
+                    })
             })
     }, [cachedCategories])
 
@@ -114,7 +130,7 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
     }, [theme]);
 
     const handleMapMove = useCallback((evt: ViewStateChangeEvent) => {
-        // dispatch(setSelectedPlace(null));
+        dispatch(setSelectedPlace(null));
         dispatch(setViewState(evt.viewState));
     }, []);
 
@@ -219,7 +235,7 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
                             onClick={handleClickPopup}
                         >
                             <div className="flex flex-col overflow-clip rounded-xl">
-                                <ImageCarousel images={popupPlace.imagesUrls.small} className='relative w-64 h-32' />
+                                <ImageCarousel images={popupPlace.imagesUrls.medium} className='relative w-64 h-32' />
                                 <div className='w-64 h-16 bg-[var(--background-color)]'>
                                     <p className="text-left pl-3 cursor-pointer">Other stuff</p>
                                 </div>
