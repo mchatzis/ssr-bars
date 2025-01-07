@@ -28,7 +28,7 @@ export default function DoubleInputSearch({ className = '', allAreas, allPlaceTy
         setPlaceTypeFieldValue('');
     })
 
-    const handleSearchClick = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+    const handleSearchClick = useCallback(() => {
         const cleanedAreaFieldValue = areaFieldValue.trim();
         const cleanedPlaceTypeFieldValue = placeTypeFieldValue.trim();
 

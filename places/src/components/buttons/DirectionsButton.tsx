@@ -2,8 +2,8 @@ import { Place } from "@/lib/redux/slices/mapStateSlice";
 import { useCallback } from "react";
 
 function createUrl(name: string, city: string) {
-    let splitName = name.split(" ")
-    let query = splitName.reduce((acc, word) => {
+    const splitName = name.split(" ")
+    const query = splitName.reduce((acc, word) => {
         return acc + word + "+";
     }, "");
 

@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
     const places = await getAllPlaces(area, placeType);
     const dataForFrontend: PlacesApiData = {};
 
-    places.forEach((place, i) => {
+    places.forEach((place) => {
         if (!dataForFrontend.hasOwnProperty(place.category)) {
             dataForFrontend[place.category] = {};
         }

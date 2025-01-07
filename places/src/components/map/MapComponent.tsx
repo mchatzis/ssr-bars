@@ -178,7 +178,7 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
         setSelectedPlaceWithAnimation(clickedPlace);
     }, [mapData, setSelectedPlaceWithAnimation])
 
-    const handleClickPopup = useCallback((e: any) => {
+    const handleClickPopup = useCallback(() => {
         if (!popupPlace) {
             console.error("PopupPlace was null when popup clicked");
             return
@@ -198,7 +198,7 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
                 onMove={handleMapMove}
                 onLoad={handleMapLoad}
                 onMouseEnter={handleMapMouseEnter}
-                // onMouseLeave={handleMapMouseLeave}
+                onMouseLeave={handleMapMouseLeave}
                 onClick={handleMapClick}
             >
                 <Source id="my-data" type="geojson" data={to_geojson(activePlaces)}>

@@ -12,8 +12,8 @@ export default function PlaceDisplay({ className = '' }) {
 
     //TODO: Somehow show which pin is active
     return (
-        <div className="absolute top-[10vh] right-[1vw] w-96 h-[85vh]
-                bg-[var(--background-color)] fade-in flex flex-col rounded-xl overflow-clip">
+        <div className={`${className} absolute top-[10vh] right-[1vw] w-96 h-[85vh]
+                bg-[var(--background-color)] fade-in flex flex-col rounded-xl overflow-clip`}>
             <ImageCarousel
                 images={selectedPlace.imagesUrls.small}
                 className="relative w-full h-72"

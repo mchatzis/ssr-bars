@@ -4,7 +4,7 @@ import { S3_IMAGES_DIR } from "../constants";
 import { ImageSizeOptions, Place } from "../redux/slices/mapStateSlice";
 
 export function to_geojson(apiData: Place[]): FeatureCollection {
-    let feature_list = apiData.map((dataPoint) => {
+    const feature_list = apiData.map((dataPoint) => {
         const feature: Feature<Geometry, GeoJsonProperties> = {
             type: "Feature",
             geometry: {
