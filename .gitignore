@@ -9,3 +9,4 @@ scrap.js
 /places/public/images/places
 .swc
 _ignore*
+/mockData*

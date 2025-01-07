@@ -237,7 +237,7 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
                             <div className="flex flex-col overflow-clip rounded-xl">
                                 <ImageCarousel images={popupPlace.imagesUrls.medium} className='relative w-64 h-32' />
                                 <div className='w-64 h-16 bg-[var(--background-color)]'>
-                                    <p className="text-left pl-3 cursor-pointer">Other stuff</p>
+                                    <p className="text-left text-sm pl-3 cursor-pointer">{popupPlace.properties.name}</p>
                                 </div>
                             </div>
                             {/* The following should be a transparent buffer that breaches the gap 

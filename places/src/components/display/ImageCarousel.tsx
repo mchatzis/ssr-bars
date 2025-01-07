@@ -37,20 +37,20 @@ const ImageCarousel = ({ className = '', images }: { className: string, images: 
         <div className={`${className} cursor-pointer`}>
             <img
                 src={images[currentIndex]}
-                className='w-full h-full'
+                className='w-full h-full object-cover'
                 onWheel={handleWheel}
             />
             <img
                 src={STATIC_IMG_ICON_PREFIX + '/' + 'right-arrow.png'}
                 onClick={handleClickNext}
-                className="absolute top-1/2 right-0 clickable-element"
+                className="absolute top-[45%] right-0 clickable-element"
                 width={30}
                 height={30}
             />
             <img
                 src={STATIC_IMG_ICON_PREFIX + '/' + 'left-arrow.png'}
                 onClick={handleClickPrevious}
-                className="absolute top-1/2 left-0 clickable-element"
+                className="absolute top-[45%] left-0 clickable-element"
                 width={30}
                 height={30}
             />
