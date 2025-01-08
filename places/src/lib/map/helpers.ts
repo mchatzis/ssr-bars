@@ -31,11 +31,42 @@ export function to_geojson(apiData: Place[]): FeatureCollection {
     }
 }
 
-async function getImageUrl(src: string) {
-    //TODO: Cache places to avoid re-fetching for places in multiple categories
-    return fetch(src)
-        .then(response => response.blob())
-        .then(blob => URL.createObjectURL(blob));
+function delay(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+//TODO: Cache places to avoid re-fetching for places in multiple categories
+async function getImageUrl(src: string, retries = 5, delayTime = 500): Promise<string> {
+    try {
+        const response = await fetch(src);
+
+        if ((response.status === 429 || // Too Many Requests
+            response.status === 503 || // Service Unavailable
+            response.status === 502 || // Bad Gateway
+            response.status === 504) && // Gateway Timeout
+            retries > 0) {
+            await delay(delayTime);
+            return getImageUrl(src, retries - 1, delayTime * 2);
+        }
+
+        if (!response.ok ||
+            response.status === 404 || // Not Found
+            response.status === 403 || // Forbidden
+            response.status === 401) { // Unauthorized
+            return '';
+        }
+
+        const blob = await response.blob();
+        return URL.createObjectURL(blob);
+    } catch (error) {
+        // Network errors
+        console.log(`Network error: ${error}`);
+        if (retries > 0) {
+            await delay(delayTime);
+            return getImageUrl(src, retries - 1, delayTime * 2);
+        }
+        return '';
+    }
 }
 
 export async function addImagesToPlaces(places: Place[], size: keyof typeof ImageSizeOptions): Promise<Place[]> {
@@ -51,8 +82,11 @@ export async function addImagesToPlaces(places: Place[], size: keyof typeof Imag
                 height: sizeOption.height
             }).props.src
         });
-        const imageUrls = imageSources.map(getImageUrl);
+        const imageUrls = imageSources.map((src) => {
+            return getImageUrl(src)
+        });
 
+        console.log(`Finished ${place.properties.name}`)
         const placeWithImages: Promise<Place> = Promise.all(imageUrls)
             .then(urls => ({
                 ...place,

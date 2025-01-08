@@ -101,6 +101,7 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
                 return updatedPlacesSmall
             })
             .then((updatedPlacesSmall) => {
+                console.log(`updatedPlacesSmall ${updatedPlacesSmall}`);
                 addImagesToPlaces(updatedPlacesSmall, 'large')
                     .then((updatedPlacesLarge) => {
                         const updatedRecords: Record<string, Place> = {}
@@ -203,6 +204,7 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
         setSelectedPlaceWithAnimation(popupPlace);
     }, [popupPlace, setSelectedPlaceWithAnimation]);
 
+    console.log(mapData)
     return (
         <div id="map-container" className={`${className}`}>
             <Map
