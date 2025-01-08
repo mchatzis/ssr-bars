@@ -235,7 +235,10 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
                             onClick={handleClickPopup}
                         >
                             <div className="flex flex-col overflow-clip rounded-xl">
-                                <ImageCarousel images={popupPlace.imagesUrls.medium} className='relative w-64 h-32' />
+                                <ImageCarousel
+                                    images={mapData[popupPlace.properties.category][popupPlace.properties.uuid].imagesUrls.medium}
+                                    className='relative w-64 h-32'
+                                />
                                 <div className='w-64 h-16 bg-[var(--background-color)]'>
                                     <p className="text-left text-sm pl-3 cursor-pointer">{popupPlace.properties.name}</p>
                                 </div>
