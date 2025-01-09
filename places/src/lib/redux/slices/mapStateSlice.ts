@@ -101,8 +101,8 @@ const mapStateSlice = createSlice({
         setViewState: (state, action: PayloadAction<ViewState>) => {
             state.viewState = action.payload;
         },
-        setMapData: (state, action: PayloadAction<PlacesApiData>) => {
-            state.data = action.payload;
+        setMapData: (state, action: PayloadAction<PlacesApiData | ((prev: PlacesApiData) => PlacesApiData)>) => {
+            state.data = typeof action.payload === 'function' ? action.payload(state.data) : action.payload;
         },
         setActivePlaces: (state, action: PayloadAction<Place[]>) => {
             state.activePlaces = action.payload;

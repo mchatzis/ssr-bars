@@ -88,30 +88,29 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
         //TODO: Refactor (DRY issues)
         const addedPlaces = Object.values(mapData[lastAddedCategory])
         addImagesToPlaces(addedPlaces, 'medium')
-            .then((updatedPlacesSmall) => {
+            .then((updatedPlacesMedium) => {
                 const updatedRecords: Record<string, Place> = {}
-                updatedPlacesSmall.forEach((place) => {
+                updatedPlacesMedium.forEach((place) => {
                     updatedRecords[place.properties.uuid] = place
                 })
-                dispatch(setMapData({
-                    ...mapData,
+                dispatch(setMapData((prevData) => ({
+                    ...prevData,
                     [lastAddedCategory]: updatedRecords
-                }))
+                })))
 
-                return updatedPlacesSmall
+                return updatedPlacesMedium
             })
-            .then((updatedPlacesSmall) => {
-                console.log(`updatedPlacesSmall ${updatedPlacesSmall}`);
-                addImagesToPlaces(updatedPlacesSmall, 'large')
+            .then((updatedPlacesMedium) => {
+                addImagesToPlaces(updatedPlacesMedium, 'large')
                     .then((updatedPlacesLarge) => {
                         const updatedRecords: Record<string, Place> = {}
                         updatedPlacesLarge.forEach((place) => {
                             updatedRecords[place.properties.uuid] = place
                         })
-                        dispatch(setMapData({
-                            ...mapData,
+                        dispatch(setMapData((prevData) => ({
+                            ...prevData,
                             [lastAddedCategory]: updatedRecords
-                        }))
+                        })))
                     })
             })
     }, [cachedCategories])
