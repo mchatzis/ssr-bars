@@ -85,16 +85,16 @@ export function isPlaceTypeEntity(obj: any): obj is PlaceTypeEntity {
 }
 
 export function isPlaceOfPlaceTypeInAreaEntity(obj: any): obj is PlaceOfPlaceTypeInAreaEntity {
-    //TODO: Check second part of PK and SK, add unit test
+    //TODO: Check second part of PK, add unit test
     return (
         isValidObject(obj) &&
         obj.PK.startsWith(`${KeyEnum.AREA}#`) &&
-        obj.SK.startsWith(`${KeyEnum.CATEGORY}#`) &&
+        obj.SK.startsWith(`${KeyEnum.PLACE}#`) &&
         typeof obj.uuid === "string" &&
         typeof obj.name === "string" &&
         typeof obj.longitude === "number" &&
         typeof obj.latitude === "number" &&
-        typeof obj.category === "string" &&
+        Array.isArray(obj.categories) && obj.categories.every((category: any) => typeof category === "string") &&
         typeof obj.area === "string" &&
         typeof obj.description === "string" &&
         typeof obj.primaryImage === "string" &&

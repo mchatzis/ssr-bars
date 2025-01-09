@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { KeyEnum } from './enums';
-import { isAreaEntity, isBaseEntity, isEmailEntity, isPlaceTypeEntity, isUserEntity, isUsernameEntity } from './type-guards';
+import { isAreaEntity, isBaseEntity, isEmailEntity, isPlaceOfPlaceTypeInAreaEntity, isPlaceTypeEntity, isUserEntity, isUsernameEntity } from './type-guards';
 
 const validUserEntity = {
     PK: `${KeyEnum.USER}#123`,
@@ -53,6 +53,22 @@ const validPlaceTypeEntity = {
     name: 'myPlaceType',
     GSI1_PK: 'PLACE_TYPE#ALL',
     GSI1_SK: 'METADATA#'
+}
+
+const validPlaceOfPlaceTypeInAreaEntity = {
+    PK: `${KeyEnum.AREA}#MyArea#${KeyEnum.PLACE_TYPE}#bar`,
+    SK: `${KeyEnum.PLACE}#83ea09c4-6110-410a-8489-4af4f289e6b9`,
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+    area: "myArea",
+    categories: ["category1", "category2"],
+    description: "myDescription",
+    images: ["image1.png", "image2.png"],
+    latitude: 3,
+    longitude: 2,
+    name: "testPlace",
+    primaryImage: "primaryImage.png",
+    uuid: "83ea09c4-6110-410a-8489-4af4f289e6b9"
 }
 
 describe('Type Guards', () => {
@@ -119,4 +135,14 @@ describe('Type Guards', () => {
             })
         ).toBe(false);
     });
+
+    it('validates PlaceOfPlaceTypeInAreaEntity', () => {
+        expect(isPlaceOfPlaceTypeInAreaEntity(validPlaceOfPlaceTypeInAreaEntity)).toBe(true);
+        expect(
+            isPlaceOfPlaceTypeInAreaEntity({
+                ...validPlaceOfPlaceTypeInAreaEntity,
+                PK: `${KeyEnum.EMAIL}#789`
+            })
+        ).toBe(false);
+    })
 });

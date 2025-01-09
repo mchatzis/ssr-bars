@@ -106,18 +106,23 @@ export function organizePlacesIntoCategories(placesData: PlaceOfPlaceTypeInAreaE
     const placesOrganized: PlacesApiData = {};
 
     placesData.forEach((place) => {
-        if (!placesOrganized.hasOwnProperty(place.category)) {
-            placesOrganized[place.category] = {};
-        }
-
-        placesOrganized[place.category][place.uuid] = {
-            properties: place,
-            imagesUrls: {
-                small: [],
-                medium: [],
-                large: []
+        place.categories.forEach((category) => {
+            if (!placesOrganized.hasOwnProperty(category)) {
+                placesOrganized[category] = {};
             }
-        }
+
+            placesOrganized[category][place.uuid] = {
+                properties: {
+                    ...place,
+                    category: category,
+                },
+                imagesUrls: {
+                    small: [],
+                    medium: [],
+                    large: []
+                }
+            }
+        })
     })
 
     return placesOrganized;

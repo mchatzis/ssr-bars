@@ -24,6 +24,7 @@ export type Place = {
         longitude: number,
         latitude: number,
         category: string,
+        categories: string[],
         area: string,
         description: string,
         primaryImage: string,

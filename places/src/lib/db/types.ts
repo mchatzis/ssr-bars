@@ -10,22 +10,19 @@ export interface BaseEntity<P, S extends Key<string, string>> {
     updatedAt: number;
 }
 
-// Example: PK: Area#London#Type#Bar, SK: Category#Modern#Place#123
+// Example: PK: Area#London#Type#Bar, SK: Place#123
 export interface PlaceOfPlaceTypeInAreaEntity extends BaseEntity<
     Key<
         Key<KeyEnum.AREA, string>,
         Key<KeyEnum.PLACE_TYPE, string>
     >,
-    Key<
-        Key<KeyEnum.CATEGORY, string>,
-        Key<KeyEnum.PLACE, string>
-    >
+    Key<KeyEnum.PLACE, string>
 > {
     uuid: string,
     name: string,
     longitude: number,
     latitude: number,
-    category: string,
+    categories: string[],
     area: string,
     description: string,
     primaryImage: string,
