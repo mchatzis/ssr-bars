@@ -5,7 +5,7 @@ import Map, { Layer, MapLayerMouseEvent, Popup, Source, SymbolLayer, ViewStateCh
 
 import { STATIC_IMG_ICON_PREFIX } from '@/lib/constants';
 import { MapRefContext } from '@/lib/context/mapContext';
-import { addImagesToPlaces, to_geojson } from '@/lib/map/helpers';
+import { addImagesToPlaces, organizePlacesIntoCategories, to_geojson } from '@/lib/map/helpers';
 import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
 import { selectAppActiveCategories, selectArea, selectCachedCategories, selectPlaceType, setActiveCategories, setAvailableCategories, setCachedCategories } from '@/lib/redux/slices/appStateSlice';
 import { Place, selectMapActivePlaces, selectMapData, selectViewState, setActivePlaces, setMapData, setSelectedPlace, setViewState } from '@/lib/redux/slices/mapStateSlice';
@@ -26,6 +26,7 @@ const pinLayer: SymbolLayer = {
         "icon-image": "pin"
     },
 };
+
 interface MapComponentProps {
     className?: string;
 }
@@ -53,9 +54,10 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
         //Fetches currently not cached? Maybe use React Query?
         fetch(`/api/data/places?area=${area.name}&placeType=${placeType.name}`, { cache: 'no-store' })
             .then(res => res.json())
-            .then(data => {
-                dispatch(setMapData(data))
-                dispatch(setAvailableCategories(Object.keys(data)))
+            .then(data => organizePlacesIntoCategories(data))
+            .then(placesByCategory => {
+                dispatch(setMapData(placesByCategory))
+                dispatch(setAvailableCategories(Object.keys(placesByCategory)))
             })
             .catch((err) => {
                 console.log(err);
@@ -203,7 +205,6 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
         setSelectedPlaceWithAnimation(popupPlace);
     }, [popupPlace, setSelectedPlaceWithAnimation]);
 
-    console.log(mapData)
     return (
         <div id="map-container" className={`${className}`}>
             <Map

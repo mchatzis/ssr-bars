@@ -1,7 +1,8 @@
+import { PlaceOfPlaceTypeInAreaEntity } from "@/lib/db/types";
+import { ImageSizeOptions, Place, PlacesApiData } from "@/lib/redux/slices/mapStateSlice";
 import { Feature, FeatureCollection, GeoJsonProperties, Geometry } from "geojson";
 import { getImageProps } from "next/image";
 import { S3_IMAGES_DIR } from "../constants";
-import { ImageSizeOptions, Place } from "../redux/slices/mapStateSlice";
 
 export function to_geojson(apiData: Place[]): FeatureCollection {
     const feature_list = apiData.map((dataPoint) => {
@@ -86,7 +87,6 @@ export async function addImagesToPlaces(places: Place[], size: keyof typeof Imag
             return getImageUrl(src)
         });
 
-        console.log(`Finished ${place.properties.name}`)
         const placeWithImages: Promise<Place> = Promise.all(imageUrls)
             .then(urls => ({
                 ...place,
@@ -100,4 +100,25 @@ export async function addImagesToPlaces(places: Place[], size: keyof typeof Imag
     })
 
     return Promise.all(placesWithImages);
+}
+
+export function organizePlacesIntoCategories(placesData: PlaceOfPlaceTypeInAreaEntity[]) {
+    const placesOrganized: PlacesApiData = {};
+
+    placesData.forEach((place) => {
+        if (!placesOrganized.hasOwnProperty(place.category)) {
+            placesOrganized[place.category] = {};
+        }
+
+        placesOrganized[place.category][place.uuid] = {
+            properties: place,
+            imagesUrls: {
+                small: [],
+                medium: [],
+                large: []
+            }
+        }
+    })
+
+    return placesOrganized;
 }
