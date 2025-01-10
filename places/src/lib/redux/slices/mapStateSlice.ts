@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import type { RootState } from '../store';
+import { defaultAppState, getInitialAppState } from './appStateSlice';
 
 type Size = 'small' | 'medium' | 'large';
 export const ImageSizeOptions: Record<Size, { width: number, height: number }> = {
@@ -68,6 +69,15 @@ interface ViewState {
     latitude: number,
     zoom: number
 }
+export function isViewState(obj: any): obj is ViewState {
+    return (
+        typeof obj === "object" && obj !== null &&
+        typeof obj.longitude === "number" &&
+        typeof obj.latitude === "number" &&
+        typeof obj.zoom === "number"
+    );
+}
+
 export type PlacesApiData = {
     [category: string]: {
         [uuid: string]: Place
@@ -80,24 +90,41 @@ interface MapState {
     selectedPlace: Place | null;
 }
 
-const initialViewState: ViewState = {
-    longitude: 16.37,
-    latitude: 48.206,
-    zoom: 13.3
-} as ViewState
+// Vienna coordinates
 const initialData = {};
 const initialActivePlaces: Place[] = []
 
-const initialMapState: MapState = {
-    viewState: initialViewState,
+const defaultMapState: MapState = {
+    viewState: {
+        longitude: defaultAppState.area.longitude,
+        latitude: defaultAppState.area.latitude,
+        zoom: defaultAppState.area.initialZoom
+    },
     data: initialData,
     activePlaces: initialActivePlaces,
     selectedPlace: null
 }
 
+const getInitialMapState = (): MapState => {
+    if (typeof window === 'undefined') {
+        return defaultMapState;
+    }
+
+    const initialAppState = getInitialAppState();
+
+    return {
+        ...defaultMapState,
+        viewState: {
+            longitude: initialAppState.area.longitude,
+            latitude: initialAppState.area.latitude,
+            zoom: initialAppState.area.initialZoom
+        }
+    }
+}
+
 const mapStateSlice = createSlice({
     name: 'map',
-    initialState: initialMapState,
+    initialState: getInitialMapState,
     reducers: {
         setViewState: (state, action: PayloadAction<ViewState>) => {
             state.viewState = action.payload;

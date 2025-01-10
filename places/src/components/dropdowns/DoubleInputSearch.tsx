@@ -60,14 +60,16 @@ export default function DoubleInputSearch({ className = '', allAreas, allPlaceTy
         setPlaceTypeFieldValue('');
 
         //TODO: All db record types should have a uuid, area and placeType included
-        if (chosenArea.name !== currentArea.name) {
-            mapRef?.current?.flyTo({
-                center: [chosenArea.longitude, chosenArea.latitude],
-                zoom: chosenArea.initialZoom,
-                duration: 5000,
-                easing: (t: number) => t * (2 - t)
-            })
+        let flyTime = 5000;
+        if (chosenArea.name === currentArea.name) {
+            flyTime = 2000;
         }
+        mapRef?.current?.flyTo({
+            center: [chosenArea.longitude, chosenArea.latitude],
+            zoom: chosenArea.initialZoom,
+            duration: flyTime,
+            easing: (t: number) => t * (2 - t)
+        })
     }, [areaFieldValue, placeTypeFieldValue, allAreas, allPlaceTypes])
 
     return (

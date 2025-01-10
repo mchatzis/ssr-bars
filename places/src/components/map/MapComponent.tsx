@@ -50,8 +50,6 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
         dispatch(setActiveCategories([]));
         dispatch(setCachedCategories([]));
 
-        //TODO: Add catch clauses to all fetches
-        //Fetches currently not cached? Maybe use React Query?
         fetch(`/api/data/places?area=${area.name}&placeType=${placeType.name}`, { cache: 'no-store' })
             .then(res => res.json())
             .then(data => organizePlacesIntoCategories(data))

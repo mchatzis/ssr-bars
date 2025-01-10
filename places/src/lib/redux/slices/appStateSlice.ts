@@ -7,10 +7,26 @@ export type Area = {
     latitude: number,
     initialZoom: number
 }
+export function isArea(obj: any): obj is Area {
+    return (
+        typeof obj === "object" && obj !== null &&
+        typeof obj.name === "string" &&
+        typeof obj.longitude === "number" &&
+        typeof obj.latitude === "number" &&
+        typeof obj.initialZoom === "number"
+    );
+}
 
 export type PlaceType = {
     name: string
 }
+export function isPlaceType(obj: any): obj is PlaceType {
+    return (
+        typeof obj === "object" && obj !== null &&
+        typeof obj.name === "string"
+    );
+}
+
 interface AppState {
     allAreas: Area[],
     area: Area,
@@ -21,7 +37,7 @@ interface AppState {
     cachedCategories: string[];
 }
 
-const initialAppState: AppState = {
+export const defaultAppState: AppState = {
     allAreas: [],
     area: {
         name: "Vienna",
@@ -38,21 +54,49 @@ const initialAppState: AppState = {
     cachedCategories: []
 }
 
+export const getInitialAppState = (): AppState => {
+    if (typeof window === 'undefined') {
+        return defaultAppState;
+    }
+
+    const storedAreaString = sessionStorage.getItem('area');
+    const storedPlaceTypeString = sessionStorage.getItem('placeType');
+
+    if (!storedAreaString || !storedPlaceTypeString) {
+        return defaultAppState;
+    }
+
+    const storedArea = JSON.parse(storedAreaString);
+    const storedPlaceType = JSON.parse(storedPlaceTypeString);
+
+    if (!isArea(storedArea) || !isPlaceType(storedPlaceType)) {
+        return defaultAppState;
+    }
+
+    return {
+        ...defaultAppState,
+        area: storedArea,
+        placeType: storedPlaceType
+    }
+}
+
 const appStateSlice = createSlice({
     name: 'app',
-    initialState: initialAppState,
+    initialState: getInitialAppState,
     reducers: {
         setAllAreas: (state, action: PayloadAction<Area[]>) => {
             state.allAreas = action.payload;
         },
         setArea: (state, action: PayloadAction<Area>) => {
             state.area = action.payload;
+            sessionStorage.setItem('area', JSON.stringify(action.payload));
         },
         setAllPlaceTypes: (state, action: PayloadAction<PlaceType[]>) => {
             state.allPlaceTypes = action.payload;
         },
         setPlaceType: (state, action: PayloadAction<PlaceType>) => {
             state.placeType = action.payload;
+            sessionStorage.setItem('placeType', JSON.stringify(action.payload));
         },
         setAvailableCategories: (state, action: PayloadAction<string[]>) => {
             state.availableCategories = action.payload;
