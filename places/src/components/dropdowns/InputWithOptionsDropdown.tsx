@@ -1,6 +1,6 @@
 'use client'
 
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useCallback, useEffect, useState } from "react";
 
 interface Props {
     className?: string;
@@ -12,6 +12,7 @@ interface Props {
 export default function InputWithOptionsDropdown({ className = '', allOptions, currentChoice, value, setValue }: Props) {
     const [focused, setFocused] = useState(false);
     const [options, setOptions] = useState(allOptions);
+    const [placeholder, setPlaceHolder] = useState('');
 
     useEffect(() => {
         let filteredSuggestions = allOptions;
@@ -25,19 +26,25 @@ export default function InputWithOptionsDropdown({ className = '', allOptions, c
         setOptions(filteredSuggestions);
     }, [value, allOptions])
 
-    function handleFocus(e: React.FocusEvent<HTMLInputElement>) {
-        e.target.setAttribute('placeholder', '');
-        setFocused(true);
-    }
-    function handleBlur(e: React.FocusEvent<HTMLInputElement>) {
-        e.target.setAttribute('placeholder', currentChoice);
-        setFocused(false);
-    }
+    // Need this because using currentChoice directly would cause a hydration issue.
+    useEffect(() => {
+        setPlaceHolder(currentChoice);
+    }, [currentChoice])
 
-    function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const handleFocus = useCallback((e: React.FocusEvent<HTMLInputElement>) => {
+        setPlaceHolder('');
+        setFocused(true);
+    }, []);
+
+    const handleBlur = useCallback((e: React.FocusEvent<HTMLInputElement>) => {
+        setPlaceHolder(currentChoice);
+        setFocused(false);
+    }, [currentChoice]);
+
+    const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
         setValue(value);
-    };
+    }, []);
 
     return (
         <div className={`h-7 w-36 ${className}`}>
@@ -46,7 +53,7 @@ export default function InputWithOptionsDropdown({ className = '', allOptions, c
                   placeholder-gray-500 pl-3"
                 type="text"
                 value={value}
-                placeholder={currentChoice}
+                placeholder={placeholder}
                 onFocus={handleFocus}
                 onBlur={handleBlur}
                 onChange={handleInputChange}

@@ -18,7 +18,6 @@ export default function DoubleInputSearch({ className = '', allAreas, allPlaceTy
     const [areaFieldValue, setAreaFieldValue] = useState('');
     const [placeTypeFieldValue, setPlaceTypeFieldValue] = useState('');
 
-
     const currentArea: Area = useAppSelector(selectArea);
     const currentPlaceType: PlaceType = useAppSelector(selectPlaceType);
     const dispatch = useAppDispatch();
@@ -59,8 +58,7 @@ export default function DoubleInputSearch({ className = '', allAreas, allPlaceTy
         dispatch(setPlaceType(chosenPlaceType));
         setPlaceTypeFieldValue('');
 
-        //TODO: All db record types should have a uuid, area and placeType included
-        let flyTime = 5000;
+        let flyTime = 4000;
         if (chosenArea.name === currentArea.name) {
             flyTime = 2000;
         }
