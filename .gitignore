@@ -8,5 +8,6 @@ scrap.js
 # other
 /places/public/images/places
 .swc
+*.csv
 _ignore*
 /mockData*

@@ -33,12 +33,12 @@ export async function createPlace(state: PlaceCreationFormState, formData: FormD
         const imagePrefix = `${placeData.area}/${placeData.placeType}/${placeData.name}_${uuid}`
         const place: PlaceOfPlaceTypeInAreaEntity = {
             PK: `AREA#${placeData.area}#PLACE_TYPE#${placeData.placeType}`,
-            SK: `CATEGORY#${placeData.category}#PLACE#${uuid}`,
+            SK: `PLACE#${uuid}`,
             uuid: uuid,
             name: placeData.name,
             longitude: placeData.longitude,
             latitude: placeData.latitude,
-            category: placeData.category,
+            categories: [placeData.category],
             area: placeData.area,
             description: placeData.description,
             primaryImage: imagePrefix + '/' + 'primaryImage.jpg',
@@ -50,8 +50,6 @@ export async function createPlace(state: PlaceCreationFormState, formData: FormD
             createdAt: Date.now(),
             updatedAt: Date.now()
         }
-
-        console.log(place)
 
         const db = Database.getInstance();
         await db.put({
