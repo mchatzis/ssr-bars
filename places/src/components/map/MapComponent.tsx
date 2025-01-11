@@ -8,7 +8,7 @@ import { MapRefContext } from '@/lib/context/mapContext';
 import { addImagesToPlaces, organizePlacesIntoCategories, to_geojson } from '@/lib/map/helpers';
 import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
 import { selectAppActiveCategories, selectArea, selectCachedCategories, selectPlaceType, setActiveCategories, setAvailableCategories, setCachedCategories } from '@/lib/redux/slices/appStateSlice';
-import { Place, selectMapActivePlaces, selectMapData, selectViewState, setActivePlaces, setMapData, setSelectedPlace, setViewState } from '@/lib/redux/slices/mapStateSlice';
+import { Place, selectMapActivePlaces, selectMapData, selectSelectedPlace, selectViewState, setActivePlaces, setMapData, setSelectedPlace, setViewState } from '@/lib/redux/slices/mapStateSlice';
 import { selectTheme } from '@/lib/redux/slices/styleStateSlice';
 import { MapLibreEvent } from 'maplibre-gl';
 import { useCallback, useContext, useEffect, useState } from 'react';
@@ -40,8 +40,10 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
     const placeType = useAppSelector(selectPlaceType);
     const mapData = useAppSelector(selectMapData);
     const activeCategories = useAppSelector(selectAppActiveCategories);
-    const activePlaces = useAppSelector(selectMapActivePlaces);
     const cachedCategories = useAppSelector(selectCachedCategories);
+    const activePlaces = useAppSelector(selectMapActivePlaces);
+    const selectedPlace = useAppSelector(selectSelectedPlace);
+
 
     const [popupPlace, setPopupPlace] = useState<Place | null>(null);
 
@@ -64,9 +66,8 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
     }, [area, placeType])
 
     useEffect(() => {
-        dispatch(setSelectedPlace(null));
-
         if (activeCategories.length === 0) {
+            dispatch(setSelectedPlace(null));
             dispatch(setActivePlaces([]));
             return
         }
@@ -76,6 +77,10 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
             .map(Object.keys)
             .reduce((acc, keys) => acc.filter(key => keys.includes(key)));
         const activePlaces = uuidsIntersection.map((uuid) => placesByCategory[0][uuid])
+
+        if (!activePlaces.some((place) => place.properties.uuid === selectedPlace?.properties.uuid)) {
+            dispatch(setSelectedPlace(null));
+        }
 
         dispatch(setActivePlaces(activePlaces));
     }, [activeCategories])
@@ -130,7 +135,7 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
     }, [theme]);
 
     const handleMapMove = useCallback((evt: ViewStateChangeEvent) => {
-        dispatch(setSelectedPlace(null));
+        // dispatch(setSelectedPlace(null));
         dispatch(setViewState(evt.viewState));
     }, []);
 
