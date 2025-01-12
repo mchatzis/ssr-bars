@@ -34,7 +34,6 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
     const dispatch = useAppDispatch();
     const mapRef = useContext(MapRefContext);
 
-    const theme = useAppSelector(selectTheme);
     const viewState = useAppSelector(selectViewState);
     const area = useAppSelector(selectArea);
     const placeType = useAppSelector(selectPlaceType);
@@ -43,9 +42,12 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
     const cachedCategories = useAppSelector(selectCachedCategories);
     const activePlaces = useAppSelector(selectMapActivePlaces);
     const selectedPlace = useAppSelector(selectSelectedPlace);
-
+    const theme = useAppSelector(selectTheme);
 
     const [popupPlace, setPopupPlace] = useState<Place | null>(null);
+
+    const isLightTheme = theme === 'light';
+    const shadowClass = isLightTheme ? 'shadow-light' : 'shadow-dark';
 
     useEffect(() => {
         dispatch(setActivePlaces([]));
@@ -125,7 +127,7 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
         const map = mapRef.current;
 
         const pinImage = new Image(45, 45);
-        pinImage.src = STATIC_IMG_ICON_PREFIX + '/' + (theme === 'light' ? 'pin-light.png' : 'pin-dark.png');
+        pinImage.src = STATIC_IMG_ICON_PREFIX + '/' + (isLightTheme ? 'pin-light.png' : 'pin-dark.png');
         pinImage.onload = () => {
             if (map.hasImage('pin')) {
                 map.removeImage('pin');
@@ -143,7 +145,7 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
         const map = e.target;
 
         const pinImage = new Image(45, 45)
-        pinImage.src = STATIC_IMG_ICON_PREFIX + '/' + (theme === 'light' ? 'pin-light.png' : 'pin-dark.png');
+        pinImage.src = STATIC_IMG_ICON_PREFIX + '/' + (isLightTheme ? 'pin-light.png' : 'pin-dark.png');
         pinImage.onload = () => map.addImage('pin', pinImage);
     }, [theme]);
 
@@ -213,7 +215,7 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
             <Map
                 ref={mapRef}
                 mapLib={import('maplibre-gl')}
-                mapStyle={(theme === 'light') ? lightMapStyle : darkMapStyle}
+                mapStyle={isLightTheme ? lightMapStyle : darkMapStyle}
                 {...viewState}
                 interactiveLayerIds={[pinLayer.id]}
                 onMove={handleMapMove}
@@ -232,21 +234,22 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
                         closeButton={false}
                         maxWidth="none"
                         anchor='bottom'
-                        offset={25}
+                        offset={30}
                         closeOnClick={false}
                     >
                         <div id="myPopup"
                             className={`w-64 h-48 fade-in`}
                             onClick={handleClickPopup}
                         >
-                            <div className="flex flex-col overflow-clip rounded-xl">
+                            <div className={`flex flex-col overflow-clip rounded-xl ${shadowClass}`}>
                                 <ImageCarousel
                                     images={mapData[popupPlace.properties.category][popupPlace.properties.uuid].imagesUrls.medium}
                                     className='relative w-64 h-32'
                                     hasArrows={false}
                                 />
-                                <div className='w-64 h-16 bg-[var(--background-color)]'>
-                                    <p className="text-left text-sm pl-3 cursor-pointer">{popupPlace.properties.name}</p>
+                                <div className='w-64 h-16 bg-bgColor'>
+                                    <p className="text-left text-lg px-3 m-0 cursor-pointer">{popupPlace.properties.name}</p>
+                                    <p className='text-left text-base px-3 py-1'>☆☆☆☆☆ {'(0)'}</p>
                                 </div>
                             </div>
                             {/* The following should be a transparent buffer that breaches the gap 

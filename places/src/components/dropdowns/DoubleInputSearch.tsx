@@ -4,7 +4,7 @@ import { MapRefContext } from "@/lib/context/mapContext";
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 import { Area, PlaceType, selectArea, selectPlaceType, setArea, setPlaceType } from "@/lib/redux/slices/appStateSlice";
 import { useCallback, useContext, useRef, useState } from "react";
-import { useClickAway } from "react-use";
+import useClickAway from "react-use/lib/useClickAway";
 import InputWithOptionsDropdown from "./InputWithOptionsDropdown";
 
 
@@ -86,7 +86,7 @@ export default function DoubleInputSearch({ className = '', allAreas, allPlaceTy
                 value={placeTypeFieldValue}
                 setValue={setPlaceTypeFieldValue}
             />
-            <button className="ml-1 text-[var(--accent-color)]" onClick={handleSearchClick}>Search</button>
+            <button className="ml-1 text-accent" onClick={handleSearchClick}>Search</button>
         </div>
     )
 }

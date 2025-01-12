@@ -5,7 +5,8 @@ export default function PlaceInfo({ selectedPlace, className = '' }: { selectedP
 
     return (
         <div className={`${className}`}>
-            <h1 className="text-3xl">{selectedPlace.properties.name}</h1>
+            <h1 className="text-3xl w-fit">{selectedPlace.properties.name}</h1>
+            <p className='absolute right-0 top-3 text-left text-lg px-3 py-1'>☆☆☆☆☆ {'(0)'}</p>
             <p className="mb-5">{selectedPlace.properties.description}</p>
             <p>{categories.reduce((prev, curr) => {
                 return prev + ' | ' + curr;

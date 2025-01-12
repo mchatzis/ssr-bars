@@ -39,12 +39,12 @@ export default function PlaceCreationForm() {
                 </div>
             </form>
             <div className='relative right-0 ml-4 w-[20vw]'>
-                {state.errors ?
+                {state.errors &&
                     <ErrorList
                         errors={state.errors}
                         className="">
                     </ErrorList>
-                    : null}
+                }
             </div>
         </div>
     )

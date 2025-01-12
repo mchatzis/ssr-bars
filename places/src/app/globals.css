@@ -4,7 +4,7 @@
 
 @layer utilities {
   ::-webkit-scrollbar {
-    width: 1vw;
+    width: 10px;
   }
 
   ::-webkit-scrollbar-track {
@@ -25,17 +25,17 @@
 :root {
   /* Light theme colors */
   --background-light: #ffffff;
-  --text-light: #000000;
+  --text-light: 0 0 0;
   --primary-light: #6200ea;
   --secondary-light: #03dac5;
-  --accent-light: #ff5722;
+  --accent-light: 255 87 34;
 
   /* Dark theme colors */
   --background-dark: #000000;
-  --text-dark: #ffffff;
-  --primary-dark: #bb86fc;
+  --text-dark: 255 255 255;
+  --primary-dark: 65 0 140;
   --secondary-dark: #03dac6;
-  --accent-dark: #eae3c9;
+  --accent-dark: 234 227 201;
 
   --z-map: 10;
   --z-controls: 20;
@@ -57,7 +57,7 @@ body {
   --accent-color: var(--accent-light);
 
   background: var(--background-color);
-  color: var(--text-color);
+  color: rgb(var(--text-color));
 }
 
 [data-theme="dark"] body {
@@ -68,7 +68,7 @@ body {
   --accent-color: var(--accent-dark);
 
   background: var(--background-color);
-  color: var(--text-color);
+  color: rgb(var(--text-color));
 }
 
 .maplibregl-ctrl-attrib.maplibregl-compact {
@@ -117,7 +117,7 @@ body {
 }
 
 .clickable-element {
-  opacity: 0.3;
+  opacity: 0.5;
   transition: transform 0.3s, opacity 0.3s;
 }
 
@@ -125,3 +125,10 @@ body {
   opacity: 1;
   transform: scale(1.25);
 }
+
+/* .color-palette {
+  color: rgb(65, 0, 140);
+  color: #b9b9b9;
+  color: #ff966d;
+  color: #ddd;
+} */

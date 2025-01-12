@@ -10,13 +10,14 @@ export default async function LeftSidebar({ className = '' }: { className: strin
     const placeTypes: PlaceType[] = await getAllPlaceTypes();
 
     return (
-        <div className={`${className} flex flex-col gap-[5vh] justify-between`}>
+        <div className={`${className} relative`}>
             <DoubleInputSearch className=""
                 allAreas={areas}
                 allPlaceTypes={placeTypes}
             />
-            <FilterCategoryDropdown className="h-[50vh] w-[10vw] border border-[var(--accent-color)] overflow-clip" />
-            <MapControlsComponent className="w-fit" />
+            <FilterCategoryDropdown className="relative top-[13vh] h-fit w-fit border border-accent/50 
+                rounded-2xl overflow-clip backdrop-blur-[2px]" />
+            <MapControlsComponent className="absolute bottom-0 w-fit" />
         </div>
     )
 }

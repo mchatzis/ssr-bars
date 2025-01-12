@@ -2,6 +2,7 @@
 
 import { useAppSelector } from "@/lib/redux/hooks";
 import { selectMapData, selectSelectedPlace } from "@/lib/redux/slices/mapStateSlice";
+import { selectTheme } from "@/lib/redux/slices/styleStateSlice";
 import DirectionsBox from "../buttons/DirectionsButton";
 import ImageCarousel from "./ImageCarousel";
 import PlaceInfo from "./PlaceInfo";
@@ -9,12 +10,15 @@ import PlaceInfo from "./PlaceInfo";
 export default function PlaceDisplay({ className = '' }) {
     const selectedPlace = useAppSelector(selectSelectedPlace);
     const mapData = useAppSelector(selectMapData);
+    const theme = useAppSelector(selectTheme);
+
+    const shadowClass = theme === 'light' ? 'shadow-light' : 'shadow-dark';
 
     if (!selectedPlace) { return null }
 
     return (
         <div className={`${className} absolute top-20 right-[1vw] w-96 h-[85vh]
-                bg-[var(--background-color)] fade-in flex flex-col rounded-xl overflow-clip`}>
+                bg-bgColor fade-in flex flex-col rounded-xl overflow-clip ${shadowClass}`}>
             <ImageCarousel
                 images={mapData[selectedPlace.properties.category][selectedPlace.properties.uuid].imagesUrls.large}
                 className="relative w-full h-72"
