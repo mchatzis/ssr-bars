@@ -26,13 +26,15 @@ export default function ThemeButton({ className = '' }) {
         };
     }, [dispatch]);
 
+    // Avoid hydration mismatch
     if (!hasMounted) {
-        // Avoid hydration mismatch
-        return null;
+        return (
+            <div className={`w-[36px] h-[36px] bg-accent m-1 ${className}`} />
+        );
     }
 
     return (
-        <div className={`${className} w-[36px] h-[36px] bg-[var(--accent-color)] m-1 flex items-center justify-center`}>
+        <div className={`w-[36px] h-[36px] bg-accent/90 m-1 flex items-center justify-center ${className}`}>
             <img
                 id="fullscreen-button"
                 className='cursor-pointer clickable-element'

@@ -4,7 +4,7 @@ import { useCallback, useState } from 'react';
 const ImageCarousel = ({ className = '', images, hasArrows = true }: { className: string, images: string[], hasArrows?: boolean }) => {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [lastWheelTime, setLastWheelTime] = useState(0);
-    const WHEEL_TIMEOUT = 500;
+    const WHEEL_TIMEOUT = 400;
 
     const handleClickNext = (e: any) => {
         e.stopPropagation();
