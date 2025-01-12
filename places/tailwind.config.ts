@@ -11,6 +11,7 @@ const config: Config = {
       colors: {
         bgColor: 'var(--background-color)',
         textColor: 'rgb(var(--text-color) / <alpha-value>)',
+        primary: 'rgb(var(--primary-color) / <alpha-value>)',
         accent: 'rgb(var(--accent-color) / <alpha-value>)',
       },
       boxShadow: {

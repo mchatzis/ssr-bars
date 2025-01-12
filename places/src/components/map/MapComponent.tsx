@@ -248,7 +248,7 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
                                     hasArrows={false}
                                 />
                                 <div className='w-64 h-16 bg-bgColor'>
-                                    <p className="text-left text-lg px-3 m-0 cursor-pointer">{popupPlace.properties.name}</p>
+                                    <p className="text-left text-lg text-accent px-3 m-0 cursor-pointer">{popupPlace.properties.name}</p>
                                     <p className='text-left text-base px-3 py-1'>☆☆☆☆☆ {'(0)'}</p>
                                 </div>
                             </div>

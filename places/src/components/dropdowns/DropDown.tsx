@@ -6,13 +6,13 @@ interface DropdownProps {
 }
 export function DropDown({ options, onMouseDown }: DropdownProps) {
     return (
-        <div className="w-full h-fit max-h-[15vh] relative z-[var(--z-popup)] rounded-xl overflow-y-scroll bg-accent">
+        <div className="w-full h-fit max-h-[15vh] relative z-[var(--z-popup)] rounded-xl overflow-y-scroll bg-primary">
             <ul className='w-full h-full text-base text-bgColor'>
                 {options.map((option, index) => {
                     return (
                         <li
                             key={index}
-                            className='block px-1 py-1 hover:bg-bgColor hover:text-accent hover:rounded-lg'
+                            className='block px-1 py-1 hover:bg-bgColor hover:text-primary hover:rounded-lg'
                             onMouseDown={() => onMouseDown(option)}
                         >
                             {option}

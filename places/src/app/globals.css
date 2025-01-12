@@ -26,16 +26,16 @@
   /* Light theme colors */
   --background-light: #ffffff;
   --text-light: 0 0 0;
-  --primary-light: #6200ea;
+  --primary-light: 255 87 34;
   --secondary-light: #03dac5;
-  --accent-light: 255 87 34;
+  --accent-light: 65 0 140;
 
   /* Dark theme colors */
   --background-dark: #000000;
   --text-dark: 255 255 255;
-  --primary-dark: 65 0 140;
+  --primary-dark: 234 227 201;
   --secondary-dark: #03dac6;
-  --accent-dark: 234 227 201;
+  --accent-dark: 227 115 131;
 
   --z-map: 10;
   --z-controls: 20;
@@ -68,7 +68,7 @@ body {
   --accent-color: var(--accent-dark);
 
   background: var(--background-color);
-  color: rgb(var(--text-color));
+  color: rgb(var(--text-color)/0.8);
 }
 
 .maplibregl-ctrl-attrib.maplibregl-compact {

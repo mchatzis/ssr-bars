@@ -57,19 +57,19 @@ export default function FilterCategoryDropdown({ className = '' }) {
             />
             {activeCategories.map((category) =>
                 <button
-                    className={`block w-36 bg-accent text-black rounded-xl
-                    border border-accent m-3`}
+                    className={`block w-36 bg-primary text-black rounded-xl
+                    border border-primary m-3`}
                     key={category}
                     onClick={handleActiveCategoriesClick}
                 >
                     {category}
                 </button>
             )}
-            <hr className='m-3 border border-accent'></hr>
+            <hr className='m-3 border border-primary'></hr>
             {recentCategories.map((category) =>
                 <button
-                    className={`block w-36 text-accent rounded-xl
-                    border border-accent m-3`}
+                    className={`block w-36 text-primary rounded-xl
+                    border border-primary m-3`}
                     key={category}
                     onClick={handleRecentCategoriesClick}
                 >
@@ -125,7 +125,7 @@ function InputField({ allOptions, placeholder = '', onClick }: InputFieldProps) 
     return (
         <div ref={enclosingDivRef}>
             <input
-                className="h-full w-36 bg-transparent border border-accent rounded-full focus:outline-none
+                className="h-full w-36 bg-transparent border border-primary rounded-full focus:outline-none
                   placeholder-textColor/50 px-3 py-1 m-3"
                 value={value}
                 type="text"
