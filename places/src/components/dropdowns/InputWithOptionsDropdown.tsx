@@ -1,5 +1,6 @@
 'use client'
 
+import { DropDown } from "@/components/dropdowns/DropDown";
 import { Dispatch, SetStateAction, useCallback, useEffect, useState } from "react";
 
 interface Props {
@@ -31,12 +32,12 @@ export default function InputWithOptionsDropdown({ className = '', allOptions, c
         setPlaceHolder(currentChoice);
     }, [currentChoice])
 
-    const handleFocus = useCallback((e: React.FocusEvent<HTMLInputElement>) => {
+    const handleFocus = useCallback(() => {
         setPlaceHolder('');
         setFocused(true);
     }, []);
 
-    const handleBlur = useCallback((e: React.FocusEvent<HTMLInputElement>) => {
+    const handleBlur = useCallback(() => {
         setPlaceHolder(currentChoice);
         setFocused(false);
     }, [currentChoice]);
@@ -49,8 +50,8 @@ export default function InputWithOptionsDropdown({ className = '', allOptions, c
     return (
         <div className={`h-7 w-36 ${className}`}>
             <input
-                className="h-full w-full bg-[var(--background)] border border-[var(--accent-color)] rounded-full focus:outline-none
-                  placeholder-gray-500 pl-3"
+                className="h-full w-full bg-transparent border border-accent rounded-full focus:outline-none
+                  placeholder-textColor/60 pl-3 backdrop-blur-[1px]"
                 type="text"
                 value={value}
                 placeholder={placeholder}
@@ -58,29 +59,12 @@ export default function InputWithOptionsDropdown({ className = '', allOptions, c
                 onBlur={handleBlur}
                 onChange={handleInputChange}
             />
-            {focused ? <DropDown options={options} setValue={setValue} /> : null}
-        </div>
-    )
-}
-
-interface DropdownProps {
-    options: string[];
-    setValue: Dispatch<SetStateAction<string>>;
-}
-export function DropDown({ options, setValue }: DropdownProps) {
-    return (
-        <div className="w-full h-fit max-h-[15vh] relative z-[var(--z-popup)] rounded-xl overflow-y-scroll bg-white">
-            <ul className='w-full h-full text-base text-gray-700'>
-                {options.map((option, index) => {
-                    return (
-                        <li
-                            key={index}
-                            className='block px-1 py-1 hover:bg-gray-200 hover:rounded-lg'
-                            onMouseDown={() => setValue(option)}
-                        >{option}</li>
-                    );
-                })}
-            </ul>
+            {focused &&
+                <DropDown
+                    options={options}
+                    onMouseDown={(option: string) => setValue(option)}
+                />
+            }
         </div>
     )
 }
