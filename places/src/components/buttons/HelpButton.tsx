@@ -16,7 +16,7 @@ export default function HelpButton({ className = '' }) {
             >?</p>
             {isHovered &&
                 <div className="relative top-10 right-12 h-fit w-fit border rounded-xl p-1 bg-primary text-bgColor z-[var(--z-popup)]">
-                    <ol className="list-decimal list-inside text-start text-base">
+                    <ol className="list-decimal list-inside text-start text-base p-2">
                         <li>Multiple active categories are supported</li>
                         <li>Scroll to change image when on top of it</li>
                         <li>Rotate map with right click</li>
