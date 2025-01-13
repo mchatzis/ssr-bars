@@ -14,7 +14,7 @@ export default function FormInput({ id, name, type = "text", placeholder, requir
       type={type}
       placeholder={placeholder}
       required={required}
-      className="border border-gray-300 rounded-md px-4 py-2 w-full text-[var(--primary-color)] bg-slate-700"
+      className="border border-gray-300 rounded-md px-4 py-2 w-full text-white bg-slate-700"
     />
   );
 }

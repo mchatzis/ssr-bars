@@ -137,7 +137,7 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
     }, [theme]);
 
     const handleMapMove = useCallback((evt: ViewStateChangeEvent) => {
-        // dispatch(setSelectedPlace(null));
+        dispatch(setSelectedPlace(null));
         dispatch(setViewState(evt.viewState));
     }, []);
 
