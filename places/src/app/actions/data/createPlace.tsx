@@ -4,9 +4,18 @@ import { PlaceCreationFormState } from "@/app/data/page";
 import { Database } from "@/lib/db/Database";
 import { PlaceOfPlaceTypeInAreaEntity } from "@/lib/db/types";
 import { randomUUID } from "crypto";
+import { Resource } from "sst";
 import placeCreationFormSchema from "./schema";
 
 export async function createPlace(state: PlaceCreationFormState, formData: FormData): Promise<PlaceCreationFormState> {
+    if (Resource.App.stage === "production") {
+        return {
+            errors: {
+                general: ["Not authorized."]
+            }
+        }
+    }
+
     const attempts = (state?.attempts ?? 0) + 1;
 
     try {

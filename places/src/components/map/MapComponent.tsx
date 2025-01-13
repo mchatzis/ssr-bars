@@ -61,8 +61,8 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
                 dispatch(setMapData(placesByCategory))
                 dispatch(setAvailableCategories(Object.keys(placesByCategory)))
             })
-            .catch((err) => {
-                console.log(err);
+            .catch((error) => {
+                console.log(error);
                 dispatch(setMapData({}));
             })
     }, [area, placeType])

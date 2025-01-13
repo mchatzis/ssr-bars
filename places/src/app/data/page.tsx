@@ -25,7 +25,7 @@ export default function PlaceCreationForm() {
     const [state, action] = useFormState<PlaceCreationFormState, FormData>(createPlace, { attempts: 0 });
 
     return (
-        <div className='absolute top-[37vh] left-[42vw] flex flex-col'>
+        <div className='absolute top-[37vh] left-[42vw] flex'>
             <form action={action} className='min-w-32 max-w-52'>
                 <FormInput id="name" name="name" placeholder="name" />
                 <FormInput id="area" name="area" placeholder="area" />
