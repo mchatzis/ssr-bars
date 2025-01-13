@@ -43,7 +43,7 @@ export const defaultAppState: AppState = {
         name: "Vienna",
         longitude: 16.37,
         latitude: 48.206,
-        initialZoom: 13
+        initialZoom: 13.2
     },
     allPlaceTypes: [],
     placeType: {

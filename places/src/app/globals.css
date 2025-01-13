@@ -24,11 +24,11 @@
 
 :root {
   /* Light theme colors */
-  --background-light: #ffffff;
+  --background-light: #cbcbcb;
   --text-light: 0 0 0;
   --primary-light: 255 87 34;
   --secondary-light: #03dac5;
-  --accent-light: 65 0 140;
+  --accent-light: 34 0 74;
 
   /* Dark theme colors */
   --background-dark: #000000;
