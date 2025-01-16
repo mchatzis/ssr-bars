@@ -249,7 +249,7 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
                             <div className={`flex flex-col overflow-clip rounded-xl ${shadowClass}`}>
                                 <ImageCarousel
                                     images={mapData[popupPlace.properties.category][popupPlace.properties.uuid].imagesUrls.medium}
-                                    className='relative w-64 h-32'
+                                    className={`relative w-64 h-32 ${!isLightTheme && 'opacity-90'}`}
                                     hasArrows={false}
                                 />
                                 <div className='w-64 h-16 bg-bgColor'>

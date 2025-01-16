@@ -22,7 +22,7 @@ export default function PlaceDisplay({ className = '' }) {
                 bg-bgColor fade-in flex flex-col rounded-xl overflow-clip ${shadowClass} ${className}`}>
             <ImageCarousel
                 images={mapData[selectedPlace.properties.category][selectedPlace.properties.uuid].imagesUrls.large}
-                className={`relative w-full h-72 ${!isLightTheme && 'opacity-85'}`}
+                className={`relative w-full h-72 ${!isLightTheme && 'opacity-90'}`}
             />
             <PlaceInfo selectedPlace={selectedPlace} className='relative w-full text-start text-base p-3 mt-2' />
             <DirectionsBox selectedPlace={selectedPlace} className="absolute bottom-1 m-3" />
