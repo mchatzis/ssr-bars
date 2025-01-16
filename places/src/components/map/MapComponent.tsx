@@ -7,7 +7,7 @@ import { STATIC_IMG_ICON_PREFIX } from '@/lib/constants';
 import { MapRefContext } from '@/lib/context/mapContext';
 import { addImagesToPlaces, organizePlacesIntoCategories, to_geojson } from '@/lib/map/helpers';
 import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
-import { selectAppActiveCategories, selectArea, selectCachedCategories, selectPlaceType, setActiveCategories, setAvailableCategories, setCachedCategories } from '@/lib/redux/slices/appStateSlice';
+import { selectAppActiveCategories, selectArea, selectCachedCategories, selectFilterWithUnion, selectPlaceType, setActiveCategories, setAvailableCategories, setCachedCategories } from '@/lib/redux/slices/appStateSlice';
 import { Place, selectMapActivePlaces, selectMapData, selectSelectedPlace, selectViewState, setActivePlaces, setMapData, setSelectedPlace, setViewState } from '@/lib/redux/slices/mapStateSlice';
 import { selectTheme } from '@/lib/redux/slices/styleStateSlice';
 import { MapLibreEvent } from 'maplibre-gl';
@@ -42,6 +42,7 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
     const cachedCategories = useAppSelector(selectCachedCategories);
     const activePlaces = useAppSelector(selectMapActivePlaces);
     const selectedPlace = useAppSelector(selectSelectedPlace);
+    const filterWithUnion = useAppSelector(selectFilterWithUnion);
     const theme = useAppSelector(selectTheme);
 
     const [popupPlace, setPopupPlace] = useState<Place | null>(null);
@@ -73,19 +74,23 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
             dispatch(setActivePlaces([]));
             return
         }
-        const placesByCategory = activeCategories.map((category) => mapData[category]);
-
-        const uuidsIntersection = placesByCategory
-            .map(Object.keys)
-            .reduce((acc, keys) => acc.filter(key => keys.includes(key)));
-        const activePlaces = uuidsIntersection.map((uuid) => placesByCategory[0][uuid])
+        let activePlaces: Place[] = [];
+        if (filterWithUnion) {
+            activeCategories.forEach((category) => activePlaces.push(...Object.values(mapData[category])))
+        } else {
+            const placesByCategory = activeCategories.map((category) => mapData[category]);
+            const uuidsIntersection = placesByCategory
+                .map(Object.keys)
+                .reduce((acc, keys) => acc.filter(key => keys.includes(key)));
+            activePlaces = uuidsIntersection.map((uuid) => placesByCategory[0][uuid])
+        }
 
         if (!activePlaces.some((place) => place.properties.uuid === selectedPlace?.properties.uuid)) {
             dispatch(setSelectedPlace(null));
         }
 
         dispatch(setActivePlaces(activePlaces));
-    }, [activeCategories])
+    }, [activeCategories, filterWithUnion])
 
     useEffect(() => {
         if (cachedCategories.length === 0) { return }

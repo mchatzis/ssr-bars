@@ -35,6 +35,7 @@ interface AppState {
     availableCategories: string[];
     activeCategories: string[];
     cachedCategories: string[];
+    filterWithUnion: boolean;
 }
 
 export const defaultAppState: AppState = {
@@ -51,7 +52,8 @@ export const defaultAppState: AppState = {
     },
     availableCategories: [],
     activeCategories: [],
-    cachedCategories: []
+    cachedCategories: [],
+    filterWithUnion: false
 }
 
 export const getInitialAppState = (): AppState => {
@@ -106,6 +108,9 @@ const appStateSlice = createSlice({
         },
         setCachedCategories: (state, action: PayloadAction<string[]>) => {
             state.cachedCategories = action.payload;
+        },
+        toggleFilterWithUnion: (state) => {
+            state.filterWithUnion = !state.filterWithUnion;
         }
     }
 })
@@ -117,6 +122,7 @@ export const selectPlaceType = (state: RootState) => state.app.placeType;
 export const selectAppAvailableCategories = (state: RootState) => state.app.availableCategories;
 export const selectAppActiveCategories = (state: RootState) => state.app.activeCategories;
 export const selectCachedCategories = (state: RootState) => state.app.cachedCategories;
+export const selectFilterWithUnion = (state: RootState) => state.app.filterWithUnion;
 
 export const {
     setAllAreas,
@@ -125,7 +131,8 @@ export const {
     setPlaceType,
     setActiveCategories,
     setAvailableCategories,
-    setCachedCategories
+    setCachedCategories,
+    toggleFilterWithUnion
 } = appStateSlice.actions;
 
 export default appStateSlice;

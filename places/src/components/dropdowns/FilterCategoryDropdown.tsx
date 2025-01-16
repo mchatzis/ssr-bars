@@ -1,7 +1,7 @@
 'use client'
 
 import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
-import { selectAppActiveCategories, selectAppAvailableCategories, selectCachedCategories, setActiveCategories, setCachedCategories } from '@/lib/redux/slices/appStateSlice';
+import { selectAppActiveCategories, selectAppAvailableCategories, selectCachedCategories, selectFilterWithUnion, setActiveCategories, setCachedCategories, toggleFilterWithUnion } from '@/lib/redux/slices/appStateSlice';
 import { useCallback, useEffect, useRef, useState } from "react";
 import useClickAway from 'react-use/lib/useClickAway';
 import { DropDown } from './DropDown';
@@ -12,6 +12,7 @@ export default function FilterCategoryDropdown({ className = '' }) {
     const availableCategories = useAppSelector(selectAppAvailableCategories);
     const activeCategories = useAppSelector(selectAppActiveCategories);
     const cachedCategories = useAppSelector(selectCachedCategories);
+    const filterWithUnion = useAppSelector(selectFilterWithUnion);
 
     const [allDropdownOptions, setAllDropdownOptions] = useState<string[]>([]);
     const [recentCategories, setRecentCategories] = useState<string[]>([]);
@@ -55,15 +56,27 @@ export default function FilterCategoryDropdown({ className = '' }) {
                 placeholder='Categories...'
                 onClick={handleOptionClick}
             />
-            {activeCategories.map((category) =>
-                <button
-                    className={`block w-36 bg-primary text-black rounded-xl
+            {activeCategories.map((category, index) =>
+                <>
+                    <button
+                        className={`block w-36 bg-primary text-black rounded-xl
                     border border-primary m-3`}
-                    key={category}
-                    onClick={handleActiveCategoriesClick}
-                >
-                    {category}
-                </button>
+                        key={category}
+                        onClick={handleActiveCategoriesClick}
+                    >
+                        {category}
+                    </button>
+                    {
+                        (activeCategories.length > 1 && index === 0) ?
+                            <button
+                                onClick={() => dispatch(toggleFilterWithUnion())}
+                                className='text-primary opacity-50 hover:scale-110 hover:opacity-100 duration-1000'
+                            >
+                                {filterWithUnion ? 'OR' : 'AND'}
+                            </button>
+                            : null
+                    }
+                </>
             )}
             <hr className='m-3 border border-primary'></hr>
             {recentCategories.map((category) =>

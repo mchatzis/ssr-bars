@@ -19,6 +19,7 @@ export default function HelpButton({ className = '' }) {
                     <ol className="list-decimal list-inside text-start text-base p-2">
                         <li>Multiple active categories are supported</li>
                         <li>Scroll to change image when on top of it</li>
+                        <li>Click on AND-OR to switch</li>
                         <li>Rotate map with right click</li>
                     </ol>
                 </div>
