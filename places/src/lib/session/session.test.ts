@@ -1,24 +1,33 @@
 // @vitest-environment node
-import { InvalidEnvironmentVariableError } from '@/lib/session/types';
 import { JWSSignatureVerificationFailed, JWTExpired } from 'jose/errors';
 import { cookies } from 'next/headers';
+import { Resource } from 'sst';
 import { afterEach, beforeAll, beforeEach, describe, expect, it, Mock, vi } from 'vitest';
 import { createSession, decrypt, encrypt, getEncodedKey, getExpirationTimeInSeconds, SessionPayload } from './session';
 
 vi.mock('next/headers');
+vi.mock('sst', () => ({
+    Resource: {
+        JWT_SECRET_KEY: {
+            value: 'default-value'
+        }
+    }
+}));
+vi.mock('@/lib/constants', () => ({
+    SESSION_EXPIRE_IN_SECONDS: 60
+}));
 
 describe('Session management tests', () => {
     const FIXED_TIMESTAMP_MILLI = 1732725656854;
     const FIXED_TIMESTAMP_SEC = Math.floor(FIXED_TIMESTAMP_MILLI / 1000);
-    const defaultExpireInSeconds = 60 * 60;
 
-    const mockSecret = 'test-secret';
+    const mockSecretKey = 'test-secret';
     const mockPayload: SessionPayload = { username: 'testUser' };
     const mockExpireInSeconds = 500;
     const mockSystemTime = new Date(FIXED_TIMESTAMP_MILLI)
 
     beforeAll(() => {
-        vi.unstubAllEnvs();
+        vi.clearAllMocks();
     })
 
     beforeEach(() => {
@@ -28,53 +37,31 @@ describe('Session management tests', () => {
 
     afterEach(() => {
         vi.useRealTimers();
-        vi.unstubAllEnvs();
+        vi.clearAllMocks();
     });
 
     describe('getEncodedKey', () => {
-        it('returns Uint8Array when SESSION_SECRET is defined', () => {
-            vi.stubEnv('SESSION_SECRET', mockSecret);
+        it('returns Uint8Array when JWT_SECRET_KEY is defined', () => {
+            Resource.JWT_SECRET_KEY.value = mockSecretKey;
             const key = getEncodedKey();
 
             expect(key).toBeInstanceOf(Uint8Array);
 
             const decoded = new TextDecoder().decode(key);
-            expect(decoded).toBe(mockSecret);
-        });
-
-        it('throws error when SESSION_SECRET is not defined', () => {
-            vi.stubEnv('SESSION_SECRET', undefined);
-            expect(() => getEncodedKey()).toThrowError('SESSION_SECRET is not defined');
+            expect(decoded).toBe(mockSecretKey);
         });
     });
 
     describe('getExpirationTimeInSeconds', () => {
-        it('returns expiration time with default value when SESSION_EXPIRE_IN_SECONDS is not set', () => {
-            vi.stubEnv('SESSION_EXPIRE_IN_SECONDS', undefined);
-            const result = getExpirationTimeInSeconds();
-            expect(result).toBe(FIXED_TIMESTAMP_SEC + defaultExpireInSeconds);
-        });
-
         it('returns expiration time with custom value when SESSION_EXPIRE_IN_SECONDS is set', () => {
-            vi.stubEnv('SESSION_EXPIRE_IN_SECONDS', `${mockExpireInSeconds}`);
             const result = getExpirationTimeInSeconds();
-            expect(result).toBe(FIXED_TIMESTAMP_SEC + mockExpireInSeconds);
-        });
-
-        it('throws when invalid SESSION_EXPIRE_IN_SECONDS is provided', () => {
-            vi.stubEnv('SESSION_EXPIRE_IN_SECONDS', 'invalid');
-            expect(() => getExpirationTimeInSeconds()).toThrow(InvalidEnvironmentVariableError);
+            expect(result).toBe(FIXED_TIMESTAMP_SEC + 60);
         });
     });
 
     describe('Session Encryption and Decryption', () => {
         beforeEach(() => {
-            vi.stubEnv('SESSION_SECRET', mockSecret);
-            vi.stubEnv('SESSION_EXPIRE_IN_SECONDS', `${mockExpireInSeconds}`);
-        });
-
-        afterEach(() => {
-            vi.unstubAllEnvs();
+            Resource.JWT_SECRET_KEY.value = mockSecretKey;
         });
 
         it('should encrypt and decrypt a valid payload', async () => {
@@ -92,7 +79,7 @@ describe('Session management tests', () => {
             const decryptedPayload = await decrypt(token);
 
             const currentTime = Math.floor(Date.now() / 1000);
-            expect(decryptedPayload.exp).toBe(currentTime + mockExpireInSeconds)
+            expect(decryptedPayload.exp).toBe(currentTime + 60)
         });
 
         it('should throw an error for a decrypted payload that is not a valid SessionPayload', async () => {
@@ -105,13 +92,12 @@ describe('Session management tests', () => {
         });
 
         it('should throw an error if decrypting with a different secret', async () => {
-            const originalSecret = 'original-secret';
-            const differentSecret = 'different-secret';
+            const differentSecretKey = 'different-secret';
 
-            vi.stubEnv('SESSION_SECRET', originalSecret);
+            Resource.JWT_SECRET_KEY.value = mockSecretKey;
             const token = await encrypt(mockPayload);
 
-            vi.stubEnv('SESSION_SECRET', differentSecret);
+            Resource.JWT_SECRET_KEY.value = differentSecretKey;
             await expect(decrypt(token)).rejects.toThrowError(JWSSignatureVerificationFailed);
         });
 
@@ -119,7 +105,7 @@ describe('Session management tests', () => {
             const token = await encrypt(mockPayload);
 
             const currentTime = Math.floor(Date.now() / 1000);
-            const forwardedTime = (currentTime + mockExpireInSeconds + 1) * 1000;
+            const forwardedTime = (currentTime + 60 + 1) * 1000;
             vi.setSystemTime(forwardedTime);
 
             await expect(decrypt(token)).rejects.toThrowError(JWTExpired);
@@ -128,12 +114,7 @@ describe('Session management tests', () => {
 
     describe('createSession', () => {
         beforeEach(() => {
-            vi.stubEnv('SESSION_SECRET', mockSecret);
-            vi.stubEnv('SESSION_EXPIRE_IN_SECONDS', `${mockExpireInSeconds}`);
-        });
-
-        afterEach(() => {
-            vi.unstubAllEnvs();
+            Resource.JWT_SECRET_KEY.value = mockSecretKey;
         });
 
         it('should create session cookie with encrypted payload', async () => {

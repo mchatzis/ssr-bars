@@ -1,9 +1,9 @@
-import { InvalidEnvironmentVariableError } from '@/lib/session/types';
+import { SESSION_EXPIRE_IN_SECONDS } from '@/lib/constants';
 import { JWTPayload, jwtVerify, SignJWT } from 'jose';
 import { cookies } from 'next/headers';
 import 'server-only';
+import { Resource } from 'sst';
 
-const DEFAULT_SESSION_EXPIRATION_TIME_IN_SECONDS = 60 * 60;
 
 export interface SessionPayload extends JWTPayload {
     username: string
@@ -15,24 +15,15 @@ export function isSessionPayload(payload: JWTPayload): payload is SessionPayload
 }
 
 export function getEncodedKey(): Uint8Array {
-    const secret = process.env.SESSION_SECRET;
-    if (!secret) {
-        throw new Error('SESSION_SECRET is not defined');
-    }
+    const secret = Resource.JWT_SECRET_KEY.value;
+
     return new TextEncoder().encode(secret);
 };
 
 export function getExpirationTimeInSeconds() {
-    const expireIn = process.env.SESSION_EXPIRE_IN_SECONDS ?
-        parseInt(process.env.SESSION_EXPIRE_IN_SECONDS, 10)
-        : DEFAULT_SESSION_EXPIRATION_TIME_IN_SECONDS;
-
-    if (!Number.isInteger(expireIn) || expireIn < 0) {
-        throw new InvalidEnvironmentVariableError(`SESSION_EXPIRE_IN_SECONDS was parsed into invalid value: ${expireIn}`);
-    }
-
     const currentTime = Math.floor(Date.now() / 1000);
-    return currentTime + expireIn
+
+    return currentTime + SESSION_EXPIRE_IN_SECONDS
 }
 
 export async function encrypt(payload: SessionPayload) {

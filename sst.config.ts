@@ -30,12 +30,15 @@ export default $config({
     };
   },
   async run() {
+    const jwtSecret = new sst.Secret("JWT_SECRET_KEY");
+
     const dynamoTable = new sst.aws.Dynamo("DynamoTable", dynamoTableArgs);
     const dynamoTestTable = new sst.aws.Dynamo("DynamoTestTable", dynamoTableArgs);
 
     const app = new sst.aws.Nextjs("MyWeb", {
       path: "places",
       link: [
+        jwtSecret,
         dynamoTable,
         dynamoTestTable
       ],
@@ -44,7 +47,8 @@ export default $config({
       },
       imageOptimization: {
         staticEtag: true,
-      }
+      },
+      warm: 1
     });
 
     return {
