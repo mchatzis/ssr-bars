@@ -23,7 +23,6 @@ describe('Session management tests', () => {
 
     const mockSecretKey = 'test-secret';
     const mockPayload: SessionPayload = { username: 'testUser' };
-    const mockExpireInSeconds = 500;
     const mockSystemTime = new Date(FIXED_TIMESTAMP_MILLI)
 
     beforeAll(() => {

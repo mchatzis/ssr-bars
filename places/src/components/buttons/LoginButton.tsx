@@ -5,8 +5,8 @@ export default function LoginButton({ className = '' }) {
     return (
         <Link
             href='/auth/login'
-            className={`${className} rounded-full p-2 border border-primary
-                transform transition-transform hover:scale-110 duration-300 backdrop-blur-[2px]`}
+            className={`inline-block rounded-full p-2 border border-primary
+                transform transition-transform hover:scale-110 duration-300 backdrop-blur-[2px] ${className}`}
         >login</Link>
     )
 }

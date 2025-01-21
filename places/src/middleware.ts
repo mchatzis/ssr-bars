@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 
 
-export function middleware(request: Request) {
+export function middleware() {
     // console.log(`Request made to: ${request.url}`);
 
     return NextResponse.next();

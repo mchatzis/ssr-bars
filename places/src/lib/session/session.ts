@@ -63,3 +63,13 @@ export async function createSession(payload: SessionPayload) {
         }
     )
 }
+
+export async function destroySession() {
+    cookies().set('session', '', {
+        httpOnly: true,
+        secure: true,
+        expires: new Date(0),
+        sameSite: 'lax',
+        path: '/',
+    });
+}

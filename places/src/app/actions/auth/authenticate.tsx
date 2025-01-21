@@ -5,7 +5,6 @@ import { LoginFormState } from "@/components/auth/LoginForm";
 import { RegisterFormState } from "@/components/auth/RegisterForm";
 import { createUser, CreateUserInput, EmailDoesNotExistError, EmailExistsError, getUserIdentity, GetUserInput, UsernameExistsError, WrongPasswordError } from "@/lib/db/models/user/user";
 import { createSession } from "@/lib/session/session";
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 export async function register(state: RegisterFormState, formData: FormData): Promise<RegisterFormState> {
@@ -71,8 +70,6 @@ export async function authenticate(state: LoginFormState, formData: FormData): P
             sub: userId,
             username: username
         });
-
-        cookies().set('username', username);
 
     } catch (error) {
         const passwordError = error instanceof WrongPasswordError ? [error.message] : undefined;
