@@ -10,7 +10,8 @@ const validUserEntity = {
     userId: '123',
     username: 'testUser',
     email: 'test@example.com',
-    password: 'password123',
+    passwordHash: 'password123',
+    salt: 'salt',
     age: 30,
 };
 
@@ -20,7 +21,8 @@ const validEmailEntity = {
     createdAt: Date.now(),
     updatedAt: Date.now(),
     userId: '456',
-    password: 'password123',
+    passwordHash: 'password123',
+    salt: 'salt',
     username: 'testEmailUser',
 };
 

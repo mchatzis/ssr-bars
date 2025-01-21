@@ -3,7 +3,7 @@ import { EmailEntityError } from "@/lib/db/type-guard-errors";
 import { isEmailEntity } from "@/lib/db/type-guards";
 import { EmailEntity, UserEntity, UsernameEntity } from "@/lib/db/types";
 import { TransactionCanceledException } from "@aws-sdk/client-dynamodb";
-import bcrypt from "bcrypt";
+import crypto from "crypto";
 import { ulid } from "ulid";
 
 export type CreateUserInput = {
@@ -49,8 +49,10 @@ export async function createUser(input: CreateUserInput) {
     const db = Database.getInstance();
 
     const { username, email, password } = input;
-    const saltRounds = 12;
-    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    const salt = crypto.randomBytes(16).toString('hex');
+    const hash = crypto
+        .pbkdf2Sync(password, salt, 100000, 32, 'sha256')
+        .toString('base64');
 
     const userId = ulid();
     const now = Date.now()
@@ -60,7 +62,8 @@ export async function createUser(input: CreateUserInput) {
         SK: 'METADATA#',
         userId,
         username: username,
-        password: hashedPassword,
+        passwordHash: hash,
+        salt: salt,
         createdAt: now,
         updatedAt: now,
     }
@@ -71,7 +74,8 @@ export async function createUser(input: CreateUserInput) {
         userId: userId,
         username: username,
         email: email,
-        password: hashedPassword,
+        passwordHash: hash,
+        salt: salt,
         createdAt: now,
         updatedAt: now
     }
@@ -144,7 +148,12 @@ export async function getUserIdentity(input: GetUserInput): Promise<Pick<EmailEn
         throw new EmailEntityError();
     }
 
-    const matchingPasswords = await bcrypt.compare(password, emailItem.password);
+    const { salt, passwordHash } = emailItem;
+    const hashedAttempt = crypto
+        .pbkdf2Sync(password, salt, 100000, 32, 'sha256')
+        .toString('base64');
+
+    const matchingPasswords = hashedAttempt === passwordHash;
     if (!matchingPasswords) {
         throw new WrongPasswordError();
     }

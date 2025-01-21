@@ -3,13 +3,20 @@
 import { Database } from '@/lib/db/Database';
 import { isEmailEntity, isUserEntity, isUsernameEntity } from '@/lib/db/type-guards';
 import { EmailEntity, UserEntity, UsernameEntity } from '@/lib/db/types';
-import bcrypt from "bcrypt";
 import { ulid } from 'ulid';
-import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createUser, EmailExistsError, UsernameExistsError } from './user';
 
 
-vi.mock('bcrypt');
+const mockSalt = 'mockedsalt123';
+const mockHash = 'mockedhash456';
+vi.mock('crypto', () => ({
+    default: {
+        randomBytes: () => ({ toString: () => mockSalt }),
+        pbkdf2Sync: () => ({ toString: () => mockHash })
+    }
+}));
+
 const getRandomUserInput = () => {
     return {
         username: `username-${ulid()}`,
@@ -18,13 +25,8 @@ const getRandomUserInput = () => {
     };
 };
 
-const hashedPassword = 'hashed-password';
 describe('createUser with real db', () => {
     let db: Database;
-
-    beforeAll(() => {
-        vi.mocked(bcrypt.hash).mockImplementation(() => Promise.resolve(hashedPassword));
-    })
 
     afterAll(() => {
         vi.resetAllMocks();
@@ -48,7 +50,8 @@ describe('createUser with real db', () => {
         expect(isEmailEntity(emailItem)).toBe(true);
         expect(emailItem?.userId).toBe(userId);
         expect(emailItem?.username).toBe(mockInput.username);
-        expect(emailItem?.password).toBe(hashedPassword);
+        expect(emailItem?.passwordHash).toBe(mockHash);
+        expect(emailItem?.salt).toBe(mockSalt);
 
 
         const usernameKey: Pick<UsernameEntity, 'PK' | 'SK'> = {
@@ -70,7 +73,8 @@ describe('createUser with real db', () => {
         expect(userItem?.userId).toBe(userId);
         expect(userItem?.username).toBe(mockInput.username);
         expect(userItem?.email).toBe(mockInput.email);
-        expect(userItem?.password).toBe(hashedPassword);
+        expect(userItem?.passwordHash).toBe(mockHash);
+        expect(userItem?.salt).toBe(mockSalt);
     });
 
     it('should throw an EmailExistsError if only email already exists', async () => {

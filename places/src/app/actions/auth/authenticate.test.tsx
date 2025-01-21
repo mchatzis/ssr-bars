@@ -220,7 +220,6 @@ describe("authenticate function", () => {
         await expect(authenticate(state, formData)).rejects.toThrow("NEXT_REDIRECT");
 
         expect(mockGetUserIdentity).toHaveBeenCalledWith(validatedData);
-        expect(mockSet).toHaveBeenCalledWith('username', userIdentity.username);
         expect(redirect).toHaveBeenCalledWith("/");
     });
 

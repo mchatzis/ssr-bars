@@ -36,7 +36,8 @@ export interface UserEntity extends BaseEntity<
     userId: string;
     username: string;
     email: string;
-    password: string;
+    passwordHash: string;
+    salt: string;
     age?: number;
 }
 
@@ -45,7 +46,8 @@ export interface EmailEntity extends BaseEntity<
     Key<KeyEnum.METADATA, ''>
 > {
     userId: string;
-    password: string;
+    passwordHash: string;
+    salt: string;
     username: string;
 }
 

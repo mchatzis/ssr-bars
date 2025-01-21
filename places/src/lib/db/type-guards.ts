@@ -29,7 +29,8 @@ export function isUserEntity(obj: any): obj is UserEntity {
         typeof obj.userId === 'string' &&
         typeof obj.username === 'string' &&
         typeof obj.email === 'string' &&
-        typeof obj.password === 'string' &&
+        typeof obj.passwordHash === 'string' &&
+        typeof obj.salt === 'string' &&
         (obj.age === undefined || typeof obj.age === 'number') &&
         isBaseEntity(obj)
     );
@@ -41,7 +42,8 @@ export function isEmailEntity(obj: any): obj is EmailEntity {
         obj.PK.startsWith(`${KeyEnum.EMAIL}#`) &&
         obj.SK === `${KeyEnum.METADATA}#` &&
         typeof obj.userId === 'string' &&
-        typeof obj.password === 'string' &&
+        typeof obj.passwordHash === 'string' &&
+        typeof obj.salt === 'string' &&
         typeof obj.username === 'string' &&
         isBaseEntity(obj)
     );
