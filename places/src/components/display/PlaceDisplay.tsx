@@ -16,7 +16,6 @@ export default function PlaceDisplay({ className = '' }) {
     const shadowClass = isLightTheme ? 'shadow-light' : 'shadow-dark';
 
     if (!selectedPlace) { return null }
-
     return (
         <div className={`absolute top-20 right-[1vw] w-96 h-[85vh]
                 bg-bgColor fade-in flex flex-col rounded-xl overflow-clip ${shadowClass} ${className}`}>

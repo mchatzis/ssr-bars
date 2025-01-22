@@ -4,22 +4,7 @@ import { cookies } from 'next/headers';
 import { cache } from 'react';
 import 'server-only';
 import { Resource } from 'sst';
-
-
-export interface SessionPayload {
-    sub: string;
-    username: string;
-    iat: number;
-    exp: number
-}
-export function isSessionPayload(obj: any): obj is SessionPayload {
-    return (
-        typeof obj.sub === 'string' &&
-        typeof obj.username === 'string' &&
-        typeof obj.iat === 'number' &&
-        typeof obj.exp === 'number'
-    );
-}
+import { isSessionPayload, SessionPayload } from './types';
 
 export function getEncodedKey(): Uint8Array {
     const secret = Resource.JWT_SECRET_KEY.value;
@@ -85,7 +70,7 @@ export async function destroySession() {
 export const verifySession = cache(async () => {
     const cookie = (await cookies()).get('session')?.value;
     if (!cookie) {
-        return { isAuth: false }
+        return { isAuth: false, userId: null }
     }
 
     const session = await decrypt(cookie);
@@ -94,5 +79,5 @@ export const verifySession = cache(async () => {
         return { isAuth: true, userId: session.sub }
     }
 
-    return { isAuth: false }
+    return { isAuth: false, userId: null }
 })
