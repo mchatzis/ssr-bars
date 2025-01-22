@@ -75,6 +75,7 @@ describe('createUser with real db', () => {
         expect(userItem?.email).toBe(mockInput.email);
         expect(userItem?.passwordHash).toBe(mockHash);
         expect(userItem?.salt).toBe(mockSalt);
+        expect(userItem?.savedPlaces).toEqual([]);
     });
 
     it('should throw an EmailExistsError if only email already exists', async () => {

@@ -3,7 +3,7 @@
 import { LoginFormSchema, SignupFormSchema } from "@/app/actions/auth/schema";
 import { LoginFormState } from "@/components/auth/LoginForm";
 import { RegisterFormState } from "@/components/auth/RegisterForm";
-import { createUser, EmailDoesNotExistError, EmailExistsError, getUserIdentity, UsernameExistsError, WrongPasswordError } from "@/lib/db/models/user/user";
+import { createUser, EmailDoesNotExistError, EmailExistsError, getUserByCredentials, UsernameExistsError, WrongPasswordError } from "@/lib/db/models/user/user";
 import { createSession } from "@/lib/session/session";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
@@ -29,7 +29,7 @@ vi.mock(import("@/lib/db/models/user/user"), async (importOriginal) => {
     return {
         ...actual,
         createUser: vi.fn(),
-        getUserIdentity: vi.fn()
+        getUserByCredentials: vi.fn()
     }
 });
 vi.mock("@/lib/session/session", () => ({
@@ -158,7 +158,7 @@ describe('register function', () => {
 });
 
 const mockSafeParseLoginForm = LoginFormSchema.safeParse as Mock;
-const mockGetUserIdentity = vi.mocked(getUserIdentity);
+const mockGetUserByCredentials = vi.mocked(getUserByCredentials);
 const mockCreateSession = vi.mocked(createSession);
 const mockSet = vi.fn();
 (vi.mocked(cookies) as Mock).mockReturnValue({
@@ -168,7 +168,7 @@ const mockSet = vi.fn();
 describe("authenticate function", () => {
     beforeEach(() => {
         mockSafeParseLoginForm.mockReset();
-        mockGetUserIdentity.mockReset();
+        mockGetUserByCredentials.mockReset();
         mockCreateSession.mockReset();
     });
 
@@ -215,11 +215,11 @@ describe("authenticate function", () => {
             success: true,
             data: validatedData,
         });
-        mockGetUserIdentity.mockResolvedValue(userIdentity);
+        mockGetUserByCredentials.mockResolvedValue(userIdentity);
 
         await expect(authenticate(state, formData)).rejects.toThrow("NEXT_REDIRECT");
 
-        expect(mockGetUserIdentity).toHaveBeenCalledWith(validatedData);
+        expect(mockGetUserByCredentials).toHaveBeenCalledWith(validatedData);
         expect(redirect).toHaveBeenCalledWith("/");
     });
 
@@ -231,7 +231,7 @@ describe("authenticate function", () => {
             success: true,
             data: { email: "nonexistent@example.com", password: "password123" },
         });
-        mockGetUserIdentity.mockRejectedValue(new EmailDoesNotExistError("Email does not exist"));
+        mockGetUserByCredentials.mockRejectedValue(new EmailDoesNotExistError("Email does not exist"));
 
         const result = await authenticate(state, formData);
 
@@ -253,7 +253,7 @@ describe("authenticate function", () => {
             success: true,
             data: { email: "test@example.com", password: "wrongpassword" },
         });
-        mockGetUserIdentity.mockRejectedValue(new WrongPasswordError("Wrong password"));
+        mockGetUserByCredentials.mockRejectedValue(new WrongPasswordError("Wrong password"));
 
         const result = await authenticate(state, formData);
 
@@ -275,7 +275,7 @@ describe("authenticate function", () => {
             success: true,
             data: { email: "test@example.com", password: "password123" },
         });
-        mockGetUserIdentity.mockRejectedValue(new Error("Unexpected mock error"));
+        mockGetUserByCredentials.mockRejectedValue(new Error("Unexpected mock error"));
 
         const result = await authenticate(state, formData);
 

@@ -53,6 +53,7 @@ describe('createUser with mocks', () => {
             email: 'test@example.com',
             passwordHash: mockHash,
             salt: mockSalt,
+            savedPlaces: [],
             userId: userId,
             createdAt: expect.any(Number),
             updatedAt: expect.any(Number),

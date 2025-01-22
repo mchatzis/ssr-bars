@@ -3,7 +3,7 @@
 import { LoginFormSchema, SignupFormSchema } from "@/app/actions/auth/schema";
 import { LoginFormState } from "@/components/auth/LoginForm";
 import { RegisterFormState } from "@/components/auth/RegisterForm";
-import { createUser, CreateUserInput, EmailDoesNotExistError, EmailExistsError, getUserIdentity, GetUserInput, UsernameExistsError, WrongPasswordError } from "@/lib/db/models/user/user";
+import { createUser, CreateUserInput, EmailDoesNotExistError, EmailExistsError, getUserByCredentials, GetUserInput, UsernameExistsError, WrongPasswordError } from "@/lib/db/models/user/user";
 import { createSession } from "@/lib/session/session";
 import { redirect } from "next/navigation";
 
@@ -63,7 +63,7 @@ export async function authenticate(state: LoginFormState, formData: FormData): P
         }
 
         const validatedData: GetUserInput = validatedFields.data;
-        const { userId, username } = await getUserIdentity(validatedData);
+        const { userId, username } = await getUserByCredentials(validatedData);
         console.log("Successful login of user: ", userId);
 
         await createSession({

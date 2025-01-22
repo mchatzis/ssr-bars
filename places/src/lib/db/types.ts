@@ -39,6 +39,7 @@ export interface UserEntity extends BaseEntity<
     passwordHash: string;
     salt: string;
     age?: number;
+    savedPlaces: string[];
 }
 
 export interface EmailEntity extends BaseEntity<

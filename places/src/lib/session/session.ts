@@ -1,16 +1,23 @@
 import { SESSION_EXPIRE_IN_SECONDS } from '@/lib/constants';
-import { JWTPayload, jwtVerify, SignJWT } from 'jose';
+import { jwtVerify, SignJWT } from 'jose';
 import { cookies } from 'next/headers';
+import { cache } from 'react';
 import 'server-only';
 import { Resource } from 'sst';
 
 
-export interface SessionPayload extends JWTPayload {
-    username: string
+export interface SessionPayload {
+    sub: string;
+    username: string;
+    iat: number;
+    exp: number
 }
-export function isSessionPayload(payload: JWTPayload): payload is SessionPayload {
+export function isSessionPayload(obj: any): obj is SessionPayload {
     return (
-        typeof (payload as SessionPayload).username === 'string'
+        typeof obj.sub === 'string' &&
+        typeof obj.username === 'string' &&
+        typeof obj.iat === 'number' &&
+        typeof obj.exp === 'number'
     );
 }
 
@@ -26,7 +33,7 @@ export function getExpirationTimeInSeconds() {
     return currentTime + SESSION_EXPIRE_IN_SECONDS
 }
 
-export async function encrypt(payload: SessionPayload) {
+export async function encrypt(payload: Omit<SessionPayload, 'iat' | 'exp'>) {
     const expiresAt = getExpirationTimeInSeconds();
 
     return await new SignJWT(payload)
@@ -48,12 +55,13 @@ export async function decrypt(session: string): Promise<SessionPayload> {
     return payload
 }
 
-export async function createSession(payload: SessionPayload) {
-    const session = await encrypt(payload);
+export async function createSession(payload: Omit<SessionPayload, 'iat' | 'exp'>) {
+    const encryptedPayload = await encrypt(payload);
 
-    cookies().set(
+    //Await needed for edge runtime
+    (await cookies()).set(
         'session',
-        session,
+        encryptedPayload,
         {
             httpOnly: true,
             secure: true,
@@ -65,7 +73,7 @@ export async function createSession(payload: SessionPayload) {
 }
 
 export async function destroySession() {
-    cookies().set('session', '', {
+    (await cookies()).set('session', '', {
         httpOnly: true,
         secure: true,
         expires: new Date(0),
@@ -73,3 +81,18 @@ export async function destroySession() {
         path: '/',
     });
 }
+
+export const verifySession = cache(async () => {
+    const cookie = (await cookies()).get('session')?.value;
+    if (!cookie) {
+        return { isAuth: false }
+    }
+
+    const session = await decrypt(cookie);
+    const currentTime = Math.floor(Date.now() / 1000);
+    if (session.exp && session.exp >= currentTime) {
+        return { isAuth: true, userId: session.sub }
+    }
+
+    return { isAuth: false }
+})

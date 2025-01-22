@@ -16,13 +16,16 @@ vi.mock('sst', () => ({
 vi.mock('@/lib/constants', () => ({
     SESSION_EXPIRE_IN_SECONDS: 60
 }));
+vi.mock('react', () => ({
+    cache: (fn: Function) => fn
+}));
 
 describe('Session management tests', () => {
     const FIXED_TIMESTAMP_MILLI = 1732725656854;
     const FIXED_TIMESTAMP_SEC = Math.floor(FIXED_TIMESTAMP_MILLI / 1000);
 
     const mockSecretKey = 'test-secret';
-    const mockPayload: SessionPayload = { username: 'testUser' };
+    const mockPayload: Omit<SessionPayload, 'iat' | 'exp'> = { username: 'testUser', sub: 'testUserId' };
     const mockSystemTime = new Date(FIXED_TIMESTAMP_MILLI)
 
     beforeAll(() => {
@@ -117,7 +120,7 @@ describe('Session management tests', () => {
         });
 
         it('should create session cookie with encrypted payload', async () => {
-            const payload = { username: 'testuser' }
+            const payload = { username: 'testuser', sub: 'testId' }
 
             const mockSet = vi.fn();
             (vi.mocked(cookies) as Mock).mockReturnValue({

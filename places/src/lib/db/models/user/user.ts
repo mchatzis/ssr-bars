@@ -1,6 +1,6 @@
 import { Database, TransactWriteItemNoTableName } from "@/lib/db/Database";
 import { EmailEntityError } from "@/lib/db/type-guard-errors";
-import { isEmailEntity } from "@/lib/db/type-guards";
+import { isEmailEntity, isUserEntity } from "@/lib/db/type-guards";
 import { EmailEntity, UserEntity, UsernameEntity } from "@/lib/db/types";
 import { TransactionCanceledException } from "@aws-sdk/client-dynamodb";
 import crypto from "crypto";
@@ -45,6 +45,13 @@ export class WrongPasswordError extends Error {
     }
 }
 
+export class UserNotFoundError extends Error {
+    constructor(message: string = "'User not found'") {
+        super(message);
+        this.name = 'UserNotFoundError';
+    }
+}
+
 export async function createUser(input: CreateUserInput) {
     const db = Database.getInstance();
 
@@ -76,6 +83,7 @@ export async function createUser(input: CreateUserInput) {
         email: email,
         passwordHash: hash,
         salt: salt,
+        savedPlaces: [],
         createdAt: now,
         updatedAt: now
     }
@@ -130,7 +138,7 @@ export async function createUser(input: CreateUserInput) {
 }
 
 // TODO: TESTTTTTT
-export async function getUserIdentity(input: GetUserInput): Promise<Pick<EmailEntity, 'userId' | 'username'>> {
+export async function getUserByCredentials(input: GetUserInput): Promise<Pick<EmailEntity, 'userId' | 'username'>> {
     const db = Database.getInstance();
     const { email, password } = input;
 
@@ -162,4 +170,25 @@ export async function getUserIdentity(input: GetUserInput): Promise<Pick<EmailEn
         userId: emailItem.userId,
         username: emailItem.username,
     }
+}
+
+export async function getUserById(userId: string): Promise<Omit<UserEntity, 'passwordHash' | 'salt'>> {
+    const db = Database.getInstance();
+
+    const userKey: Pick<UserEntity, 'PK' | 'SK'> = {
+        PK: `USER#${userId}`,
+        SK: 'METADATA#'
+    };
+
+    const userItem = await db.get({ Key: userKey });
+
+    if (!userItem) {
+        throw new UserNotFoundError();
+    }
+    if (!isUserEntity(userItem)) {
+        throw new Error('Invalid user data');
+    }
+
+    const { passwordHash, salt, ...userData } = userItem;
+    return userData;
 }
