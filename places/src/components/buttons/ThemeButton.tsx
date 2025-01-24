@@ -3,16 +3,13 @@
 import { STATIC_IMG_ICON_PREFIX } from "@/lib/constants";
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 import { selectTheme, setTheme, toggleTheme } from "@/lib/redux/slices/styleStateSlice";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
-export default function ThemeButton({ className = '' }) {
+export default function ThemeButton({ className = '', hasMounted }: { className: string, hasMounted: boolean }) {
     const theme = useAppSelector(selectTheme);
     const dispatch = useAppDispatch();
-    const [hasMounted, setHasMounted] = useState(false);
 
     useEffect(() => {
-        setHasMounted(true);
-
         const mediaQueryList = window.matchMedia('(prefers-color-scheme: dark)');
         const listener = (e: MediaQueryListEvent) => {
             const newTheme = e.matches ? 'dark' : 'light';
@@ -26,23 +23,20 @@ export default function ThemeButton({ className = '' }) {
         };
     }, [dispatch]);
 
-    // Avoid hydration mismatch
-    if (!hasMounted) {
-        return (
-            <div className={`w-[36px] h-[36px] bg-primary m-1 ${className}`} />
-        );
-    }
 
     return (
         <div className={`w-[36px] h-[36px] bg-primary/90 m-1 flex items-center justify-center ${className}`}>
-            <img
-                id="fullscreen-button"
-                className='cursor-pointer clickable-element'
-                onClick={() => dispatch(toggleTheme())}
-                src={STATIC_IMG_ICON_PREFIX + '/' + (theme === 'light' ? 'night-mode.png' : 'light-mode.png')}
-                width={30}
-                height={30}
-            />
+            {hasMounted ?
+                <img
+                    id="fullscreen-button"
+                    className='cursor-pointer clickable-element fade-in-slow-half'
+                    onClick={() => dispatch(toggleTheme())}
+                    src={STATIC_IMG_ICON_PREFIX + '/' + (theme === 'light' ? 'night-mode.png' : 'light-mode.png')}
+                    width={30}
+                    height={30}
+                /> : null
+            }
+
         </div>
     );
 }

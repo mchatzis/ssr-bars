@@ -5,6 +5,7 @@ import { getAllAreas } from "@/lib/db/models/area/area";
 import { getAllPlaceTypes } from "@/lib/db/models/place-type/place-type";
 import { Area, PlaceType } from "@/lib/redux/slices/appStateSlice";
 
+
 export default async function LeftSidebar({ className = '' }: { className: string }) {
     const areas: Area[] = await getAllAreas();
     const placeTypes: PlaceType[] = await getAllPlaceTypes();

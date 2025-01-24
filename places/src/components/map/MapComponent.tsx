@@ -15,6 +15,7 @@ import { useCallback, useContext, useEffect, useState } from 'react';
 import ImageCarousel from '../display/ImageCarousel';
 
 
+const PIN_IMAGE_SIDE = 35;
 const darkMapStyle = "mapStyles/dark-matter-style.json";
 const lightMapStyle = "mapStyles/positron-style.json";
 
@@ -131,7 +132,7 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
         if (!mapRef || !mapRef.current) { return };
         const map = mapRef.current;
 
-        const pinImage = new Image(45, 45);
+        const pinImage = new Image(PIN_IMAGE_SIDE, PIN_IMAGE_SIDE);
         pinImage.src = STATIC_IMG_ICON_PREFIX + '/' + (isLightTheme ? 'pin-light.png' : 'pin-dark.png');
         pinImage.onload = () => {
             if (map.hasImage('pin')) {
@@ -149,7 +150,7 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
     const handleMapLoad = useCallback((e: MapLibreEvent) => {
         const map = e.target;
 
-        const pinImage = new Image(45, 45)
+        const pinImage = new Image(PIN_IMAGE_SIDE, PIN_IMAGE_SIDE)
         pinImage.src = STATIC_IMG_ICON_PREFIX + '/' + (isLightTheme ? 'pin-light.png' : 'pin-dark.png');
         pinImage.onload = () => map.addImage('pin', pinImage);
     }, [theme]);
@@ -228,6 +229,10 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
                 onMouseEnter={handleMapMouseEnter}
                 onMouseLeave={handleMapMouseLeave}
                 onClick={handleMapClick}
+                style={{
+                    opacity: 0,
+                    animation: 'fadeIn 1s ease-in forwards'
+                }}
             >
                 <Source id="my-data" type="geojson" data={to_geojson(activePlaces)}>
                     <Layer {...pinLayer} />
@@ -243,7 +248,7 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
                         closeOnClick={false}
                     >
                         <div id="myPopup"
-                            className={`w-64 h-48 fade-in`}
+                            className={`w-64 h-48 fade-in-fast-full`}
                             onClick={handleClickPopup}
                         >
                             <div className={`flex flex-col overflow-clip rounded-xl ${shadowClass}`}>
