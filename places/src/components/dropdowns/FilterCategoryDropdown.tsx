@@ -57,39 +57,42 @@ export default function FilterCategoryDropdown({ className = '' }) {
                 placeholder='Categories...'
                 onClick={handleOptionClick}
             />
-            {activeCategories.map((category, index) =>
-                <>
+            <div className="max-h-[50vh] overflow-scroll">
+                {activeCategories.map((category, index) =>
+                    <>
+                        <button
+                            className={`block w-36 bg-primary text-black rounded-xl
+                                border border-primary m-3`}
+                            key={category}
+                            onClick={handleActiveCategoriesClick}
+                        >
+                            {category}
+                        </button>
+                        {
+                            (activeCategories.length > 1 && index === 0) ?
+                                <button
+                                    onClick={() => dispatch(toggleFilterWithUnion())}
+                                    className='text-primary opacity-70 hover:scale-110 hover:opacity-100 duration-1000'
+                                >
+                                    {filterWithUnion ? 'OR' : 'AND'}
+                                </button>
+                                : null
+                        }
+                    </>
+                )}
+                <hr className='m-3 border border-primary'></hr>
+
+                {recentCategories.map((category) =>
                     <button
-                        className={`block w-36 bg-primary text-black rounded-xl
-                    border border-primary m-3`}
+                        className={`block w-36 text-primary rounded-xl
+                            border border-primary m-3`}
                         key={category}
-                        onClick={handleActiveCategoriesClick}
+                        onClick={handleRecentCategoriesClick}
                     >
                         {category}
                     </button>
-                    {
-                        (activeCategories.length > 1 && index === 0) ?
-                            <button
-                                onClick={() => dispatch(toggleFilterWithUnion())}
-                                className='text-primary opacity-70 hover:scale-110 hover:opacity-100 duration-1000'
-                            >
-                                {filterWithUnion ? 'OR' : 'AND'}
-                            </button>
-                            : null
-                    }
-                </>
-            )}
-            <hr className='m-3 border border-primary'></hr>
-            {recentCategories.map((category) =>
-                <button
-                    className={`block w-36 text-primary rounded-xl
-                    border border-primary m-3`}
-                    key={category}
-                    onClick={handleRecentCategoriesClick}
-                >
-                    {category}
-                </button>
-            )}
+                )}
+            </div>
         </div>
     )
 }

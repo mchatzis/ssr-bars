@@ -16,8 +16,8 @@ export default async function LeftSidebar({ className = '' }: { className: strin
                 allAreas={areas}
                 allPlaceTypes={placeTypes}
             />
-            <FilterCategoryDropdown className="relative top-[13vh] h-fit w-fit border border-primary/50 
-                rounded-2xl overflow-clip backdrop-blur-[2px]" />
+            <FilterCategoryDropdown className="relative top-[13vh] max-h-[60vh] h-fit overflow-clip w-fit 
+            border border-primary/50 rounded-2xl backdrop-blur-[2px]" />
             <MapControlsComponent className="absolute bottom-0 w-fit" />
         </div>
     )
