@@ -231,7 +231,7 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
                 onClick={handleMapClick}
                 style={{
                     opacity: 0,
-                    animation: 'fadeIn 1s ease-in forwards'
+                    animation: 'fadeIn 1.2s ease-in forwards'
                 }}
             >
                 <Source id="my-data" type="geojson" data={to_geojson(activePlaces)}>

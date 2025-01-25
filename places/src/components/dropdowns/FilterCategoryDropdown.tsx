@@ -1,5 +1,6 @@
 'use client'
 
+import usePlaceholderFadeIn from '@/lib/hooks/usePlaceholderFadeIn';
 import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
 import { selectAppActiveCategories, selectAppAvailableCategories, selectCachedCategories, selectFilterWithUnion, setActiveCategories, setCachedCategories, toggleFilterWithUnion } from '@/lib/redux/slices/appStateSlice';
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -102,6 +103,7 @@ function InputField({ allOptions, placeholder = '', onClick }: InputFieldProps) 
     const [value, setValue] = useState('');
     const [options, setOptions] = useState<string[]>([]);
     const [focused, setFocused] = useState(false);
+    const placeholderClass = usePlaceholderFadeIn();
 
     const enclosingDivRef = useRef<HTMLDivElement>(null);
     useClickAway(enclosingDivRef, () => {
@@ -138,8 +140,8 @@ function InputField({ allOptions, placeholder = '', onClick }: InputFieldProps) 
     return (
         <div ref={enclosingDivRef}>
             <input
-                className="h-full w-36 bg-transparent border border-primary rounded-full focus:outline-none
-                  placeholder-textColor/50 px-3 py-1 m-3"
+                className={`h-full w-36 bg-transparent border border-primary rounded-full focus:outline-none
+                  px-3 py-1 m-3 ${placeholderClass}`}
                 value={value}
                 type="text"
                 placeholder={placeholder}

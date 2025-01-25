@@ -5,6 +5,7 @@
 @layer utilities {
   ::-webkit-scrollbar {
     width: 10px;
+    background: transparent;
   }
 
   ::-webkit-scrollbar-track {
@@ -20,6 +21,10 @@
   ::-webkit-scrollbar-thumb:hover {
     background: #B2A59B;
   }
+
+  ::-webkit-scrollbar-corner {
+    background: transparent;
+  }
 }
 
 :root {
@@ -29,6 +34,7 @@
   --primary-light: 255 87 34;
   --secondary-light: #03dac5;
   --accent-light: 187 20 45;
+  --discrete-light: 210 210 210;
 
   /* Dark theme colors */
   --background-dark: #000000;
@@ -36,6 +42,7 @@
   --primary-dark: 234 227 201;
   --secondary-dark: #03dac6;
   --accent-dark: 227 115 131;
+  --discrete-dark: 45 45 45;
 
   --z-map: 10;
   --z-controls: 20;
@@ -55,6 +62,7 @@ body {
   --primary-color: var(--primary-light);
   --secondary-color: var(--secondary-light);
   --accent-color: var(--accent-light);
+  --discrete-color: var(--discrete-light);
 
   background: var(--background-color);
   color: rgb(var(--text-color));
@@ -66,6 +74,7 @@ body {
   --primary-color: var(--primary-dark);
   --secondary-color: var(--secondary-dark);
   --accent-color: var(--accent-dark);
+  --discrete-color: var(--discrete-dark);
 
   background: var(--background-color);
   color: rgb(var(--text-color)/0.8);
@@ -144,6 +153,15 @@ body {
 .clickable-element:hover {
   opacity: 1;
   transform: scale(1.25);
+}
+
+.placeholder-start::placeholder {
+  opacity: 0;
+  transition: opacity 0.7s ease-in;
+}
+
+.placeholder-visible::placeholder {
+  opacity: 1;
 }
 
 /* .color-palette {

@@ -1,6 +1,7 @@
 'use client'
 
 import { DropDown } from "@/components/dropdowns/DropDown";
+import usePlaceholderFadeIn from "@/lib/hooks/usePlaceholderFadeIn";
 import { Dispatch, SetStateAction, useCallback, useEffect, useState } from "react";
 
 interface Props {
@@ -14,6 +15,7 @@ export default function InputWithOptionsDropdown({ className = '', allOptions, c
     const [focused, setFocused] = useState(false);
     const [options, setOptions] = useState(allOptions);
     const [placeholder, setPlaceHolder] = useState('');
+    const placeholderClass = usePlaceholderFadeIn();
 
     useEffect(() => {
         let filteredSuggestions = allOptions;
@@ -50,8 +52,8 @@ export default function InputWithOptionsDropdown({ className = '', allOptions, c
     return (
         <div className={`h-7 w-36 ${className}`}>
             <input
-                className="h-full w-full bg-transparent border border-primary rounded-full focus:outline-none
-                  placeholder-textColor/60 pl-3 backdrop-blur-[1px]"
+                className={`h-full w-full bg-transparent border border-primary rounded-full focus:outline-none
+                  pl-3 backdrop-blur-[1px] ${placeholderClass}`}
                 type="text"
                 value={value}
                 placeholder={placeholder}
