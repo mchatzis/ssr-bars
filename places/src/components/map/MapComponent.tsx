@@ -169,11 +169,6 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
 
     const handleMapMouseLeave = useCallback((e: MapLayerMouseEvent) => {
         e.target.getCanvas().style.cursor = '';
-
-        const box = document.getElementById('myPopup');
-        box?.classList.add('fade-out');
-
-
         setPopupPlace(null);
     }, [])
 
@@ -190,8 +185,8 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
             setPopupPlace(null);
         }, 550)
         setTimeout(() => {
-            const box = document.getElementById('myPopup');
-            box?.classList.add('popup-active');
+            const popupElement = document.getElementById('myPopup');
+            popupElement?.classList.add('popup-slide-away');
         }, 400);
     }, [viewState]);
 
@@ -231,7 +226,7 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
                 onClick={handleMapClick}
                 style={{
                     opacity: 0,
-                    animation: 'fadeIn 1.2s ease-in forwards'
+                    animation: 'fadeIn 2s ease-in forwards'
                 }}
             >
                 <Source id="my-data" type="geojson" data={to_geojson(activePlaces)}>
@@ -248,13 +243,13 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
                         closeOnClick={false}
                     >
                         <div id="myPopup"
-                            className={`w-64 h-48 fade-in-fast-full`}
+                            className={`w-64 h-48 animate-[fadeIn_0.3s_ease-out_none]`}
                             onClick={handleClickPopup}
                         >
                             <div className={`flex flex-col overflow-clip rounded-xl ${shadowClass}`}>
                                 <ImageCarousel
                                     images={mapData[popupPlace.properties.category][popupPlace.properties.uuid].imagesUrls.medium}
-                                    className={`relative w-64 h-32 ${!isLightTheme && 'opacity-90'}`}
+                                    className={`relative w-64 h-32 ${!isLightTheme && 'brightness-90'}`}
                                     hasArrows={false}
                                 />
                                 <div className='w-64 h-16 bg-bgColor'>

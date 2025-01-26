@@ -15,7 +15,7 @@
 
   ::-webkit-scrollbar-thumb {
     border-radius: 100vh;
-    background: var(--background-color)
+    background: rgb(var(--primary-color))
   }
 
   ::-webkit-scrollbar-thumb:hover {
@@ -29,31 +29,43 @@
 
 :root {
   /* Light theme colors */
-  --background-light: #f1f1f1;
+  --background-light: #f0f0f0;
   --text-light: 0 0 0;
   --primary-light: 255 87 34;
-  --secondary-light: #03dac5;
-  --accent-light: 187 20 45;
-  --discrete-light: 210 210 210;
+  --discrete-light: 104 0 25;
+  --accent-light: 219 31 76;
+
+  /* Uncomment to see palettes: */
+  /* --background-light: #f0f0f0;
+  --text-light: rgb(0, 0, 0);
+  --primary-light: rgb(255, 87, 34);
+  --discrete-light: rgb(104, 0, 25);
+  --accent-light: rgb(219, 31, 76); */
+
+  /* Other light color ideas: */
+  /* 159 38 0 */
+  /* 89 27 47  */
+  /* 110 38 66 dark pink */
 
   /* Dark theme colors */
   --background-dark: #000000;
   --text-dark: 255 255 255;
   --primary-dark: 234 227 201;
-  --secondary-dark: #03dac6;
+  --discrete-dark: 103 105 126;
   --accent-dark: 227 115 131;
-  --discrete-dark: 45 45 45;
+
+  /* Uncomment to see palettes: */
+  /* --background-dark: #000000;
+  --text-dark: rgb(255, 255, 255);
+  --primary-dark: rgb(234, 227, 201);
+  --discrete-dark: rgb(103, 105, 126);
+  --accent-dark: rgb(227, 115, 131); */
 
   --z-map: 10;
   --z-controls: 20;
   --z-display: 30;
   --z-popup: 40;
   --z-max: 50;
-}
-
-body {
-  text-align: center;
-  font-size: large;
 }
 
 [data-theme="light"] body {
@@ -63,9 +75,6 @@ body {
   --secondary-color: var(--secondary-light);
   --accent-color: var(--accent-light);
   --discrete-color: var(--discrete-light);
-
-  background: var(--background-color);
-  color: rgb(var(--text-color));
 }
 
 [data-theme="dark"] body {
@@ -75,13 +84,17 @@ body {
   --secondary-color: var(--secondary-dark);
   --accent-color: var(--accent-dark);
   --discrete-color: var(--discrete-dark);
+}
 
+body {
+  text-align: center;
+  font-size: large;
   background: var(--background-color);
   color: rgb(var(--text-color)/0.8);
 }
 
 .maplibregl-ctrl-attrib.maplibregl-compact {
-  background-color: #acacac !important;
+  background-color: rgba(172, 172, 172, 0.64) !important;
   opacity: 0.7;
 }
 
@@ -107,10 +120,6 @@ body {
   }
 }
 
-.fade-in-fast-full {
-  animation: fadeIn 0.3s ease-out forwards;
-}
-
 @keyframes fadeInHalf {
   from {
     opacity: 0;
@@ -121,25 +130,7 @@ body {
   }
 }
 
-.fade-in-slow-half {
-  animation: fadeInHalf 1s ease-out forwards;
-}
-
-@keyframes fadeOut {
-  from {
-    opacity: 1;
-  }
-
-  to {
-    opacity: 0;
-  }
-}
-
-.fade-out {
-  animation: fadeOut 0.2s ease-in forwards;
-}
-
-.popup-active {
+.popup-slide-away {
   transform: translateX(30vw);
   opacity: 0;
   transition: transform 0.7s, opacity 0.7s;
@@ -153,6 +144,14 @@ body {
 .clickable-element:hover {
   opacity: 1;
   transform: scale(1.25);
+}
+
+[data-theme="light"] input::placeholder {
+  color: rgb(var(--text-color)/0.5);
+}
+
+[data-theme="dark"] input::placeholder {
+  color: rgb(var(--text-color)/0.6);
 }
 
 .placeholder-start::placeholder {

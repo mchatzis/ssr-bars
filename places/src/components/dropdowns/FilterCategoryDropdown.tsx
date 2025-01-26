@@ -72,7 +72,7 @@ export default function FilterCategoryDropdown({ className = '' }) {
                             (activeCategories.length > 1 && index === 0) ?
                                 <button
                                     onClick={() => dispatch(toggleFilterWithUnion())}
-                                    className='text-primary opacity-70 hover:scale-110 hover:opacity-100 duration-1000'
+                                    className='text-primary opacity-70 hover:scale-110 hover:opacity-100 duration-300'
                                 >
                                     {filterWithUnion ? 'OR' : 'AND'}
                                 </button>

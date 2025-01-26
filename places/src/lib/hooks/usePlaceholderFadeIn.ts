@@ -12,7 +12,7 @@ export default function usePlaceholderFadeIn() {
         return () => clearTimeout(timer);
     }, []);
 
-    const placeholderClass = `placeholder:text-textColor placeholder-start ${showPlaceholder ? "placeholder-visible" : ""}`;
+    const placeholderClass = `placeholder-start ${showPlaceholder ? "placeholder-visible" : ""}`;
 
     return placeholderClass
 }

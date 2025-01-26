@@ -86,7 +86,9 @@ export default function DoubleInputSearch({ className = '', allAreas, allPlaceTy
                 value={placeTypeFieldValue}
                 setValue={setPlaceTypeFieldValue}
             />
-            <button className="ml-1 text-primary" onClick={handleSearchClick}>Search</button>
+            <button className="ml-1 text-base text-primary bg-transparent hover:scale-105 duration-200
+                        border border-transparent p-1 rounded-full backdrop-blur-[1px]"
+                onClick={handleSearchClick}>Search</button>
         </div>
     )
 }

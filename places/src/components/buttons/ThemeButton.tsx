@@ -29,7 +29,7 @@ export default function ThemeButton({ className = '', hasMounted }: { className:
             {hasMounted ?
                 <img
                     id="fullscreen-button"
-                    className='cursor-pointer clickable-element fade-in-slow-half'
+                    className='cursor-pointer animate-[fadeInHalf_1s_ease-out_none] clickable-element'
                     onClick={() => dispatch(toggleTheme())}
                     src={STATIC_IMG_ICON_PREFIX + '/' + (theme === 'light' ? 'night-mode.png' : 'light-mode.png')}
                     width={30}

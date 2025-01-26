@@ -23,7 +23,7 @@ export default function FullscreenToggle({ className = '', hasMounted }: { class
       {hasMounted ?
         <img
           id="fullscreen-button"
-          className='cursor-pointer clickable-element fade-in-slow-half'
+          className='cursor-pointer animate-[fadeInHalf_1s_ease-out_none] clickable-element'
           onClick={toggleFullScreen}
           src={STATIC_IMG_ICON_PREFIX + '/' + (isFullscreen ? 'minimize.png' : 'fullscreen.png')}
           width={30}
