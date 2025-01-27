@@ -3,7 +3,8 @@ import { JWSSignatureVerificationFailed, JWTExpired } from 'jose/errors';
 import { cookies } from 'next/headers';
 import { Resource } from 'sst';
 import { afterEach, beforeAll, beforeEach, describe, expect, it, Mock, vi } from 'vitest';
-import { createSession, decrypt, encrypt, getEncodedKey, getExpirationTimeInSeconds, SessionPayload } from './session';
+import { createSession, decrypt, encrypt, getEncodedKey, getExpirationTimeInSeconds } from './session';
+import { SessionPayload } from './types';
 
 vi.mock('next/headers');
 vi.mock('sst', () => ({
@@ -17,6 +18,7 @@ vi.mock('@/lib/constants', () => ({
     SESSION_EXPIRE_IN_SECONDS: 60
 }));
 vi.mock('react', () => ({
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
     cache: (fn: Function) => fn
 }));
 

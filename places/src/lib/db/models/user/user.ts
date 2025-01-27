@@ -189,6 +189,6 @@ export async function getUserById(userId: string): Promise<Omit<UserEntity, 'pas
         throw new Error('Invalid user data');
     }
 
-    const { passwordHash, salt, ...userData } = userItem;
+    const { passwordHash: _passwordHash, salt: _salt, ...userData } = userItem;
     return userData;
 }
