@@ -127,3 +127,35 @@ export function organizePlacesIntoCategories(placesData: PlaceOfPlaceTypeInAreaE
 
     return placesOrganized;
 }
+
+export function getOperationFromButton(pressedButton: number): FilterOperation | null {
+    let operation: FilterOperation | null;
+    switch (pressedButton) {
+        case 0:
+            operation = 'and';
+            break;
+        case 2:
+            operation = 'or';
+            break;
+        default:
+            operation = null;
+            break;
+    }
+
+    return operation
+}
+
+
+export function intersectObjects<T extends object>(obj1: T, obj2: T): Partial<T> {
+    const commonKeys = Object.keys(obj1).filter(key => key in obj2);
+    return commonKeys.reduce((result, key) => {
+        result[key as keyof T] = obj1[key as keyof T];
+        return result;
+    }, {} as Partial<T>);
+}
+
+export function getCommonValues<T extends object>(obj1: T, obj2: T): Array<T[keyof T]> {
+    return Object.keys(obj1)
+        .filter(key => key in obj2)
+        .map(key => obj1[key as keyof T]);
+}

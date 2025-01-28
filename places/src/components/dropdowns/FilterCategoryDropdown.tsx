@@ -1,9 +1,10 @@
 'use client'
 
 import usePlaceholderFadeIn from '@/lib/hooks/usePlaceholderFadeIn';
+import { getOperationFromButton } from '@/lib/map/helpers';
 import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
-import { selectAppActiveCategories, selectAppAvailableCategories, selectCachedCategories, selectFilterWithUnion, setActiveCategories, setCachedCategories, toggleFilterWithUnion } from '@/lib/redux/slices/appStateSlice';
-import { useCallback, useEffect, useRef, useState } from "react";
+import { FilterOperation, selectAppActiveCategories, selectAppAvailableCategories, selectCachedCategories, setActiveCategories, setCachedCategories } from '@/lib/redux/slices/appStateSlice';
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import useClickAway from 'react-use/lib/useClickAway';
 import { DropDown } from './DropDown';
 
@@ -13,84 +14,138 @@ export default function FilterCategoryDropdown({ className = '' }) {
     const availableCategories = useAppSelector(selectAppAvailableCategories);
     const activeCategories = useAppSelector(selectAppActiveCategories);
     const cachedCategories = useAppSelector(selectCachedCategories);
-    const filterWithUnion = useAppSelector(selectFilterWithUnion);
 
     const [allDropdownOptions, setAllDropdownOptions] = useState<string[]>([]);
     const [recentCategories, setRecentCategories] = useState<string[]>([]);
 
     useEffect(() => {
-        setRecentCategories(cachedCategories.filter((category) => !activeCategories.includes(category)))
+        setRecentCategories(cachedCategories.filter((cachedCategory) =>
+            !activeCategories.some((activeCategory) => activeCategory.name === cachedCategory))
+        )
     }, [activeCategories])
 
     useEffect(() => {
-        const availableMinusActiveMinusCached = availableCategories
-            .filter((category) => !activeCategories.includes(category))
+        const availableMinusActiveMinusCachedCategories = availableCategories
+            .filter((availableCategory) => !activeCategories.some((activeCategory) => activeCategory.name === availableCategory))
             .filter((category) => !cachedCategories.includes(category));
 
-        setAllDropdownOptions(availableMinusActiveMinusCached);
+        setAllDropdownOptions(availableMinusActiveMinusCachedCategories);
     }, [availableCategories, activeCategories])
 
-    const handleOptionClick = useCallback((inputCategory: string) => {
-        dispatch(setActiveCategories([...activeCategories, inputCategory]))
+    const activateClickedCategory =
+        useCallback(({ chosenCategory, pressedButton }: { chosenCategory: string, pressedButton: number }) => {
+            let operation = getOperationFromButton(pressedButton);
+            if (!operation) { return }
+            if (activeCategories.length === 0) {
+                operation = 'or'; // First activated category is always or
+            }
 
-        if (!cachedCategories.includes(inputCategory)) {
-            dispatch(setCachedCategories([...cachedCategories, inputCategory]));
-        }
-    }, [activeCategories, cachedCategories]);
+            dispatch(setActiveCategories([...activeCategories, { name: chosenCategory, operation }]))
 
-    const handleActiveCategoriesClick = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+            if (!cachedCategories.includes(chosenCategory)) {
+                dispatch(setCachedCategories([...cachedCategories, chosenCategory]));
+            }
+        }, [activeCategories, cachedCategories]);
+
+    const handleClickActiveCategories = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
         const inputCategory = e.currentTarget.innerText;
 
-        dispatch(setActiveCategories(activeCategories.filter((category) => category !== inputCategory)));
+        dispatch(setActiveCategories(activeCategories.filter((category) => category.name !== inputCategory)));
     }, [activeCategories]);
 
-    const handleRecentCategoriesClick = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+    const handleClickRecentCategories = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+        let operation = getOperationFromButton(e.button);
+        if (!operation) { return }
+        if (activeCategories.length === 0) {
+            operation = 'or'; // First activated category is always or
+        }
+
         const inputCategory = e.currentTarget.innerText;
 
-        dispatch(setActiveCategories([...activeCategories, inputCategory]));
+        dispatch(setActiveCategories([...activeCategories, { name: inputCategory, operation }]));
     }, [activeCategories])
+
+    const categoriesByOperation = useMemo(() => {
+        return activeCategories.reduce((acc, category) => {
+            const operation = category.operation;
+            if (!(operation in acc)) {
+                acc[operation] = [];
+            }
+            acc[operation].push(category.name);
+            return acc
+        }, {} as { [operation in FilterOperation]: string[] })
+    }, [activeCategories]);
+
+    const categoryButton = (
+        category: string,
+        handleClick: (e: any) => void,
+        handleContextMenu?: (e: any) => void,
+        className: string = '',
+    ) => (
+        <button
+            className={`block w-36 bg-primary text-black rounded-xl border border-primary m-3 ${className}`}
+            key={category}
+            onClick={handleClick}
+            onContextMenu={(e) => {
+                e.preventDefault();
+                if (handleContextMenu) handleContextMenu(e);
+            }}
+        >
+            {category}
+        </button>
+    );
 
     return (
         <div className={`${className}`}>
             <InputField
                 allOptions={allDropdownOptions}
                 placeholder='Categories...'
-                onClick={handleOptionClick}
+                activateClickedCategory={activateClickedCategory}
             />
-            <div className="max-h-[50vh] overflow-scroll">
-                {activeCategories.map((category, index) =>
+            <div className="max-h-[55vh] overflow-scroll">
+                {categoriesByOperation['or']?.map((category, index) =>
                     <>
-                        <button
-                            className={`block w-36 bg-primary text-black rounded-xl
-                                border border-primary m-3`}
-                            key={category}
-                            onClick={handleActiveCategoriesClick}
-                        >
-                            {category}
-                        </button>
-                        {
-                            (activeCategories.length > 1 && index === 0) ?
-                                <button
-                                    onClick={() => dispatch(toggleFilterWithUnion())}
-                                    className='text-primary opacity-70 hover:scale-110 hover:opacity-100 duration-300'
-                                >
-                                    {filterWithUnion ? 'OR' : 'AND'}
-                                </button>
-                                : null
+                        {categoryButton(category, handleClickActiveCategories)}
+                        {(categoriesByOperation['or']?.length > 1 && index === 0) ?
+                            <p className='text-primary'>OR</p>
+                            : null
                         }
                     </>
                 )}
-                <hr className='m-3 border border-primary'></hr>
+                {categoriesByOperation['and']?.map((category, index) => {
+                    if (!categoriesByOperation['or'] || categoriesByOperation['or']?.length === 0) {
+                        return (
+                            <>
+                                {categoryButton(category, handleClickActiveCategories)}
+                                {(categoriesByOperation['and'].length > 1 && index === 0) ?
+                                    <p className='text-primary'>AND</p>
+                                    : null
+                                }
+                            </>
+                        )
+                    } else {
+                        return (
+                            <>
+                                {(categoriesByOperation['and'].length > 0 && index === 0) ?
+                                    <>
+                                        <hr className='m-3 border border-primary'></hr>
+                                        <p className='text-primary'>AND</p>
+                                    </>
+                                    : null
+                                }
+                                {categoryButton(category, handleClickActiveCategories)}
+                            </>
+                        )
+                    }
+                })}
 
+                <hr className='m-3 border border-primary'></hr>
                 {recentCategories.map((category) =>
-                    <button
-                        className={`block w-36 text-primary rounded-xl
-                            border border-primary m-3`}
-                        key={category}
-                        onClick={handleRecentCategoriesClick}
-                    >
-                        {category}
-                    </button>
+                    categoryButton(category,
+                        handleClickRecentCategories,
+                        handleClickRecentCategories,
+                        className = 'bg-transparent text-primary'
+                    )
                 )}
             </div>
         </div>
@@ -100,9 +155,9 @@ export default function FilterCategoryDropdown({ className = '' }) {
 interface InputFieldProps {
     allOptions: string[];
     placeholder?: string;
-    onClick: (option: string) => any;
+    activateClickedCategory: ({ chosenCategory, pressedButton }: { chosenCategory: string, pressedButton: number }) => any;
 }
-function InputField({ allOptions, placeholder = '', onClick }: InputFieldProps) {
+function InputField({ allOptions, placeholder = '', activateClickedCategory }: InputFieldProps) {
     const [value, setValue] = useState('');
     const [options, setOptions] = useState<string[]>([]);
     const [focused, setFocused] = useState(false);
@@ -111,6 +166,7 @@ function InputField({ allOptions, placeholder = '', onClick }: InputFieldProps) 
     const enclosingDivRef = useRef<HTMLDivElement>(null);
     useClickAway(enclosingDivRef, () => {
         setValue('');
+        setFocused(false);
     })
 
     useEffect(() => {
@@ -132,8 +188,13 @@ function InputField({ allOptions, placeholder = '', onClick }: InputFieldProps) 
 
     const handleBlur = useCallback((e: React.FocusEvent<HTMLInputElement>) => {
         e.target.setAttribute('placeholder', placeholder);
+    }, [placeholder]);
+
+    const handleClick = useCallback((e: React.MouseEvent, chosenCategory: string) => {
+        e.preventDefault(); // Prevent context menu when right clicking
         setFocused(false);
-    }, []);
+        activateClickedCategory({ chosenCategory, pressedButton: e.button });
+    }, [activateClickedCategory])
 
     const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
@@ -155,7 +216,8 @@ function InputField({ allOptions, placeholder = '', onClick }: InputFieldProps) 
             {focused &&
                 <DropDown
                     options={options}
-                    onMouseDown={onClick}
+                    onClick={handleClick}
+                    onContextMenu={handleClick}
                 />
             }
         </div>

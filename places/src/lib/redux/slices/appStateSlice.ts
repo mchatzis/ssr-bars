@@ -27,15 +27,23 @@ export function isPlaceType(obj: any): obj is PlaceType {
     );
 }
 
+export const Operations = {
+    intersection: 'and',
+    union: 'or'
+} as const;
+export type FilterOperation = typeof Operations[keyof typeof Operations];
+export type ActiveCategory = {
+    name: string,
+    operation: FilterOperation
+};
 interface AppState {
     allAreas: Area[],
     area: Area,
     allPlaceTypes: PlaceType[],
     placeType: PlaceType,
     availableCategories: string[];
-    activeCategories: string[];
+    activeCategories: ActiveCategory[];
     cachedCategories: string[];
-    filterWithUnion: boolean;
 }
 
 export const defaultAppState: AppState = {
@@ -52,8 +60,7 @@ export const defaultAppState: AppState = {
     },
     availableCategories: [],
     activeCategories: [],
-    cachedCategories: [],
-    filterWithUnion: false
+    cachedCategories: []
 }
 
 export const getInitialAppState = (): AppState => {
@@ -103,14 +110,11 @@ const appStateSlice = createSlice({
         setAvailableCategories: (state, action: PayloadAction<string[]>) => {
             state.availableCategories = action.payload;
         },
-        setActiveCategories: (state, action: PayloadAction<string[]>) => {
+        setActiveCategories: (state, action: PayloadAction<ActiveCategory[]>) => {
             state.activeCategories = action.payload;
         },
         setCachedCategories: (state, action: PayloadAction<string[]>) => {
             state.cachedCategories = action.payload;
-        },
-        toggleFilterWithUnion: (state) => {
-            state.filterWithUnion = !state.filterWithUnion;
         }
     }
 })
@@ -122,7 +126,6 @@ export const selectPlaceType = (state: RootState) => state.app.placeType;
 export const selectAppAvailableCategories = (state: RootState) => state.app.availableCategories;
 export const selectAppActiveCategories = (state: RootState) => state.app.activeCategories;
 export const selectCachedCategories = (state: RootState) => state.app.cachedCategories;
-export const selectFilterWithUnion = (state: RootState) => state.app.filterWithUnion;
 
 export const {
     setAllAreas,
@@ -132,7 +135,6 @@ export const {
     setActiveCategories,
     setAvailableCategories,
     setCachedCategories,
-    toggleFilterWithUnion
 } = appStateSlice.actions;
 
 export default appStateSlice;

@@ -5,9 +5,9 @@ import Map, { Layer, MapLayerMouseEvent, Popup, Source, SymbolLayer, ViewStateCh
 
 import { STATIC_IMG_ICON_PREFIX } from '@/lib/constants';
 import { MapRefContext } from '@/lib/context/mapContext';
-import { addImagesToPlaces, organizePlacesIntoCategories, to_geojson } from '@/lib/map/helpers';
+import { addImagesToPlaces, getCommonValues, organizePlacesIntoCategories, to_geojson } from '@/lib/map/helpers';
 import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
-import { selectAppActiveCategories, selectArea, selectCachedCategories, selectFilterWithUnion, selectPlaceType, setActiveCategories, setAvailableCategories, setCachedCategories } from '@/lib/redux/slices/appStateSlice';
+import { selectAppActiveCategories, selectArea, selectCachedCategories, selectPlaceType, setActiveCategories, setAvailableCategories, setCachedCategories } from '@/lib/redux/slices/appStateSlice';
 import { Place, selectMapActivePlaces, selectMapData, selectSelectedPlace, selectViewState, setActivePlaces, setMapData, setSelectedPlace, setViewState } from '@/lib/redux/slices/mapStateSlice';
 import { selectTheme } from '@/lib/redux/slices/styleStateSlice';
 import { MapLibreEvent } from 'maplibre-gl';
@@ -43,7 +43,6 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
     const cachedCategories = useAppSelector(selectCachedCategories);
     const activePlaces = useAppSelector(selectMapActivePlaces);
     const selectedPlace = useAppSelector(selectSelectedPlace);
-    const filterWithUnion = useAppSelector(selectFilterWithUnion);
     const theme = useAppSelector(selectTheme);
 
     const [popupPlace, setPopupPlace] = useState<Place | null>(null);
@@ -75,23 +74,48 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
             dispatch(setActivePlaces([]));
             return
         }
-        let activePlaces: Place[] = [];
-        if (filterWithUnion) {
-            activeCategories.forEach((category) => activePlaces.push(...Object.values(mapData[category])))
+
+        const unionCategories = activeCategories.filter((category) => category.operation === 'or');
+        const unionedPlacesWithUuids = unionCategories.reduce((acc, category) =>
+            Object.assign(acc, mapData[category.name])
+            , {} as { [uuid: string]: Place });
+
+        const intersectionCategories = activeCategories.filter((category) => category.operation === 'and');
+        const placesByCategory = intersectionCategories.map((category) => mapData[category.name]);
+        const intersectedPlacesWithUuids = placesByCategory.reduce((acc, placesWithUuids, index) => {
+            if (index === 0) return placesWithUuids;
+
+            const newAcc: { [uuid: string]: Place } = {};
+            Object.keys(placesWithUuids).forEach((uuid) => {
+                if (uuid in acc) {
+                    newAcc[uuid] = acc[uuid];
+                }
+            })
+            return newAcc
+        }, {});
+
+        let newActivePlaces: Place[];
+        const emptyUnion = Object.keys(unionedPlacesWithUuids).length === 0;
+        const emptyIntersection = Object.keys(intersectedPlacesWithUuids).length === 0
+        if (emptyUnion) {
+            if (emptyIntersection) {
+                newActivePlaces = [];
+            } else {
+                newActivePlaces = Object.values(intersectedPlacesWithUuids);
+            }
         } else {
-            const placesByCategory = activeCategories.map((category) => mapData[category]);
-            const uuidsIntersection = placesByCategory
-                .map(Object.keys)
-                .reduce((acc, keys) => acc.filter(key => keys.includes(key)));
-            activePlaces = uuidsIntersection.map((uuid) => placesByCategory[0][uuid])
+            if (emptyIntersection) {
+                newActivePlaces = Object.values(unionedPlacesWithUuids);
+            } else {
+                newActivePlaces = getCommonValues(unionedPlacesWithUuids, intersectedPlacesWithUuids)
+            }
         }
 
-        if (!activePlaces.some((place) => place.properties.uuid === selectedPlace?.properties.uuid)) {
+        if (!newActivePlaces.some((place) => place.properties.uuid === selectedPlace?.properties.uuid)) {
             dispatch(setSelectedPlace(null));
         }
-
-        dispatch(setActivePlaces(activePlaces));
-    }, [activeCategories, filterWithUnion])
+        dispatch(setActivePlaces(newActivePlaces));
+    }, [activeCategories])
 
     useEffect(() => {
         if (cachedCategories.length === 0) { return }

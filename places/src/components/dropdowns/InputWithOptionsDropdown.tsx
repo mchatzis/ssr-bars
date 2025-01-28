@@ -2,7 +2,8 @@
 
 import { DropDown } from "@/components/dropdowns/DropDown";
 import usePlaceholderFadeIn from "@/lib/hooks/usePlaceholderFadeIn";
-import { Dispatch, SetStateAction, useCallback, useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useCallback, useEffect, useRef, useState } from "react";
+import { useClickAway } from "react-use";
 
 interface Props {
     className?: string;
@@ -16,6 +17,12 @@ export default function InputWithOptionsDropdown({ className = '', allOptions, c
     const [options, setOptions] = useState(allOptions);
     const [placeholder, setPlaceHolder] = useState('');
     const placeholderClass = usePlaceholderFadeIn();
+
+    const enclosingDivRef = useRef<HTMLDivElement>(null);
+    useClickAway(enclosingDivRef, () => {
+        setPlaceHolder(currentChoice);
+        setFocused(false);
+    })
 
     useEffect(() => {
         let filteredSuggestions = allOptions;
@@ -39,18 +46,19 @@ export default function InputWithOptionsDropdown({ className = '', allOptions, c
         setFocused(true);
     }, []);
 
-    const handleBlur = useCallback(() => {
-        setPlaceHolder(currentChoice);
-        setFocused(false);
-    }, [currentChoice]);
-
     const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
         setValue(value);
     }, []);
 
+    const handleClickOption = useCallback((e: React.MouseEvent, option: string) => {
+        e.preventDefault(); //Prevent context menu when right clicking
+        setValue(option)
+        setFocused(false);
+    }, []);
+
     return (
-        <div className={`h-7 w-36 ${className}`}>
+        <div ref={enclosingDivRef} className={`h-7 w-36 ${className}`}>
             <input
                 className={`h-full w-full bg-transparent border border-primary rounded-full focus:outline-none
                   pl-3 backdrop-blur-[1px] ${placeholderClass}`}
@@ -58,13 +66,13 @@ export default function InputWithOptionsDropdown({ className = '', allOptions, c
                 value={value}
                 placeholder={placeholder}
                 onFocus={handleFocus}
-                onBlur={handleBlur}
                 onChange={handleInputChange}
             />
             {focused &&
                 <DropDown
                     options={options}
-                    onMouseDown={(option: string) => setValue(option)}
+                    onClick={handleClickOption}
+                    onContextMenu={handleClickOption}
                 />
             }
         </div>

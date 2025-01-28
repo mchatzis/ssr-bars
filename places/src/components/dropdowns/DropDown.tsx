@@ -2,11 +2,12 @@
 
 interface DropdownProps {
     options: string[];
-    onMouseDown: (option: string) => any;
+    onClick: (e: React.MouseEvent, option: string) => any;
+    onContextMenu: (e: React.MouseEvent, option: string) => any;
 }
-export function DropDown({ options, onMouseDown }: DropdownProps) {
+export function DropDown({ options, onClick, onContextMenu }: DropdownProps) {
     return (
-        <div className="w-full h-fit max-h-[15vh] relative z-[var(--z-popup)] rounded-xl overflow-y-auto bg-discrete">
+        <div className="w-full h-fit max-h-[13vh] relative z-[var(--z-popup)] rounded-xl overflow-y-auto bg-discrete">
             <ul className='w-full h-full text-base text-white/90'>
                 {options.map((option, index) => {
                     return (
@@ -14,7 +15,8 @@ export function DropDown({ options, onMouseDown }: DropdownProps) {
                             key={index}
                             className='block cursor-pointer px-1 py-1 border border-transparent hover:text-primary hover:rounded-xl
                                 hover:border hover:border-primary'
-                            onMouseDown={() => onMouseDown(option)}
+                            onClick={(e) => onClick(e, option)}
+                            onContextMenu={(e) => onContextMenu(e, option)}
                         >
                             {option}
                         </li>
