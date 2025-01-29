@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import type { RootState } from '../store';
 
-type Theme = 'light' | 'dark';
+export type Theme = 'light' | 'dark';
 const defaultTheme = 'light';
 function isValidTheme(theme: string): theme is Theme {
     return theme === 'light' || theme === 'dark';

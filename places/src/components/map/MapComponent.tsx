@@ -1,21 +1,21 @@
 'use client'
 
 import 'maplibre-gl/dist/maplibre-gl.css';
-import Map, { Layer, MapLayerMouseEvent, Popup, Source, SymbolLayer, ViewStateChangeEvent } from 'react-map-gl/maplibre';
+import Map, { Layer, Popup, Source, SymbolLayer } from 'react-map-gl/maplibre';
 
-import { STATIC_IMG_ICON_PREFIX } from '@/lib/constants';
 import { MapRefContext } from '@/lib/context/mapContext';
-import { addImagesToPlaces, getCommonValues, organizePlacesIntoCategories, to_geojson } from '@/lib/map/helpers';
-import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
-import { selectAppActiveCategories, selectArea, selectCachedCategories, selectPlaceType, setActiveCategories, setAvailableCategories, setCachedCategories } from '@/lib/redux/slices/appStateSlice';
-import { Place, selectMapActivePlaces, selectMapData, selectSelectedPlace, selectViewState, setActivePlaces, setMapData, setSelectedPlace, setViewState } from '@/lib/redux/slices/mapStateSlice';
+import { to_geojson } from '@/lib/map/helpers';
+import { useAppSelector } from '@/lib/redux/hooks';
+import { selectAppActiveCategories, selectArea, selectCachedCategories, selectPlaceType } from '@/lib/redux/slices/appStateSlice';
+import { Place, selectMapActivePlaces, selectMapData, selectSelectedPlace, selectViewState } from '@/lib/redux/slices/mapStateSlice';
 import { selectTheme } from '@/lib/redux/slices/styleStateSlice';
-import { MapLibreEvent } from 'maplibre-gl';
-import { useCallback, useContext, useEffect, useState } from 'react';
-import ImageCarousel from '../display/ImageCarousel';
+import { useContext, useState } from 'react';
+import MapPopupContent from './MapPopupContent';
+import useMapCategories from './useMapCategories';
+import useMapData from './useMapData';
+import useMapEvents from './useMapEvents';
 
 
-const PIN_IMAGE_SIDE = 35;
 const darkMapStyle = "mapStyles/dark-matter-style.json";
 const lightMapStyle = "mapStyles/positron-style.json";
 
@@ -32,7 +32,6 @@ interface MapComponentProps {
     className?: string;
 }
 export default function MapComponent({ className = '' }: MapComponentProps) {
-    const dispatch = useAppDispatch();
     const mapRef = useContext(MapRefContext);
 
     const viewState = useAppSelector(selectViewState);
@@ -44,196 +43,21 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
     const activePlaces = useAppSelector(selectMapActivePlaces);
     const selectedPlace = useAppSelector(selectSelectedPlace);
     const theme = useAppSelector(selectTheme);
+    const isLightTheme = theme === 'light';
 
     const [popupPlace, setPopupPlace] = useState<Place | null>(null);
 
-    const isLightTheme = theme === 'light';
-    const shadowClass = isLightTheme ? 'shadow-light' : 'shadow-dark';
+    useMapData({ area, placeType });
+    useMapCategories({ activeCategories, cachedCategories, selectedPlace, mapData });
 
-    useEffect(() => {
-        dispatch(setActivePlaces([]));
-        dispatch(setActiveCategories([]));
-        dispatch(setCachedCategories([]));
-
-        fetch(`/api/data/places?area=${area.name}&placeType=${placeType.name}`, { cache: 'no-store' })
-            .then(res => res.json())
-            .then(data => organizePlacesIntoCategories(data))
-            .then(placesByCategory => {
-                dispatch(setMapData(placesByCategory))
-                dispatch(setAvailableCategories(Object.keys(placesByCategory)))
-            })
-            .catch((error) => {
-                console.log(error);
-                dispatch(setMapData({}));
-            })
-    }, [area, placeType])
-
-    useEffect(() => {
-        if (activeCategories.length === 0) {
-            dispatch(setSelectedPlace(null));
-            dispatch(setActivePlaces([]));
-            return
-        }
-
-        const unionCategories = activeCategories.filter((category) => category.operation === 'or');
-        const unionedPlacesWithUuids = unionCategories.reduce((acc, category) =>
-            Object.assign(acc, mapData[category.name])
-            , {} as { [uuid: string]: Place });
-
-        const intersectionCategories = activeCategories.filter((category) => category.operation === 'and');
-        const placesByCategory = intersectionCategories.map((category) => mapData[category.name]);
-        const intersectedPlacesWithUuids = placesByCategory.reduce((acc, placesWithUuids, index) => {
-            if (index === 0) return placesWithUuids;
-
-            const newAcc: { [uuid: string]: Place } = {};
-            Object.keys(placesWithUuids).forEach((uuid) => {
-                if (uuid in acc) {
-                    newAcc[uuid] = acc[uuid];
-                }
-            })
-            return newAcc
-        }, {});
-
-        let newActivePlaces: Place[];
-        const emptyUnion = Object.keys(unionedPlacesWithUuids).length === 0;
-        const emptyIntersection = Object.keys(intersectedPlacesWithUuids).length === 0
-        if (emptyUnion) {
-            if (emptyIntersection) {
-                newActivePlaces = [];
-            } else {
-                newActivePlaces = Object.values(intersectedPlacesWithUuids);
-            }
-        } else {
-            if (emptyIntersection) {
-                newActivePlaces = Object.values(unionedPlacesWithUuids);
-            } else {
-                newActivePlaces = getCommonValues(unionedPlacesWithUuids, intersectedPlacesWithUuids)
-            }
-        }
-
-        if (!newActivePlaces.some((place) => place.properties.uuid === selectedPlace?.properties.uuid)) {
-            dispatch(setSelectedPlace(null));
-        }
-        dispatch(setActivePlaces(newActivePlaces));
-    }, [activeCategories])
-
-    useEffect(() => {
-        if (cachedCategories.length === 0) { return }
-        const lastAddedCategory = cachedCategories[cachedCategories.length - 1];
-
-        //TODO: Why not use activePlaces instead and maybe cache already fetched places?
-        //TODO: Refactor (DRY issues)
-        const addedPlaces = Object.values(mapData[lastAddedCategory])
-        addImagesToPlaces(addedPlaces, 'medium')
-            .then((updatedPlacesMedium) => {
-                const updatedRecords: Record<string, Place> = {}
-                updatedPlacesMedium.forEach((place) => {
-                    updatedRecords[place.properties.uuid] = place
-                })
-                dispatch(setMapData((prevData) => ({
-                    ...prevData,
-                    [lastAddedCategory]: updatedRecords
-                })))
-
-                return updatedPlacesMedium
-            })
-            .then((updatedPlacesMedium) => {
-                addImagesToPlaces(updatedPlacesMedium, 'large')
-                    .then((updatedPlacesLarge) => {
-                        const updatedRecords: Record<string, Place> = {}
-                        updatedPlacesLarge.forEach((place) => {
-                            updatedRecords[place.properties.uuid] = place
-                        })
-                        dispatch(setMapData((prevData) => ({
-                            ...prevData,
-                            [lastAddedCategory]: updatedRecords
-                        })))
-                    })
-            })
-    }, [cachedCategories])
-
-    useEffect(() => {
-        if (!mapRef || !mapRef.current) { return };
-        const map = mapRef.current;
-
-        const pinImage = new Image(PIN_IMAGE_SIDE, PIN_IMAGE_SIDE);
-        pinImage.src = STATIC_IMG_ICON_PREFIX + '/' + (isLightTheme ? 'pin-light.png' : 'pin-dark.png');
-        pinImage.onload = () => {
-            if (map.hasImage('pin')) {
-                map.removeImage('pin');
-            }
-            map.addImage('pin', pinImage);
-        };
-    }, [theme]);
-
-    const handleMapMove = useCallback((evt: ViewStateChangeEvent) => {
-        dispatch(setSelectedPlace(null));
-        dispatch(setViewState(evt.viewState));
-    }, []);
-
-    const handleMapLoad = useCallback((e: MapLibreEvent) => {
-        const map = e.target;
-
-        const pinImage = new Image(PIN_IMAGE_SIDE, PIN_IMAGE_SIDE)
-        pinImage.src = STATIC_IMG_ICON_PREFIX + '/' + (isLightTheme ? 'pin-light.png' : 'pin-dark.png');
-        pinImage.onload = () => map.addImage('pin', pinImage);
-    }, [theme]);
-
-    const handleMapMouseEnter = useCallback((e: MapLayerMouseEvent) => {
-        if (!e.features || e.features?.length === 0) {
-            console.error("onMouseEnter triggered with undefined features");
-            return
-        }
-        e.target.getCanvas().style.cursor = 'pointer';
-
-        const feature = e.features[0];
-        const hoveredPlace = mapData[feature.properties.category][feature.properties.uuid];
-        setPopupPlace(hoveredPlace);
-    }, [mapData])
-
-    const handleMapMouseLeave = useCallback((e: MapLayerMouseEvent) => {
-        e.target.getCanvas().style.cursor = '';
-        setPopupPlace(null);
-    }, [])
-
-    const setSelectedPlaceWithAnimation = useCallback((place: Place) => {
-        mapRef?.current?.flyTo({
-            center: [place.properties.longitude, place.properties.latitude],
-            zoom: viewState.zoom,
-            duration: 500,
-            easing: (t: number) => t * (2 - t)
-        })
-
-        setTimeout(() => {
-            dispatch(setSelectedPlace(place));
-            setPopupPlace(null);
-        }, 550)
-        setTimeout(() => {
-            const popupElement = document.getElementById('myPopup');
-            popupElement?.classList.add('popup-slide-away');
-        }, 400);
-    }, [viewState]);
-
-    const handleMapClick = useCallback((e: MapLayerMouseEvent) => {
-        if (!e.features || e.features?.length === 0) {
-            console.error("onClick triggered with undefined features");
-            return
-        }
-
-        const feature = e.features[0];
-        const clickedPlace = mapData[feature.properties.category][feature.properties.uuid];
-
-        setSelectedPlaceWithAnimation(clickedPlace);
-    }, [mapData, setSelectedPlaceWithAnimation])
-
-    const handleClickPopup = useCallback(() => {
-        if (!popupPlace) {
-            console.error("PopupPlace was null when popup clicked");
-            return
-        }
-
-        setSelectedPlaceWithAnimation(popupPlace);
-    }, [popupPlace, setSelectedPlaceWithAnimation]);
+    const {
+        handleMapMove,
+        handleMapLoad,
+        handleMapMouseEnter,
+        handleMapMouseLeave,
+        handleMapClick,
+        handleClickPopup
+    } = useMapEvents({ mapRef, viewState, theme, popupPlace, setPopupPlace, mapData });
 
     return (
         <div id="map-container" className={`${className}`}>
@@ -266,25 +90,12 @@ export default function MapComponent({ className = '' }: MapComponentProps) {
                         offset={30}
                         closeOnClick={false}
                     >
-                        <div id="myPopup"
-                            className={`w-64 h-48 animate-[fadeIn_0.3s_ease-out_none]`}
-                            onClick={handleClickPopup}
-                        >
-                            <div className={`flex flex-col overflow-clip rounded-xl ${shadowClass}`}>
-                                <ImageCarousel
-                                    images={mapData[popupPlace.properties.category][popupPlace.properties.uuid].imagesUrls.medium}
-                                    className={`relative w-64 h-32 ${!isLightTheme && 'brightness-90'}`}
-                                    hasArrows={false}
-                                />
-                                <div className='w-64 h-16 bg-bgColor'>
-                                    <p className="text-left text-lg text-accent px-3 m-0 cursor-pointer">{popupPlace.properties.name}</p>
-                                    <p className='text-left text-base px-3 py-1'>☆☆☆☆☆ {'(0)'}</p>
-                                </div>
-                            </div>
-                            {/* The following should be a transparent buffer that breaches the gap 
-                            between the popup and its anchor for mouseEnter and mouseLeave to work */}
-                            <div className='relative left-1/4 w-32 h-5'></div>
-                        </div>
+                        <MapPopupContent
+                            handleClick={handleClickPopup}
+                            theme={theme}
+                            popupPlace={popupPlace}
+                            mapData={mapData}
+                        />
                     </Popup>
                 )}
             </Map>
