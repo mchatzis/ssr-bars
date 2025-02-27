@@ -1,5 +1,12 @@
 'use client'
 
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle
+} from "@/components/ui/dialog";
 import usePlaceholderFadeIn from '@/lib/hooks/usePlaceholderFadeIn';
 import { getOperationFromButton } from '@/lib/map/helpers';
 import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
@@ -161,65 +168,83 @@ function InputField({ allOptions, placeholder = '', activateClickedCategory }: I
     const [value, setValue] = useState('');
     const [options, setOptions] = useState<string[]>([]);
     const [focused, setFocused] = useState(false);
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
     const placeholderClass = usePlaceholderFadeIn();
 
     const enclosingDivRef = useRef<HTMLDivElement>(null);
     useClickAway(enclosingDivRef, () => {
         setValue('');
         setFocused(false);
-    })
+    });
 
     useEffect(() => {
         let filteredSuggestions = allOptions;
-
         if (value.trim() !== "") {
-            filteredSuggestions = filteredSuggestions.filter(suggestion => {
-                return suggestion.includes(value);
-            });
+            filteredSuggestions = filteredSuggestions.filter(suggestion => suggestion.includes(value));
         }
-
         setOptions(filteredSuggestions);
-    }, [value, allOptions])
+    }, [value, allOptions]);
 
-    const handleFocus = useCallback((e: React.FocusEvent<HTMLInputElement>) => {
+    const handleInputFocus = useCallback((e: React.FocusEvent<HTMLInputElement>) => {
+        const firstVisit = localStorage.getItem('firstVisit');
+        if (firstVisit === null || firstVisit === "true") {
+            localStorage.setItem('firstVisit', 'false');
+            setIsDialogOpen(true);
+            return;
+        }
         e.target.setAttribute('placeholder', '');
         setFocused(true);
     }, []);
 
-    const handleBlur = useCallback((e: React.FocusEvent<HTMLInputElement>) => {
+    const handleInputBlur = useCallback((e: React.FocusEvent<HTMLInputElement>) => {
         e.target.setAttribute('placeholder', placeholder);
     }, [placeholder]);
 
-    const handleClick = useCallback((e: React.MouseEvent, chosenCategory: string) => {
+    const handleDropdownClick = useCallback((e: React.MouseEvent, chosenCategory: string) => {
         e.preventDefault(); // Prevent context menu when right clicking
         setFocused(false);
         activateClickedCategory({ chosenCategory, pressedButton: e.button });
-    }, [activateClickedCategory])
+    }, [activateClickedCategory]);
 
     const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-        const value = e.target.value;
-        setValue(value);
+        setValue(e.target.value);
     }, []);
 
     return (
-        <div ref={enclosingDivRef}>
-            <input
-                className={`h-full w-36 bg-transparent border border-primary rounded-full focus:outline-none
+        <>
+            <div ref={enclosingDivRef}>
+                <input
+                    className={`h-full w-36 bg-transparent border border-primary rounded-full focus:outline-none
                   px-3 py-1 m-3 ${placeholderClass}`}
-                value={value}
-                type="text"
-                placeholder={placeholder}
-                onFocus={handleFocus}
-                onBlur={handleBlur}
-                onChange={handleInputChange}
-            />
-            {focused &&
-                <DropDown
-                    options={options}
-                    onClick={handleClick}
-                    onContextMenu={handleClick}
+                    value={value}
+                    type="text"
+                    placeholder={placeholder}
+                    onFocus={handleInputFocus}
+                    onBlur={handleInputBlur}
+                    onChange={handleInputChange}
                 />
-            }
-        </div>
-    )
+                {focused && (
+                    <DropDown
+                        options={options}
+                        onClick={handleDropdownClick}
+                        onContextMenu={handleDropdownClick}
+                    />
+                )}
+            </div>
+            <Dialog
+                open={isDialogOpen}
+                onOpenChange={setIsDialogOpen}
+            >
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Welcome</DialogTitle>
+                        <DialogDescription>
+                            It seems this is your first time here. Let us give you some usage tips.
+                            ...
+                        </DialogDescription>
+                    </DialogHeader>
+                </DialogContent>
+            </Dialog>
+        </>
+    );
 }
