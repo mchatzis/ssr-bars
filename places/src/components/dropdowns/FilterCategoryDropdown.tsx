@@ -5,8 +5,9 @@ import { getOperationFromButton } from '@/lib/map/helpers';
 import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
 import { FilterOperation, selectAppActiveCategories, selectAppAvailableCategories, selectCachedCategories, setActiveCategories, setCachedCategories } from '@/lib/redux/slices/appStateSlice';
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import useClickAway from 'react-use/lib/useClickAway';
+import { createPortal } from 'react-dom';
 import CategoriesTips from "../dialog/CategoriesTips";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { DropDown } from './DropDown';
 
 
@@ -26,16 +27,16 @@ export default function FilterCategoryDropdown({ className = '' }) {
     }, [activeCategories])
 
     useEffect(() => {
-        const availableMinusActiveMinusCachedCategories = availableCategories
-            .filter((availableCategory) => !activeCategories.some((activeCategory) => activeCategory.name === availableCategory))
-            .filter((category) => !cachedCategories.includes(category));
+        const availableMinusActiveCategories = availableCategories
+            .filter((availableCategory) => !activeCategories.some((activeCategory) => activeCategory.name === availableCategory));
 
-        setAllDropdownOptions(availableMinusActiveMinusCachedCategories);
+        setAllDropdownOptions(availableMinusActiveCategories);
     }, [availableCategories, activeCategories])
 
     const activateClickedCategory =
         useCallback(({ chosenCategory, pressedButton }: { chosenCategory: string, pressedButton: number }) => {
             let operation = getOperationFromButton(pressedButton);
+            console.log("printing", operation)
             if (!operation) { return }
             if (activeCategories.length === 0) {
                 operation = 'or'; // First activated category is always or
@@ -103,7 +104,7 @@ export default function FilterCategoryDropdown({ className = '' }) {
                 placeholder='Categories...'
                 activateClickedCategory={activateClickedCategory}
             />
-            <div className="max-h-[55vh] overflow-scroll">
+            <div className="flex flex-col items-center max-h-[55vh] overflow-y-auto">
                 {categoriesByOperation['or']?.map((category, index) =>
                     <>
                         {categoryButton(category, handleClickActiveCategories)}
@@ -129,7 +130,7 @@ export default function FilterCategoryDropdown({ className = '' }) {
                             <>
                                 {(categoriesByOperation['and'].length > 0 && index === 0) ?
                                     <>
-                                        <hr className='m-3 border border-primary'></hr>
+                                        <hr className='m-3 w-36 border border-primary'></hr>
                                         <p className='text-primary'>AND</p>
                                     </>
                                     : null
@@ -140,7 +141,7 @@ export default function FilterCategoryDropdown({ className = '' }) {
                     }
                 })}
 
-                <hr className='m-3 border border-primary'></hr>
+                <hr className='m-3 w-36 border border-primary'></hr>
                 {recentCategories.map((category) =>
                     categoryButton(category,
                         handleClickRecentCategories,
@@ -166,10 +167,6 @@ function InputField({ allOptions, placeholder = '', activateClickedCategory }: I
     const placeholderClass = usePlaceholderFadeIn();
 
     const enclosingDivRef = useRef<HTMLDivElement>(null);
-    useClickAway(enclosingDivRef, () => {
-        setValue('');
-        setFocused(false);
-    });
 
     useEffect(() => {
         let filteredSuggestions = allOptions;
@@ -196,7 +193,6 @@ function InputField({ allOptions, placeholder = '', activateClickedCategory }: I
 
     const handleDropdownClick = useCallback((e: React.MouseEvent, chosenCategory: string) => {
         e.preventDefault(); // Prevent context menu when right clicking
-        setFocused(false);
         activateClickedCategory({ chosenCategory, pressedButton: e.button });
     }, [activateClickedCategory]);
 
@@ -204,11 +200,16 @@ function InputField({ allOptions, placeholder = '', activateClickedCategory }: I
         setValue(e.target.value);
     }, []);
 
+    const handleClose = () => {
+        setFocused(false);
+        setValue('');
+    };
+
     return (
         <>
             <div ref={enclosingDivRef}>
                 <input
-                    className={`h-full w-36 bg-transparent border border-primary rounded-full focus:outline-none
+                    className={`h-full w-40 bg-transparent border border-primary rounded-full focus:outline-none
                   px-3 py-1 m-3 ${placeholderClass}`}
                     value={value}
                     type="text"
@@ -217,13 +218,38 @@ function InputField({ allOptions, placeholder = '', activateClickedCategory }: I
                     onBlur={handleInputBlur}
                     onChange={handleInputChange}
                 />
-                {focused && (
-                    <DropDown
-                        options={options}
-                        onClick={handleDropdownClick}
-                        onContextMenu={handleDropdownClick}
-                    />
-                )}
+                {focused && createPortal(
+                    <Card
+                        className='fixed w-[50vw] h-[80vh] z-display bg-transparent backdrop-blur-[2px]'
+                        style={{
+                            top: enclosingDivRef.current?.getBoundingClientRect().top - 16 + 'px',
+                            left: enclosingDivRef.current?.getBoundingClientRect().right + 60 + 'px'
+                        }}
+                    >
+                        <CardHeader className='relative'>
+                            <CardTitle>Choose categories</CardTitle>
+                            <CardDescription>You can use both left and right click</CardDescription>
+                            <button onClick={handleClose} className="absolute text-gray-400">
+                                Close
+                            </button>
+                        </CardHeader>
+                        <CardContent className='w-full flex justify-center items-center'>
+                            <div className="grid grid-cols-3 gap-y-6 gap-x-20">
+                                {Array.from({ length: 9 }).map((item, index) => (
+                                    <div>
+                                        <h1>Title {index}</h1>
+                                        <DropDown
+                                            options={options}
+                                            onClick={handleDropdownClick}
+                                            onContextMenu={handleDropdownClick}
+                                            className='w-40 max-h-28 bg-transparent border border-primary border-opacity-35 rounded-xl'
+                                        />
+                                    </div>
+                                ))}
+                            </div>
+                        </CardContent>
+                    </Card>
+                    , document.body)}
             </div>
             <CategoriesTips open={isDialogOpen} onOpenChange={setIsDialogOpen} />
         </>

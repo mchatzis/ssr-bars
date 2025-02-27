@@ -11,3 +11,4 @@ scrap.js
 *.csv
 _ignore*
 /mockData*
+.aider*

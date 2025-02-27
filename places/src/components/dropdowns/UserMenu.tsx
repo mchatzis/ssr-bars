@@ -30,7 +30,7 @@ export default function UserMenu({ className = '', username }: { className: stri
             </p>
             {isHovered &&
                 <div className={`absolute top-full right-0 rounded-md
-                    border border-primary bg-primary/70 p-1 text-background z-[var(--z-popup)]`}>
+                    border border-primary bg-primary/70 p-1 text-background z-popup`}>
                     <ol className="min-w-max list-inside text-start text-base p-2">
                         <li
                             className="cursor-pointer hover:scale-110 duration-200"

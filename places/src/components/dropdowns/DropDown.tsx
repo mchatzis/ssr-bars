@@ -2,10 +2,11 @@ interface DropdownProps {
     options: string[];
     onClick: (e: React.MouseEvent, option: string) => any;
     onContextMenu: (e: React.MouseEvent, option: string) => any;
+    className?: string;
 }
-export function DropDown({ options, onClick, onContextMenu }: DropdownProps) {
+export function DropDown({ options, onClick, onContextMenu, className }: DropdownProps) {
     return (
-        <div className="w-full h-fit max-h-[13vh] relative z-[var(--z-popup)] rounded-xl overflow-y-auto bg-discrete">
+        <div className={`h-fit max-h-[13vh] relative z-popup rounded-xl overflow-y-auto bg-discrete ${className}`}>
             <ul className='w-full h-full text-base text-textColor/90'>
                 {options.map((option, index) => {
                     return (

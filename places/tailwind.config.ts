@@ -62,6 +62,13 @@ const config: Config = {
 				lg: 'var(--radius)',
 				md: 'calc(var(--radius) - 2px)',
 				sm: 'calc(var(--radius) - 4px)'
+			},
+			zIndex: {
+				'map': '10',
+				'controls': '20',
+				'display': '30',
+				'popup': '40',
+				'max': '50',
 			}
 		}
 	},

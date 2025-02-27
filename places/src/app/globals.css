@@ -6,11 +6,6 @@
   :root {
     text-align: center;
     font-size: large;
-    --z-map: 10;
-    --z-controls: 20;
-    --z-display: 30;
-    --z-popup: 40;
-    --z-max: 50;
 
     /* Other light color ideas: */
     /* 159 38 0 */
@@ -101,7 +96,7 @@
 
   ::-webkit-scrollbar-thumb {
     border-radius: 100vh;
-    background: rgb(var(--primary-color))
+    background: hsl(var(--primary) / 0.3)
   }
 
   ::-webkit-scrollbar-thumb:hover {
