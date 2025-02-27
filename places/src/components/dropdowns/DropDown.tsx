@@ -1,5 +1,3 @@
-
-
 interface DropdownProps {
     options: string[];
     onClick: (e: React.MouseEvent, option: string) => any;
