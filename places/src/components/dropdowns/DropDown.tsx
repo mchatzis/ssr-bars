@@ -6,7 +6,7 @@ interface DropdownProps {
 export function DropDown({ options, onClick, onContextMenu }: DropdownProps) {
     return (
         <div className="w-full h-fit max-h-[13vh] relative z-[var(--z-popup)] rounded-xl overflow-y-auto bg-discrete">
-            <ul className='w-full h-full text-base text-white/90'>
+            <ul className='w-full h-full text-base text-textColor/90'>
                 {options.map((option, index) => {
                     return (
                         <li

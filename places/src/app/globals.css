@@ -17,7 +17,7 @@
     /* 89 27 47  */
     /* 110 38 66 dark pink */
 
-    --text-color: 0 0% 0%;
+    --text-color: 0 0% 100%;
     --discrete: 346 100% 20%;
 
     --background: 0 0% 94%;
@@ -84,7 +84,7 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-textColor;
   }
 }
 

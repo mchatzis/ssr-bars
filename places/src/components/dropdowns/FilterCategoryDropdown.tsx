@@ -1,18 +1,12 @@
 'use client'
 
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle
-} from "@/components/ui/dialog";
 import usePlaceholderFadeIn from '@/lib/hooks/usePlaceholderFadeIn';
 import { getOperationFromButton } from '@/lib/map/helpers';
 import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
 import { FilterOperation, selectAppActiveCategories, selectAppAvailableCategories, selectCachedCategories, setActiveCategories, setCachedCategories } from '@/lib/redux/slices/appStateSlice';
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import useClickAway from 'react-use/lib/useClickAway';
+import CategoriesTips from "../dialog/CategoriesTips";
 import { DropDown } from './DropDown';
 
 
@@ -231,20 +225,7 @@ function InputField({ allOptions, placeholder = '', activateClickedCategory }: I
                     />
                 )}
             </div>
-            <Dialog
-                open={isDialogOpen}
-                onOpenChange={setIsDialogOpen}
-            >
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Welcome</DialogTitle>
-                        <DialogDescription>
-                            It seems this is your first time here. Let us give you some usage tips.
-                            ...
-                        </DialogDescription>
-                    </DialogHeader>
-                </DialogContent>
-            </Dialog>
+            <CategoriesTips open={isDialogOpen} onOpenChange={setIsDialogOpen} />
         </>
     );
 }
