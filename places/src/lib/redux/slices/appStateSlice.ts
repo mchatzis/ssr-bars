@@ -36,6 +36,7 @@ export type ActiveCategory = {
     name: string,
     operation: FilterOperation
 };
+
 interface AppState {
     allAreas: Area[],
     area: Area,
@@ -89,32 +90,60 @@ export const getInitialAppState = (): AppState => {
     }
 }
 
+type Updater<T> = T | ((prev: T) => T);
+
 const appStateSlice = createSlice({
     name: 'app',
     initialState: getInitialAppState,
     reducers: {
-        setAllAreas: (state, action: PayloadAction<Area[]>) => {
-            state.allAreas = action.payload;
+        setAllAreas: (state, action: PayloadAction<Updater<Area[]>>) => {
+            if (typeof action.payload === 'function') {
+                state.allAreas = (action.payload as (prev: Area[]) => Area[])(state.allAreas);
+            } else {
+                state.allAreas = action.payload;
+            }
         },
-        setArea: (state, action: PayloadAction<Area>) => {
-            state.area = action.payload;
-            sessionStorage.setItem('area', JSON.stringify(action.payload));
+        setArea: (state, action: PayloadAction<Updater<Area>>) => {
+            const newArea = typeof action.payload === 'function'
+                ? (action.payload as (prev: Area) => Area)(state.area)
+                : action.payload;
+            state.area = newArea;
+            sessionStorage.setItem('area', JSON.stringify(newArea));
         },
-        setAllPlaceTypes: (state, action: PayloadAction<PlaceType[]>) => {
-            state.allPlaceTypes = action.payload;
+        setAllPlaceTypes: (state, action: PayloadAction<Updater<PlaceType[]>>) => {
+            if (typeof action.payload === 'function') {
+                state.allPlaceTypes = (action.payload as (prev: PlaceType[]) => PlaceType[])(state.allPlaceTypes);
+            } else {
+                state.allPlaceTypes = action.payload;
+            }
         },
-        setPlaceType: (state, action: PayloadAction<PlaceType>) => {
-            state.placeType = action.payload;
-            sessionStorage.setItem('placeType', JSON.stringify(action.payload));
+        setPlaceType: (state, action: PayloadAction<Updater<PlaceType>>) => {
+            const newPlaceType = typeof action.payload === 'function'
+                ? (action.payload as (prev: PlaceType) => PlaceType)(state.placeType)
+                : action.payload;
+            state.placeType = newPlaceType;
+            sessionStorage.setItem('placeType', JSON.stringify(newPlaceType));
         },
-        setAvailableCategories: (state, action: PayloadAction<string[]>) => {
-            state.availableCategories = action.payload;
+        setAvailableCategories: (state, action: PayloadAction<Updater<string[]>>) => {
+            if (typeof action.payload === 'function') {
+                state.availableCategories = (action.payload as (prev: string[]) => string[])(state.availableCategories);
+            } else {
+                state.availableCategories = action.payload;
+            }
         },
-        setActiveCategories: (state, action: PayloadAction<ActiveCategory[]>) => {
-            state.activeCategories = action.payload;
+        setActiveCategories: (state, action: PayloadAction<Updater<ActiveCategory[]>>) => {
+            if (typeof action.payload === 'function') {
+                state.activeCategories = (action.payload as (prev: ActiveCategory[]) => ActiveCategory[])(state.activeCategories);
+            } else {
+                state.activeCategories = action.payload;
+            }
         },
-        setCachedCategories: (state, action: PayloadAction<string[]>) => {
-            state.cachedCategories = action.payload;
+        setCachedCategories: (state, action: PayloadAction<Updater<string[]>>) => {
+            if (typeof action.payload === 'function') {
+                state.cachedCategories = (action.payload as (prev: string[]) => string[])(state.cachedCategories);
+            } else {
+                state.cachedCategories = action.payload;
+            }
         }
     }
 })
