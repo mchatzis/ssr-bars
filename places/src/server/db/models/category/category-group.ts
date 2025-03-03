@@ -4,7 +4,7 @@ import { isCategoryGroupEntity } from "@/server/db/type-guards";
 import { CategoryGroupEntity } from "@/server/db/types";
 
 
-type CategoryGroupData = {
+export type CategoryGroupData = {
     group: string;
     categories: string[];
 }

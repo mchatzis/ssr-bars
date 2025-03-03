@@ -22,9 +22,7 @@ export type ActiveCategory = {
 };
 
 export type AppState = {
-    allAreas: Area[],
     area: Area,
-    allPlaceTypes: PlaceType[],
     placeType: PlaceType,
     availableCategories: string[];
     activeCategories: ActiveCategory[];

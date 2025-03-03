@@ -7,6 +7,7 @@ import { getAllPlaceTypes } from "@/server/db/models/place-type/place-type";
 
 
 export default async function LeftSidebar({ className = '' }: { className: string }) {
+    //TODO: Need to handle errors here
     const areas: Area[] = await getAllAreas();
     const placeTypes: PlaceType[] = await getAllPlaceTypes();
 

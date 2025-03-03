@@ -24,6 +24,7 @@ function getInitialResource() {
 
 describe('Database Configuration', () => {
     afterEach(() => {
+        // @ts-ignore
         Resource = getInitialResource();
         vi.unstubAllEnvs();
         vi.resetAllMocks();

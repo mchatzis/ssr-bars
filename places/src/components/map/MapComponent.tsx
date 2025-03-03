@@ -3,6 +3,7 @@
 import 'maplibre-gl/dist/maplibre-gl.css';
 import Map, { Layer, Popup, Source, SymbolLayer } from 'react-map-gl/maplibre';
 
+import useStoredSessionState from '@/hooks/useStoredSessionState';
 import { MapRefContext } from '@/lib/context/mapContext';
 import { to_geojson } from '@/lib/map/helpers';
 import { useAppSelector } from '@/redux/hooks';
@@ -34,6 +35,7 @@ interface MapComponentProps {
 }
 export default function MapComponent({ className = '' }: MapComponentProps) {
     const mapRef = useContext(MapRefContext);
+    useStoredSessionState();
 
     const viewState = useAppSelector(selectViewState);
     const area = useAppSelector(selectArea);

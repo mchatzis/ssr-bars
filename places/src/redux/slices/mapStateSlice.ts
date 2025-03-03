@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import type { RootState } from '../store';
 import { MapState, Place, PlacesApiData, Size, Updater, ViewState } from '../types';
-import { defaultAppState, getInitialAppState } from './appStateSlice';
+import { defaultAppState } from './appStateSlice';
 
 export const ImageSizeOptions: Record<Size, { width: number, height: number }> = {
     small: {
@@ -33,26 +33,9 @@ const defaultMapState: MapState = {
     selectedPlace: null
 }
 
-const getInitialMapState = (): MapState => {
-    if (typeof window === 'undefined') {
-        return defaultMapState;
-    }
-
-    const initialAppState = getInitialAppState();
-
-    return {
-        ...defaultMapState,
-        viewState: {
-            longitude: initialAppState.area.longitude,
-            latitude: initialAppState.area.latitude,
-            zoom: initialAppState.area.initialZoom
-        }
-    }
-}
-
 const mapStateSlice = createSlice({
     name: 'map',
-    initialState: getInitialMapState,
+    initialState: defaultMapState,
     reducers: {
         setViewState: (state, action: PayloadAction<Updater<ViewState>>) => {
             state.viewState = typeof action.payload === 'function'
