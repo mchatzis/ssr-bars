@@ -142,7 +142,7 @@ export default function FilterCategoryDropdown({ className = '' }) {
                     <Card
                         className="fixed w-[50vw] h-[80vh] z-display bg-transparent backdrop-blur-[2px]"
                         style={{
-                            top: categoriesButtonPosition ? categoriesButtonPosition.top - 16 + 'px' : '0px',
+                            top: categoriesButtonPosition ? categoriesButtonPosition.top - 35 + 'px' : '0px',
                             left: categoriesButtonPosition ? categoriesButtonPosition.right + 60 + 'px' : '0px'
                         }}
                     >
@@ -162,7 +162,7 @@ export default function FilterCategoryDropdown({ className = '' }) {
                                             options={allDropdownOptions}
                                             onClick={handleActivateCategory}
                                             onContextMenu={handleActivateCategory}
-                                            className="w-40 max-h-28 bg-transparent border border-primary border-opacity-35 rounded-xl"
+                                            className="w-40 max-h-32 bg-transparent border border-primary border-opacity-35 rounded-xl"
                                         />
                                     </div>
                                 ))}

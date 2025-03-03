@@ -79,3 +79,14 @@ export interface PlaceTypeEntity extends BaseEntity<
     GSI1_PK: Key<KeyEnum.PLACE_TYPE, 'ALL'>,
     GSI1_SK: Key<KeyEnum.METADATA, string>
 }
+
+export interface CategoryGroupEntity extends BaseEntity<
+    Key<
+        Key<KeyEnum.AREA, string>,
+        Key<KeyEnum.PLACE_TYPE, string>
+    >,
+    Key<KeyEnum.CATEGORY_GROUP, string>
+> {
+    group: string;
+    categories: string[];
+}

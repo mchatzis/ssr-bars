@@ -1,5 +1,5 @@
 import { KeyEnum } from './enums';
-import { AreaEntity, BaseEntity, EmailEntity, Key, PlaceOfPlaceTypeInAreaEntity, PlaceTypeEntity, UserEntity, UsernameEntity } from './types';
+import { AreaEntity, BaseEntity, CategoryGroupEntity, EmailEntity, Key, PlaceOfPlaceTypeInAreaEntity, PlaceTypeEntity, UserEntity, UsernameEntity } from './types';
 
 function isValidObject(obj: any) {
     return typeof obj === 'object' && obj !== null
@@ -101,6 +101,18 @@ export function isPlaceOfPlaceTypeInAreaEntity(obj: any): obj is PlaceOfPlaceTyp
         typeof obj.description === "string" &&
         typeof obj.primaryImage === "string" &&
         Array.isArray(obj.images) && obj.images.every((image: any) => typeof image === "string") &&
+        isBaseEntity(obj)
+    );
+}
+
+export function isCategoryGroupEntity(obj: any): obj is CategoryGroupEntity {
+    return (
+        isValidObject(obj) &&
+        obj.PK.startsWith(`${KeyEnum.AREA}#`) &&
+        obj.SK.startsWith(`${KeyEnum.CATEGORY_GROUP}#`) &&
+        typeof obj.group === "string" &&
+        Array.isArray(obj.categories) &&
+        obj.categories.every((category: any) => typeof category === "string") &&
         isBaseEntity(obj)
     );
 }

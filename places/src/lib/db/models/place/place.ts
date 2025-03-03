@@ -5,9 +5,7 @@ import { isPlaceOfPlaceTypeInAreaEntity } from "../../type-guards";
 export async function getAllPlaces(area: string, placeType: string) {
     const db = Database.getInstance();
 
-    const placesKey: Pick<PlaceOfPlaceTypeInAreaEntity, 'PK'> = {
-        PK: `AREA#${area}#PLACE_TYPE#${placeType}`,
-    }
+    const placesKey: PlaceOfPlaceTypeInAreaEntity["PK"] = `AREA#${area}#PLACE_TYPE#${placeType}`;
 
     const placeItems = await db.query({
         KeyConditionExpression: "#pk = :pkValue",
@@ -15,7 +13,7 @@ export async function getAllPlaces(area: string, placeType: string) {
             "#pk": "PK",
         },
         ExpressionAttributeValues: {
-            ":pkValue": placesKey.PK
+            ":pkValue": placesKey
         }
     })
 

@@ -6,5 +6,6 @@ export enum KeyEnum {
     PLACE = 'PLACE',
     PLACE_TYPE = 'PLACE_TYPE',
     CATEGORY = 'CATEGORY',
+    CATEGORY_GROUP = 'CATEGORY_GROUP',
     METADATA = 'METADATA',
 }

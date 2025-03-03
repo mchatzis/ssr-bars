@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { KeyEnum } from './enums';
-import { isAreaEntity, isBaseEntity, isEmailEntity, isPlaceOfPlaceTypeInAreaEntity, isPlaceTypeEntity, isUserEntity, isUsernameEntity } from './type-guards';
+import { isAreaEntity, isBaseEntity, isCategoryGroupEntity, isEmailEntity, isPlaceOfPlaceTypeInAreaEntity, isPlaceTypeEntity, isUserEntity, isUsernameEntity } from './type-guards';
 
 const validUserEntity = {
     PK: `${KeyEnum.USER}#123`,
@@ -72,6 +72,15 @@ const validPlaceOfPlaceTypeInAreaEntity = {
     primaryImage: "primaryImage.png",
     uuid: "83ea09c4-6110-410a-8489-4af4f289e6b9"
 }
+
+const validCategoryGroupEntity = {
+    PK: `${KeyEnum.AREA}#MyArea#${KeyEnum.PLACE_TYPE}#bar`,
+    SK: `${KeyEnum.CATEGORY_GROUP}#myGroup`,
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+    group: "myGroup",
+    categories: ["category1", "category2"]
+};
 
 describe('Type Guards', () => {
     it('validates BaseEntity', () => {
@@ -147,4 +156,20 @@ describe('Type Guards', () => {
             })
         ).toBe(false);
     })
+
+    it('validates CategoryGroupEntity', () => {
+        expect(isCategoryGroupEntity(validCategoryGroupEntity)).toBe(true);
+        expect(
+            isCategoryGroupEntity({
+                ...validCategoryGroupEntity,
+                PK: `${KeyEnum.EMAIL}#789`
+            })
+        ).toBe(false);
+        expect(
+            isCategoryGroupEntity({
+                ...validCategoryGroupEntity,
+                categories: ["valid", 123]
+            })
+        ).toBe(false);
+    });
 });
