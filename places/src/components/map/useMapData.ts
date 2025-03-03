@@ -31,5 +31,12 @@ export default function useMapData({ area, placeType }: useMapDataProps) {
                 console.log(error);
                 dispatch(setMapData({}));
             })
+
+        fetch(`/api/data/category/groups?area=${area.name}&placeType=${placeType.name}`, { cache: 'no-store' })
+            .then(res => res.json())
+            .then(data => dispatch(setCategoryGroups(data)))
+            .catch((error) => {
+                console.log(error);
+            })
     }, [area, placeType])
 }

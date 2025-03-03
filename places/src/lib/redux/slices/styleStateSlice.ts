@@ -1,15 +1,8 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import type { RootState } from '../store';
+import { isValidTheme, StyleState, Theme } from '../types';
 
-export type Theme = 'light' | 'dark';
 const defaultTheme = 'light';
-function isValidTheme(theme: string): theme is Theme {
-    return theme === 'light' || theme === 'dark';
-}
-
-interface StyleState {
-    theme: Theme;
-}
 
 function getInitialTheme(): Theme {
     const savedTheme = sessionStorage.getItem('theme');

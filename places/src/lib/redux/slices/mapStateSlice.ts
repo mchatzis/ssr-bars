@@ -1,8 +1,8 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import type { RootState } from '../store';
+import { MapState, Place, PlacesApiData, Size, Updater, ViewState } from '../types';
 import { defaultAppState, getInitialAppState } from './appStateSlice';
 
-type Size = 'small' | 'medium' | 'large';
 export const ImageSizeOptions: Record<Size, { width: number, height: number }> = {
     small: {
         width: 100,
@@ -18,80 +18,7 @@ export const ImageSizeOptions: Record<Size, { width: number, height: number }> =
     }
 } as const;
 
-export type Place = {
-    properties: {
-        uuid: string,
-        name: string,
-        longitude: number,
-        latitude: number,
-        category: string,
-        categories: string[],
-        area: string,
-        description: string,
-        primaryImage: string,
-        images: string[]
-    };
-    imagesUrls: {
-        small: string[],
-        medium: string[],
-        large: string[],
-    }
-}
 
-export function isPlace(obj: any): obj is Place {
-    return (
-        typeof obj === 'object' && obj !== null &&
-        typeof obj.properties === 'object' &&
-        obj.properties !== null &&
-        typeof obj.properties.uuid === 'string' &&
-        typeof obj.properties.category === 'string' &&
-        typeof obj.properties.longitude === 'number' &&
-        typeof obj.properties.latitude === 'number' &&
-        typeof obj.properties.name === 'string' &&
-        typeof obj.properties.area === 'string' &&
-        typeof obj.properties.description === 'string' &&
-        typeof obj.properties.primaryImage === 'string' &&
-        Array.isArray(obj.properties.images) &&
-        obj.properties.images.every((image: any) => typeof image === 'string') &&
-        typeof obj.imagesUrls === 'object' &&
-        obj.imagesUrls !== null &&
-        Array.isArray(obj.imagesUrls.small) &&
-        obj.imagesUrls.small.every((url: any) => typeof url === 'string') &&
-        Array.isArray(obj.imagesUrls.medium) &&
-        obj.imagesUrls.medium.every((url: any) => typeof url === 'string') &&
-        Array.isArray(obj.imagesUrls.large) &&
-        obj.imagesUrls.large.every((url: any) => typeof url === 'string')
-    );
-}
-
-interface ViewState {
-    longitude: number,
-    latitude: number,
-    zoom: number
-}
-export function isViewState(obj: any): obj is ViewState {
-    return (
-        typeof obj === "object" && obj !== null &&
-        typeof obj.longitude === "number" &&
-        typeof obj.latitude === "number" &&
-        typeof obj.zoom === "number"
-    );
-}
-
-export type PlacesApiData = {
-    [category: string]: {
-        [uuid: string]: Place
-    }
-}
-
-interface MapState {
-    viewState: ViewState;
-    data: PlacesApiData;
-    activePlaces: Place[];
-    selectedPlace: Place | null;
-}
-
-// Vienna coordinates
 const initialData = {};
 const initialActivePlaces: Place[] = [];
 
@@ -122,8 +49,6 @@ const getInitialMapState = (): MapState => {
         }
     }
 }
-
-type Updater<T> = T | ((prev: T) => T);
 
 const mapStateSlice = createSlice({
     name: 'map',

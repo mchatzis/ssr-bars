@@ -1,9 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import type { RootState } from '../store';
-
-interface UserState {
-    hasVisited: boolean;
-}
+import { UserState } from '../types';
 
 const initialState: UserState = {
     hasVisited: false,

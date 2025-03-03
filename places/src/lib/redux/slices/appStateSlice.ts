@@ -1,51 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import type { RootState } from '../store';
-
-export type Area = {
-    name: string,
-    longitude: number,
-    latitude: number,
-    initialZoom: number
-}
-export function isArea(obj: any): obj is Area {
-    return (
-        typeof obj === "object" && obj !== null &&
-        typeof obj.name === "string" &&
-        typeof obj.longitude === "number" &&
-        typeof obj.latitude === "number" &&
-        typeof obj.initialZoom === "number"
-    );
-}
-
-export type PlaceType = {
-    name: string
-}
-export function isPlaceType(obj: any): obj is PlaceType {
-    return (
-        typeof obj === "object" && obj !== null &&
-        typeof obj.name === "string"
-    );
-}
-
-export const Operations = {
-    intersection: 'and',
-    union: 'or'
-} as const;
-export type FilterOperation = typeof Operations[keyof typeof Operations];
-export type ActiveCategory = {
-    name: string,
-    operation: FilterOperation
-};
-
-interface AppState {
-    allAreas: Area[],
-    area: Area,
-    allPlaceTypes: PlaceType[],
-    placeType: PlaceType,
-    availableCategories: string[];
-    activeCategories: ActiveCategory[];
-    cachedCategories: string[];
-}
+import { ActiveCategory, AppState, Area, isArea, isPlaceType, PlaceType, Updater } from '../types';
 
 export const defaultAppState: AppState = {
     allAreas: [],
@@ -89,8 +44,6 @@ export const getInitialAppState = (): AppState => {
         placeType: storedPlaceType
     }
 }
-
-type Updater<T> = T | ((prev: T) => T);
 
 const appStateSlice = createSlice({
     name: 'app',
