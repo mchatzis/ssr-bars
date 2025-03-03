@@ -1,4 +1,4 @@
-import { STATIC_IMG_ICON_PREFIX } from '@/lib/constants';
+import { STATIC_IMG_ICON_PREFIX } from '@/server/constants';
 import { useCallback, useState } from 'react';
 
 const ImageCarousel = ({ className = '', images, hasArrows = true }: { className: string, images: string[], hasArrows?: boolean }) => {

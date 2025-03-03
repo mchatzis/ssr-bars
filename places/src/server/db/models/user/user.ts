@@ -1,7 +1,7 @@
-import { Database, TransactWriteItemNoTableName } from "@/lib/db/Database";
-import { EmailEntityError } from "@/lib/db/type-guard-errors";
-import { isEmailEntity, isUserEntity } from "@/lib/db/type-guards";
-import { EmailEntity, UserEntity, UsernameEntity } from "@/lib/db/types";
+import { Database, TransactWriteItemNoTableName } from "@/server/db/database";
+import { EmailEntityError } from "@/server/db/type-guard-errors";
+import { isEmailEntity, isUserEntity } from "@/server/db/type-guards";
+import { EmailEntity, UserEntity, UsernameEntity } from "@/server/db/types";
 import { TransactionCanceledException } from "@aws-sdk/client-dynamodb";
 import crypto from "crypto";
 import { ulid } from "ulid";

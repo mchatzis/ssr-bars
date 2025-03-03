@@ -1,4 +1,4 @@
-import { getCategoryGroups } from "@/lib/db/models/category/category-group";
+import { getCategoryGroups } from "@/server/db/models/category/category-group";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {

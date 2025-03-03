@@ -2,7 +2,8 @@
 
 import { getOperationFromButton } from '@/lib/map/helpers';
 import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
-import { FilterOperation, selectAppActiveCategories, selectAppAvailableCategories, selectCachedCategories, setActiveCategories, setCachedCategories } from '@/lib/redux/slices/appStateSlice';
+import { selectAppActiveCategories, selectAppAvailableCategories, selectCachedCategories, setActiveCategories, setCachedCategories } from '@/lib/redux/slices/appStateSlice';
+import { FilterOperation } from '@/lib/redux/types';
 import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from 'react-dom';
 import CategoriesTips from "../dialog/CategoriesTips";

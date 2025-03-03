@@ -1,6 +1,5 @@
 import ImageCarousel from "@/components/display/ImageCarousel";
-import { Place, PlacesApiData } from "@/lib/redux/slices/mapStateSlice";
-import { Theme } from "@/lib/redux/slices/styleStateSlice";
+import { Place, PlacesApiData, Theme } from "@/lib/redux/types";
 
 interface MapPopupContentProps {
     handleClick: () => void;

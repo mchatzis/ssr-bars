@@ -1,6 +1,6 @@
-import { Database } from "@/lib/db/Database";
-import { isAreaEntity } from "@/lib/db/type-guards";
-import { AreaEntity } from "@/lib/db/types";
+import { Database } from "@/server/db/database";
+import { isAreaEntity } from "@/server/db/type-guards";
+import { AreaEntity } from "@/server/db/types";
 
 export async function getAllAreas() {
     const db = Database.getInstance();

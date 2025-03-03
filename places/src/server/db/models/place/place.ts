@@ -1,5 +1,5 @@
-import { Database } from "@/lib/db/Database";
-import { PlaceOfPlaceTypeInAreaEntity } from "@/lib/db/types";
+import { Database } from "@/server/db/database";
+import { PlaceOfPlaceTypeInAreaEntity } from "@/server/db/types";
 import { isPlaceOfPlaceTypeInAreaEntity } from "../../type-guards";
 
 export async function getAllPlaces(area: string, placeType: string) {

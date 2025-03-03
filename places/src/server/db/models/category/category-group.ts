@@ -1,7 +1,7 @@
-import { Database } from "@/lib/db/Database";
-import { KeyEnum } from "@/lib/db/enums";
-import { isCategoryGroupEntity } from "@/lib/db/type-guards";
-import { CategoryGroupEntity } from "@/lib/db/types";
+import { Database } from "@/server/db/database";
+import { KeyEnum } from "@/server/db/enums";
+import { isCategoryGroupEntity } from "@/server/db/type-guards";
+import { CategoryGroupEntity } from "@/server/db/types";
 
 
 type CategoryGroupData = {

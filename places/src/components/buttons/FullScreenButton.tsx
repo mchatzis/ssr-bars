@@ -1,6 +1,6 @@
 'use client'
 
-import { STATIC_IMG_ICON_PREFIX } from '@/lib/constants';
+import { STATIC_IMG_ICON_PREFIX } from '@/server/constants';
 import { useCallback, useEffect, useState } from 'react';
 
 export default function FullscreenToggle({ className = '', hasMounted }: { className: string, hasMounted: boolean }) {

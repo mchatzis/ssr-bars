@@ -1,4 +1,4 @@
-import { Place } from "@/lib/redux/slices/mapStateSlice";
+import { Place } from "@/lib/redux/types";
 import { useCallback } from "react";
 
 function createUrl(name: string, city: string) {

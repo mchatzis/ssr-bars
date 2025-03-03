@@ -4,8 +4,9 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 
 import { organizePlacesIntoCategories } from '@/lib/map/helpers';
 import { useAppDispatch } from '@/lib/redux/hooks';
-import { Area, PlaceType, setActiveCategories, setAvailableCategories, setCachedCategories } from '@/lib/redux/slices/appStateSlice';
+import { setActiveCategories, setAvailableCategories, setCachedCategories } from '@/lib/redux/slices/appStateSlice';
 import { setActivePlaces, setMapData } from '@/lib/redux/slices/mapStateSlice';
+import { Area, PlaceType } from '@/lib/redux/types';
 import { useEffect } from 'react';
 
 interface useMapDataProps {

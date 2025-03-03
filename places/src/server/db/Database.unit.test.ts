@@ -3,8 +3,8 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
-import { Database } from './Database';
 import { getDatabaseConfig } from "./config";
+import { Database } from './database';
 
 
 vi.mock('./config');

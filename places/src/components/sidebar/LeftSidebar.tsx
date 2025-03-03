@@ -1,9 +1,9 @@
 import MapControlsComponent from "@/components/controls/MapControlsComponent";
 import DoubleInputSearch from "@/components/dropdowns/DoubleInputSearch";
 import FilterCategoryDropdown from "@/components/dropdowns/FilterCategoryDropdown";
-import { getAllAreas } from "@/lib/db/models/area/area";
-import { getAllPlaceTypes } from "@/lib/db/models/place-type/place-type";
-import { Area, PlaceType } from "@/lib/redux/slices/appStateSlice";
+import { Area, PlaceType } from "@/lib/redux/types";
+import { getAllAreas } from "@/server/db/models/area/area";
+import { getAllPlaceTypes } from "@/server/db/models/place-type/place-type";
 
 
 export default async function LeftSidebar({ className = '' }: { className: string }) {

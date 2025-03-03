@@ -3,7 +3,7 @@
 import { TransactionCanceledException } from "@aws-sdk/client-dynamodb";
 import { ulid } from "ulid";
 import { beforeAll, describe, expect, it } from 'vitest';
-import { Database, TransactWriteItemNoTableName } from './Database';
+import { Database, TransactWriteItemNoTableName } from './database';
 import { KeyEnum } from "./enums";
 import { BaseEntity, Key } from "./types";
 

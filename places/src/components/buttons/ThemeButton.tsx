@@ -1,8 +1,8 @@
 'use client'
 
-import { STATIC_IMG_ICON_PREFIX } from "@/lib/constants";
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 import { selectTheme, setTheme, toggleTheme } from "@/lib/redux/slices/styleStateSlice";
+import { STATIC_IMG_ICON_PREFIX } from "@/server/constants";
 import { useEffect } from "react";
 
 export default function ThemeButton({ className = '', hasMounted }: { className: string, hasMounted: boolean }) {

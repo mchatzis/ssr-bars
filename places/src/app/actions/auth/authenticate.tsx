@@ -3,8 +3,8 @@
 import { LoginFormSchema, SignupFormSchema } from "@/app/actions/auth/schema";
 import { LoginFormState } from "@/components/auth/LoginForm";
 import { RegisterFormState } from "@/components/auth/RegisterForm";
-import { createUser, CreateUserInput, EmailDoesNotExistError, EmailExistsError, getUserByCredentials, GetUserInput, UsernameExistsError, WrongPasswordError } from "@/lib/db/models/user/user";
-import { createSession } from "@/lib/session/session";
+import { createUser, CreateUserInput, EmailDoesNotExistError, EmailExistsError, getUserByCredentials, GetUserInput, UsernameExistsError, WrongPasswordError } from "@/server/db/models/user/user";
+import { createSession } from "@/server/session/session";
 import { redirect } from "next/navigation";
 
 export async function register(state: RegisterFormState, formData: FormData): Promise<RegisterFormState> {

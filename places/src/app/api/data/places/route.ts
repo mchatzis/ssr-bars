@@ -1,4 +1,4 @@
-import { getAllPlaces } from "@/lib/db/models/place/place";
+import { getAllPlaces } from "@/server/db/models/place/place";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {

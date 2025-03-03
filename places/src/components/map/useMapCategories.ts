@@ -4,8 +4,8 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 
 import { addImagesToPlaces, getCommonValues } from '@/lib/map/helpers';
 import { useAppDispatch } from '@/lib/redux/hooks';
-import { ActiveCategory } from '@/lib/redux/slices/appStateSlice';
-import { Place, PlacesApiData, setActivePlaces, setMapData, setSelectedPlace } from '@/lib/redux/slices/mapStateSlice';
+import { setActivePlaces, setMapData, setSelectedPlace } from '@/lib/redux/slices/mapStateSlice';
+import { ActiveCategory, Place, PlacesApiData, } from '@/lib/redux/types';
 import { useEffect } from 'react';
 
 interface useMapCategoriesProps {

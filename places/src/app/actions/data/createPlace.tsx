@@ -1,8 +1,8 @@
 'use server'
 
 import { PlaceCreationFormState } from "@/app/data/page";
-import { Database } from "@/lib/db/Database";
-import { PlaceOfPlaceTypeInAreaEntity } from "@/lib/db/types";
+import { Database } from "@/server/db/database";
+import { PlaceOfPlaceTypeInAreaEntity } from "@/server/db/types";
 import { randomUUID } from "crypto";
 import { Resource } from "sst";
 import placeCreationFormSchema from "./schema";

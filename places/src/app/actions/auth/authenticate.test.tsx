@@ -3,8 +3,8 @@
 import { LoginFormSchema, SignupFormSchema } from "@/app/actions/auth/schema";
 import { LoginFormState } from "@/components/auth/LoginForm";
 import { RegisterFormState } from "@/components/auth/RegisterForm";
-import { createUser, EmailDoesNotExistError, EmailExistsError, getUserByCredentials, UsernameExistsError, WrongPasswordError } from "@/lib/db/models/user/user";
-import { createSession } from "@/lib/session/session";
+import { createUser, EmailDoesNotExistError, EmailExistsError, getUserByCredentials, UsernameExistsError, WrongPasswordError } from "@/server/db/models/user/user";
+import { createSession } from "@/server/session/session";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { beforeEach, describe, expect, it, Mock, vi } from "vitest";
@@ -24,7 +24,7 @@ vi.mock('@/app/actions/auth/schema', () => ({
         safeParse: vi.fn()
     }
 }));
-vi.mock(import("@/lib/db/models/user/user"), async (importOriginal) => {
+vi.mock(import("@/server/db/models/user/user"), async (importOriginal) => {
     const actual = await importOriginal()
     return {
         ...actual,
@@ -32,7 +32,7 @@ vi.mock(import("@/lib/db/models/user/user"), async (importOriginal) => {
         getUserByCredentials: vi.fn()
     }
 });
-vi.mock("@/lib/session/session", () => ({
+vi.mock("@/server/session/session", () => ({
     createSession: vi.fn(),
 }));
 vi.mock('next/headers');

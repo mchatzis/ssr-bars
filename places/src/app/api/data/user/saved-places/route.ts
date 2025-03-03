@@ -1,5 +1,5 @@
-import { getUserById } from "@/lib/db/models/user/user";
-import { verifySession } from "@/lib/session/session";
+import { getUserById } from "@/server/db/models/user/user";
+import { verifySession } from "@/server/session/session";
 import { NextResponse } from "next/server";
 
 export async function GET() {

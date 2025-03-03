@@ -1,4 +1,4 @@
-import { SESSION_EXPIRE_IN_SECONDS } from '@/lib/constants';
+import { SESSION_EXPIRE_IN_SECONDS } from '@/server/constants';
 import { jwtVerify, SignJWT } from 'jose';
 import { cookies } from 'next/headers';
 import { cache } from 'react';

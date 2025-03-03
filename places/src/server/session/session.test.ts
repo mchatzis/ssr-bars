@@ -14,7 +14,7 @@ vi.mock('sst', () => ({
         }
     }
 }));
-vi.mock('@/lib/constants', () => ({
+vi.mock('@/server/constants', () => ({
     SESSION_EXPIRE_IN_SECONDS: 60
 }));
 vi.mock('react', () => ({

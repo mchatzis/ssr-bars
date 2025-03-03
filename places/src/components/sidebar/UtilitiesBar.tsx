@@ -1,7 +1,7 @@
 import HelpButton from "@/components/buttons/HelpButton";
 import LoginButton from "@/components/buttons/LoginButton";
 import UserMenu from "@/components/dropdowns/UserMenu";
-import { isSessionPayload, SessionPayload } from "@/lib/session/types";
+import { isSessionPayload, SessionPayload } from "@/server/session/types";
 import { decodeJwt } from 'jose';
 import { cookies } from "next/headers";
 

@@ -1,4 +1,4 @@
-import { Database } from "@/lib/db/Database";
+import { Database } from "@/server/db/database";
 import { loadEnvConfig } from '@next/env';
 
 export default async () => {

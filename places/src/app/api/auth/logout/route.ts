@@ -1,4 +1,4 @@
-import { destroySession } from "@/lib/session/session";
+import { destroySession } from "@/server/session/session";
 
 export async function POST() {
     await destroySession();

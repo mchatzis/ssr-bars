@@ -1,6 +1,6 @@
-import { Database } from "@/lib/db/Database";
-import { isPlaceTypeEntity } from "@/lib/db/type-guards";
-import { PlaceTypeEntity } from "@/lib/db/types";
+import { Database } from "@/server/db/database";
+import { isPlaceTypeEntity } from "@/server/db/type-guards";
+import { PlaceTypeEntity } from "@/server/db/types";
 
 export async function getAllPlaceTypes() {
     const db = Database.getInstance();

@@ -3,10 +3,10 @@
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { MapLayerMouseEvent, MapRef, ViewState, ViewStateChangeEvent } from 'react-map-gl/maplibre';
 
-import { STATIC_IMG_ICON_PREFIX } from '@/lib/constants';
 import { useAppDispatch } from '@/lib/redux/hooks';
-import { Place, PlacesApiData, setSelectedPlace, setViewState } from '@/lib/redux/slices/mapStateSlice';
-import { Theme } from '@/lib/redux/slices/styleStateSlice';
+import { setSelectedPlace, setViewState } from '@/lib/redux/slices/mapStateSlice';
+import { Place, PlacesApiData, Theme } from '@/lib/redux/types';
+import { STATIC_IMG_ICON_PREFIX } from '@/server/constants';
 import { MapLibreEvent } from 'maplibre-gl';
 import { Dispatch, RefObject, SetStateAction, useCallback, useEffect } from 'react';
 
