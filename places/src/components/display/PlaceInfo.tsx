@@ -1,4 +1,4 @@
-import { Place } from "@/lib/redux/types";
+import { Place } from "@/redux/types";
 
 export default function PlaceInfo({ selectedPlace, className = '' }: { selectedPlace: Place, className?: string }) {
     const categories = selectedPlace.properties.categories;

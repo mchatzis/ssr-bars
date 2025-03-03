@@ -1,7 +1,7 @@
 'use client'
 
-import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
-import { selectTheme, setTheme, toggleTheme } from "@/lib/redux/slices/styleStateSlice";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { selectTheme, setTheme, toggleTheme } from "@/redux/slices/styleStateSlice";
 import { STATIC_IMG_ICON_PREFIX } from "@/server/constants";
 import { useEffect } from "react";
 

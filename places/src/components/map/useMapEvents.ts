@@ -3,9 +3,9 @@
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { MapLayerMouseEvent, MapRef, ViewState, ViewStateChangeEvent } from 'react-map-gl/maplibre';
 
-import { useAppDispatch } from '@/lib/redux/hooks';
-import { setSelectedPlace, setViewState } from '@/lib/redux/slices/mapStateSlice';
-import { Place, PlacesApiData, Theme } from '@/lib/redux/types';
+import { useAppDispatch } from '@/redux/hooks';
+import { setSelectedPlace, setViewState } from '@/redux/slices/mapStateSlice';
+import { Place, PlacesApiData, Theme } from '@/redux/types';
 import { STATIC_IMG_ICON_PREFIX } from '@/server/constants';
 import { MapLibreEvent } from 'maplibre-gl';
 import { Dispatch, RefObject, SetStateAction, useCallback, useEffect } from 'react';

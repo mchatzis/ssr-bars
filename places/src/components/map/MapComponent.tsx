@@ -5,11 +5,11 @@ import Map, { Layer, Popup, Source, SymbolLayer } from 'react-map-gl/maplibre';
 
 import { MapRefContext } from '@/lib/context/mapContext';
 import { to_geojson } from '@/lib/map/helpers';
-import { useAppSelector } from '@/lib/redux/hooks';
-import { selectAppActiveCategories, selectArea, selectCachedCategories, selectPlaceType } from '@/lib/redux/slices/appStateSlice';
-import { selectMapActivePlaces, selectMapData, selectSelectedPlace, selectViewState } from '@/lib/redux/slices/mapStateSlice';
-import { selectTheme } from '@/lib/redux/slices/styleStateSlice';
-import { Place } from '@/lib/redux/types';
+import { useAppSelector } from '@/redux/hooks';
+import { selectAppActiveCategories, selectArea, selectCachedCategories, selectPlaceType } from '@/redux/slices/appStateSlice';
+import { selectMapActivePlaces, selectMapData, selectSelectedPlace, selectViewState } from '@/redux/slices/mapStateSlice';
+import { selectTheme } from '@/redux/slices/styleStateSlice';
+import { Place } from '@/redux/types';
 import { useContext, useState } from 'react';
 import MapPopupContent from './MapPopupContent';
 import useMapCategories from './useMapCategories';

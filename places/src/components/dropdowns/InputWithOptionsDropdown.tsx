@@ -1,7 +1,7 @@
 'use client'
 
 import { DropDown } from "@/components/dropdowns/DropDown";
-import usePlaceholderFadeIn from "@/lib/hooks/usePlaceholderFadeIn";
+import usePlaceholderFadeIn from "@/hooks/usePlaceholderFadeIn";
 import { Dispatch, SetStateAction, useCallback, useEffect, useRef, useState } from "react";
 import { useClickAway } from "react-use";
 

@@ -1,7 +1,7 @@
 import MapControlsComponent from "@/components/controls/MapControlsComponent";
 import DoubleInputSearch from "@/components/dropdowns/DoubleInputSearch";
 import FilterCategoryDropdown from "@/components/dropdowns/FilterCategoryDropdown";
-import { Area, PlaceType } from "@/lib/redux/types";
+import { Area, PlaceType } from "@/redux/types";
 import { getAllAreas } from "@/server/db/models/area/area";
 import { getAllPlaceTypes } from "@/server/db/models/place-type/place-type";
 

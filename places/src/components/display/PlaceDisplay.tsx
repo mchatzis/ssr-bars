@@ -1,8 +1,8 @@
 'use client'
 
-import { useAppSelector } from "@/lib/redux/hooks";
-import { selectMapData, selectSelectedPlace } from "@/lib/redux/slices/mapStateSlice";
-import { selectTheme } from "@/lib/redux/slices/styleStateSlice";
+import { useAppSelector } from "@/redux/hooks";
+import { selectMapData, selectSelectedPlace } from "@/redux/slices/mapStateSlice";
+import { selectTheme } from "@/redux/slices/styleStateSlice";
 import DirectionsBox from "../buttons/DirectionsButton";
 import ImageCarousel from "./ImageCarousel";
 import PlaceInfo from "./PlaceInfo";

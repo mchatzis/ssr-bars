@@ -1,9 +1,9 @@
 'use client'
 
 import { getOperationFromButton } from '@/lib/map/helpers';
-import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
-import { selectAppActiveCategories, selectAppAvailableCategories, selectCachedCategories, setActiveCategories, setCachedCategories } from '@/lib/redux/slices/appStateSlice';
-import { FilterOperation } from '@/lib/redux/types';
+import { useAppDispatch, useAppSelector } from '@/redux/hooks';
+import { selectAppActiveCategories, selectAppAvailableCategories, selectCachedCategories, setActiveCategories, setCachedCategories } from '@/redux/slices/appStateSlice';
+import { FilterOperation } from '@/redux/types';
 import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from 'react-dom';
 import CategoriesTips from "../dialog/CategoriesTips";
