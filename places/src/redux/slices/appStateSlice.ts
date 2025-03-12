@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import type { RootState } from '../store';
-import { ActiveCategory, AppState, Area, PlaceType, Updater } from '../types';
+import { ActiveCategory, AppState, Area, CategoryGroups, PlaceType } from '../types';
 
 export const defaultAppState: AppState = {
     area: {
@@ -14,6 +14,7 @@ export const defaultAppState: AppState = {
     },
     availableCategories: [],
     activeCategories: [],
+    cachedCategories: [],
     cachedCategories: []
 }
 
@@ -21,33 +22,38 @@ const appStateSlice = createSlice({
     name: 'app',
     initialState: defaultAppState,
     reducers: {
-        setArea: (state, action: PayloadAction<Updater<Area>>) => {
-            const newArea = typeof action.payload === 'function'
-                ? (action.payload as (prev: Area) => Area)(state.area)
-                : action.payload;
-            state.area = newArea;
-            localStorage.setItem('area', JSON.stringify(newArea));
+        setArea(state, action: PayloadAction<Area>) {
+            state.area = action.payload;
+            localStorage.setItem('area', JSON.stringify(action.payload));
         },
-        setPlaceType: (state, action: PayloadAction<Updater<PlaceType>>) => {
-            const newPlaceType = typeof action.payload === 'function'
-                ? (action.payload as (prev: PlaceType) => PlaceType)(state.placeType)
-                : action.payload;
-            state.placeType = newPlaceType;
-            localStorage.setItem('placeType', JSON.stringify(newPlaceType));
+        setPlaceType(state, action: PayloadAction<PlaceType>) {
+            state.placeType = action.payload;
+            localStorage.setItem('placeType', JSON.stringify(action.payload));
         },
-        setAvailableCategories: (state, action: PayloadAction<Updater<string[]>>) => {
-            if (typeof action.payload === 'function') {
-                state.availableCategories = (action.payload as (prev: string[]) => string[])(state.availableCategories);
-            } else {
-                state.availableCategories = action.payload;
-            }
+        setAvailableCategories(state, action: PayloadAction<string[]>) {
+            state.availableCategories = action.payload;
         },
-        setActiveCategories: (state, action: PayloadAction<Updater<ActiveCategory[]>>) => {
-            if (typeof action.payload === 'function') {
-                state.activeCategories = (action.payload as (prev: ActiveCategory[]) => ActiveCategory[])(state.activeCategories);
-            } else {
-                state.activeCategories = action.payload;
-            }
+        setActiveCategories(state, action: PayloadAction<ActiveCategory[]>) {
+            state.activeCategories = action.payload;
+        },
+        addActiveCategory(state, action: PayloadAction<ActiveCategory>) {
+            state.activeCategories.push(action.payload);
+        },
+        removeActiveCategory(state, action: PayloadAction<string>) {
+            state.activeCategories = state.activeCategories.filter(
+                category => category.name !== action.payload
+            );
+        },
+        setCachedCategories(state, action: PayloadAction<string[]>) {
+            state.cachedCategories = action.payload;
+        },
+        addCachedCategory(state, action: PayloadAction<string>) {
+            state.cachedCategories.push(action.payload);
+        },
+        removeCachedCategory(state, action: PayloadAction<string>) {
+            state.cachedCategories = state.cachedCategories.filter(
+                category => category !== action.payload
+            );
         },
         setCachedCategories: (state, action: PayloadAction<Updater<string[]>>) => {
             if (typeof action.payload === 'function') {
@@ -70,7 +76,12 @@ export const {
     setPlaceType,
     setActiveCategories,
     setAvailableCategories,
+    setActiveCategories,
+    addActiveCategory,
+    removeActiveCategory,
     setCachedCategories,
+    addCachedCategory,
+    removeCachedCategory
 } = appStateSlice.actions;
 
 export default appStateSlice;

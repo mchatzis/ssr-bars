@@ -2,7 +2,7 @@
 
 import { getOperationFromButton } from '@/lib/map/helpers';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
-import { selectAppActiveCategories, selectAppAvailableCategories, selectCachedCategories, setActiveCategories, setCachedCategories } from '@/redux/slices/appStateSlice';
+import { addActiveCategory, addCachedCategory, removeActiveCategory, selectAppActiveCategories, selectAppAvailableCategories, selectCachedCategories, selectCategoryGroups } from '@/redux/slices/appStateSlice';
 import { FilterOperation } from '@/redux/types';
 import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from 'react-dom';
@@ -16,6 +16,7 @@ export default function FilterCategoryDropdown({ className = '' }) {
     const availableCategories = useAppSelector(selectAppAvailableCategories);
     const activeCategories = useAppSelector(selectAppActiveCategories);
     const cachedCategories = useAppSelector(selectCachedCategories);
+    const categoryGroups = useAppSelector(selectCategoryGroups);
 
     const [isCategoriesCardOpen, setIsCategoriesCardOpen] = useState(false);
     const [categoriesButtonPosition, setCategoriesButtonPosition] = useState<{ top: number, right: number } | null>(null);
@@ -38,18 +39,17 @@ export default function FilterCategoryDropdown({ className = '' }) {
             if (activeCategories.length === 0) {
                 operation = 'or'; // First activated category is always 'or'-ed
             }
-
-            dispatch(setActiveCategories(prev => [...prev, { name: clickedCategory, operation }]))
+            dispatch(addActiveCategory({ name: clickedCategory, operation }));
 
             if (!cachedCategories.includes(clickedCategory)) {
-                dispatch(setCachedCategories(prev => [...prev, clickedCategory]));
+                dispatch(addCachedCategory(clickedCategory));
             }
         },
         [activeCategories, cachedCategories]
     );
 
     const handleDeactivateCategory = (_e: React.MouseEvent<HTMLButtonElement>, clickedCategory: string) =>
-        dispatch(setActiveCategories(prev => prev.filter((category) => category.name !== clickedCategory)));
+        dispatch(removeActiveCategory(clickedCategory));
 
     const recentCategories = useMemo(() => cachedCategories.filter((cachedCategory) =>
         !activeCategories.some((activeCategory) => activeCategory.name === cachedCategory)
@@ -114,13 +114,13 @@ export default function FilterCategoryDropdown({ className = '' }) {
             </button>
             <div className="max-h-[55vh] overflow-y-auto">
                 {categoriesByOperation['or']?.map((category, index) =>
-                    <>
+                    <div key={category}>
                         {categoryButton(category, handleDeactivateCategory)}
                         {(categoriesByOperation['or']?.length > 1 && index === 0) ?
                             <p className='text-primary'>OR</p>
                             : null
                         }
-                    </>
+                    </div>
                 )}
                 {categoriesByOperation['and']?.length > 0 &&
                     <p className='text-primary'>AND</p>

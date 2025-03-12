@@ -4,7 +4,7 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 
 import { organizePlacesIntoCategories } from '@/lib/map/helpers';
 import { useAppDispatch } from '@/redux/hooks';
-import { setActiveCategories, setAvailableCategories, setCachedCategories } from '@/redux/slices/appStateSlice';
+import { setActiveCategories, setAvailableCategories, setCachedCategories, setCategoryGroups } from '@/redux/slices/appStateSlice';
 import { setActivePlaces, setMapData } from '@/redux/slices/mapStateSlice';
 import { Area, PlaceType } from '@/redux/types';
 import { useEffect } from 'react';
@@ -36,8 +36,6 @@ export default function useMapData({ area, placeType }: useMapDataProps) {
         fetch(`/api/data/category/groups?area=${area.name}&placeType=${placeType.name}`, { cache: 'no-store' })
             .then(res => res.json())
             .then(data => dispatch(setCategoryGroups(data)))
-            .catch((error) => {
-                console.log(error);
-            })
+            .catch((error) => console.log(error))
     }, [area, placeType])
 }

@@ -4,7 +4,7 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 
 import { addImagesToPlaces, getCommonValues } from '@/lib/map/helpers';
 import { useAppDispatch } from '@/redux/hooks';
-import { setActivePlaces, setMapData, setSelectedPlace } from '@/redux/slices/mapStateSlice';
+import { setActivePlaces, setSelectedPlace, updateMapData } from '@/redux/slices/mapStateSlice';
 import { ActiveCategory, Place, PlacesApiData, } from '@/redux/types';
 import { useEffect } from 'react';
 
@@ -79,10 +79,7 @@ export default function useMapCategories({ activeCategories, cachedCategories, s
                 updatedPlacesMedium.forEach((place) => {
                     updatedRecords[place.properties.uuid] = place
                 })
-                dispatch(setMapData((prevData) => ({
-                    ...prevData,
-                    [lastAddedCategory]: updatedRecords
-                })))
+                dispatch(updateMapData({ category: lastAddedCategory, records: updatedRecords }))
 
                 return updatedPlacesMedium
             })
@@ -93,10 +90,7 @@ export default function useMapCategories({ activeCategories, cachedCategories, s
                         updatedPlacesLarge.forEach((place) => {
                             updatedRecords[place.properties.uuid] = place
                         })
-                        dispatch(setMapData((prevData) => ({
-                            ...prevData,
-                            [lastAddedCategory]: updatedRecords
-                        })))
+                        dispatch(updateMapData({ category: lastAddedCategory, records: updatedRecords }))
                     })
             })
     }, [cachedCategories])
